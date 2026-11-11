@@ -1087,6 +1087,17 @@
         <p>This calendar shows public and company-facing dates only. Client appointments and personal appointments are never posted here.</p>
         <p><em>Current as of November 10, 2026.</em></p>
       </div>
+
+      <div class="cal-box" style="border:1px solid #ddd;border-radius:12px;padding:16px;margin:0 0 20px;background:#fff">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px">
+          <button type="button" id="calPrev" style="padding:8px 14px;border-radius:8px;border:1px solid #c9a227;background:#fff;cursor:pointer;font-weight:600">&larr; Previous month</button>
+          <h3 id="calTitle" style="margin:0;text-align:center"></h3>
+          <button type="button" id="calNext" style="padding:8px 14px;border-radius:8px;border:1px solid #c9a227;background:#fff;cursor:pointer;font-weight:600">Next month &rarr;</button>
+        </div>
+        <div id="calGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px"></div>
+        <div id="calDetail" style="margin-top:14px"></div>
+        <p style="margin:12px 0 0;font-size:.9em;color:#555">Use the buttons to move month to month &mdash; go back to see past schedules, or forward for what is coming. Days marked in gold have something on the calendar; select a marked day to see what is on it.</p>
+      </div>
       <!-- WORK-CALENDAR-ENTRIES-BEGIN -->
       <div style="display:grid;gap:12px">
         <article class="card">
@@ -1130,6 +1141,60 @@
       <!-- WORK-CALENDAR-ENTRIES-END -->
     </div>
   </section>
+
+
+  <script>
+  // WORK-CALENDAR-DATA-BEGIN
+  var CENTIPEDE_CALENDAR = {
+    "2026-10-01": ["Board of Directors — Written Consent in Lieu of Meeting"],
+    "2026-10-16": ["Emergency Board Meeting — Justice Support Program and Substance Abuse Recovery Support adopted"],
+    "2026-10-22": ["Regular Board Meeting — superseded by the October 16 session (not held)"],
+    "2026-10-24": ["Emergency meeting called — Veterans Program packet and draft resolution prepared (program pending board approval)"],
+    "2026-11-10": ["Program work day — nonprofit outreach (12 organizations), Probation introduction sent, Veterans Program inquiry sent to DLA Distribution Public Affairs, Company Proof published, Member Spotlights and Member Voices launched"],
+    "2026-11-11": ["Officer of the Day: Jarvis — Levi unavailable all day"],
+    "2026-11-14": ["Fair Housing Open House — Stribley Community Center, 10:00 AM to 1:00 PM (Centipede attending)"],
+    "2026-11-20": ["HHAP Round 6 applications close at 2:00 PM — shelter project funding deadline"],
+    "2026-11-27": ["Centipede Board Meeting"],
+    "2026-12-01": ["Officer of the Day: Jarvis — Levi unavailable all day", "CASH SJC working deadline"],
+    "2026-12-02": ["CASH SJC applications close (AidKit online only)"],
+    "2026-12-09": ["CASH SJC selection notifications"],
+    "2026-12-10": ["Centipede Outreach Day — starts 12:00 PM"]
+  };
+  // WORK-CALENDAR-DATA-END
+  (function(){
+    var MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+    var DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    var view={y:2026,m:10}; // November 2026 (m is 0-based)
+    var grid=document.getElementById("calGrid"), title=document.getElementById("calTitle"), detail=document.getElementById("calDetail");
+    function key(y,m,d){return y+"-"+String(m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");}
+    function showDay(y,m,d){
+      var items=CENTIPEDE_CALENDAR[key(y,m,d)];
+      if(!items){detail.innerHTML="";return;}
+      var html="<div class=\"card\"><h3>"+MONTHS[m]+" "+d+", "+y+"</h3>";
+      for(var i=0;i<items.length;i++){html+="<p>"+items[i]+"</p>";}
+      detail.innerHTML=html+"</div>";
+    }
+    function render(){
+      title.textContent=MONTHS[view.m]+" "+view.y;
+      var first=new Date(view.y,view.m,1), startDay=first.getDay(), days=new Date(view.y,view.m+1,0).getDate();
+      var html="";
+      for(var i=0;i<7;i++){html+="<div style=\"font-weight:700;text-align:center;padding:4px 0\">"+DOW[i]+"</div>";}
+      for(var b=0;b<startDay;b++){html+="<div></div>";}
+      for(var d=1;d<=days;d++){
+        var has=CENTIPEDE_CALENDAR[key(view.y,view.m,d)];
+        var style="text-align:center;padding:9px 0;border-radius:8px;border:1px solid "+(has?"#c9a227":"#eee")+(has?";background:#fdf6dd;font-weight:700;cursor:pointer":"");
+        html+="<div data-day=\""+d+"\" style=\""+style+"\">"+d+"</div>";
+      }
+      grid.innerHTML=html;
+      var cells=grid.querySelectorAll("[data-day]");
+      for(var c=0;c<cells.length;c++){cells[c].addEventListener("click",function(){showDay(view.y,view.m,parseInt(this.getAttribute("data-day"),10));});}
+      detail.innerHTML="";
+    }
+    document.getElementById("calPrev").addEventListener("click",function(){view.m--;if(view.m<0){view.m=11;view.y--;}render();});
+    document.getElementById("calNext").addEventListener("click",function(){view.m++;if(view.m>11){view.m=0;view.y++;}render();});
+    render();
+  })();
+  </script>
 
   <!-- HOW -->
   <section id="how">
