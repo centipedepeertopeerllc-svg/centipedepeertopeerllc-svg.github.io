@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAP Noting Dashboard — Centipede Peer to Peer, LLC</title>
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<!-- ============ LOGIN GATE (no client data exists in the page before login) ============ -->
+<section id="login-screen">
+  <div class="login-card">
+    <img src="assets/centipede-logo.png" alt="Centipede Peer to Peer, LLC logo" class="login-logo">
+    <h1>DAP Noting Dashboard</h1>
+    <p class="org">Centipede Peer to Peer, LLC<br>LIC: 0714781 · Stockton, California</p>
+    <p class="gate-note">Staff only. Client information is confidential and is not shown until you sign in with your name and access code.</p>
+    <form id="login-form">
+      <label for="login-user">Your name</label>
+      <select id="login-user" required></select>
+      <label for="login-pin">Access code</label>
+      <input type="password" id="login-pin" inputmode="numeric" autocomplete="current-password" required>
+      <button type="submit" class="btn-primary">Sign in</button>
+      <p id="login-error" class="error" role="alert"></p>
+    </form>
+    <p class="fineprint">Centipede provides non-clinical peer support. In an emergency, call 911.</p>
+  </div>
+</section>
+
+<!-- ============ APP (built by app.js after login) ============ -->
+<div id="app" hidden>
+  <header class="app-header">
+    <img src="assets/centipede-logo.png" alt="Centipede Peer to Peer, LLC logo" class="header-logo">
+    <div class="header-titles">
+      <strong>Centipede Peer to Peer, LLC</strong>
+      <span>DAP Noting Dashboard · LIC: 0714781 · 717 E. Longview Ave., Stockton, CA 95207</span>
+    </div>
+    <div class="header-user">
+      <span id="who"></span>
+      <button id="logout-btn" class="btn-small" type="button">Sign out</button>
+    </div>
+  </header>
+
+  <div id="mode-banner" class="banner" role="status"></div>
+
+  <main class="layout">
+    <aside class="panel">
+      <label for="client-select"><strong>Client</strong></label>
+      <select id="client-select"></select>
+
+      <div class="row-between">
+        <h2>Notes for this client</h2>
+        <button id="refresh-btn" class="btn-small" type="button">Refresh</button>
+      </div>
+      <p id="save-status" class="save-status" role="status"></p>
+      <ul id="note-list" class="note-list"></ul>
+      <button id="new-note-btn" class="btn-primary" type="button">Start a new DAP note</button>
+    </aside>
+
+    <section class="panel" id="main-panel">
+      <div id="note-view"></div>
+
+      <form id="note-form" hidden>
+        <h2>New DAP note — Form DAP-SKEL-01 structure</h2>
+        <p class="hint">Approved skeleton (Nov 9, 2026). Complete every section, in order. <strong>Do not infer absent facts</strong> — mark gaps plainly as “Not observed” or “Not stated.”</p>
+
+        <div class="grid2">
+          <div>
+            <label for="f-contact-at">Date &amp; time of contact</label>
+            <input type="datetime-local" id="f-contact-at" required>
+          </div>
+          <div>
+            <label for="f-author">Peer supporter (author)</label>
+            <select id="f-author"></select>
+          </div>
+          <div>
+            <label for="f-location">Location</label>
+            <input type="text" id="f-location" placeholder="Where the contact happened">
+          </div>
+          <div>
+            <label for="f-contact-type">Contact type</label>
+            <select id="f-contact-type">
+              <option>In person</option><option>Phone</option><option>Field</option>
+            </select>
+          </div>
+          <div>
+            <label for="f-persons">Persons present</label>
+            <input type="text" id="f-persons" placeholder="Who was there">
+          </div>
+          <div>
+            <label for="f-transcript">Transcript on file — file name</label>
+            <input type="text" id="f-transcript" placeholder="File name, or “None — notes only”">
+          </div>
+        </div>
+
+        <fieldset id="carried-box">
+          <legend>Prior plan — carried forward</legend>
+          <p class="hint">Open plan items from the most recent note for this client. Each one must be closed here or carried forward again — never silently dropped.</p>
+          <div id="carried-list"></div>
+          <label class="check"><input type="checkbox" id="f-carried-reviewed"> Prior plan carried forward — reviewed</label>
+        </fieldset>
+
+        <label for="f-data">D — Data (what happened)</label>
+        <p class="hint">Only what was directly observed and what the client said. Quote the client’s own words exactly, in quotation marks. No opinions, no conclusions.</p>
+        <textarea id="f-data" rows="6" required></textarea>
+
+        <label for="f-assessment-observed">A — Assessment: what I observed (peer observation)</label>
+        <p class="hint">Peer observation only. This is not a clinical assessment. Never state or imply a diagnosis.</p>
+        <textarea id="f-assessment-observed" rows="4" required></textarea>
+
+        <label for="f-assessment-actions">A — Assessment: actions I took</label>
+        <p class="hint">Support offered, resources provided, referrals made, advocacy performed, strengths observed.</p>
+        <textarea id="f-assessment-actions" rows="3"></textarea>
+
+        <label for="f-assessment-gaps">A — Assessment: inferred / not known (gaps)</label>
+        <p class="hint">Keep what was inferred separate from what was observed. Mark every gap as a gap.</p>
+        <textarea id="f-assessment-gaps" rows="3" placeholder="Not observed: … / Not stated: …"></textarea>
+
+        <fieldset>
+          <legend>P — Plan (next steps, follow-up)</legend>
+          <p class="hint">Every item carries an owner and a due date.</p>
+          <div id="plan-rows"></div>
+          <button type="button" id="add-plan-btn" class="btn-small">+ Add a plan step</button>
+        </fieldset>
+
+        <label for="f-restricted">Provider-documented diagnoses — restricted block</label>
+        <p class="hint">Enter a code here ONLY where a licensed provider has already documented it, with the provider’s name and source document. Centipede does not diagnose. If none is on file, leave “None recorded.”</p>
+        <input type="text" id="f-restricted" value="None recorded.">
+
+        <fieldset>
+          <legend>Completeness checklist — every box must pass before saving</legend>
+          <div id="checklist"></div>
+          <label class="check"><input type="checkbox" id="f-quote-override"> Any flagged word below appears only inside a client’s quoted words in Data</label>
+          <p id="scan-result" class="scan" role="alert"></p>
+        </fieldset>
+
+        <button type="submit" class="btn-primary">Save this note</button>
+        <p class="hint">Saved notes cannot be edited or deleted. A correction is added later as a dated addendum, so the original always stands as written.</p>
+      </form>
+
+      <form id="addendum-form" hidden>
+        <h2>Add a dated correction / addendum</h2>
+        <p class="hint" id="addendum-target"></p>
+        <label for="a-text">Correction or added information</label>
+        <textarea id="a-text" rows="4" required></textarea>
+        <button type="submit" class="btn-primary">Save addendum</button>
+        <button type="button" id="addendum-cancel" class="btn-small">Cancel</button>
+      </form>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span>Centipede Peer to Peer, LLC — a California for-profit limited liability company. Peer support is non-clinical and is not medical, psychiatric, or legal advice. In an emergency, call 911.</span>
+    <span>Locked client binders remain the official record; Jarvis carries dashboard entries into them.</span>
+  </footer>
+</div>
+
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
