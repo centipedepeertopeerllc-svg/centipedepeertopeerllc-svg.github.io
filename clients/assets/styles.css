@@ -15,6 +15,7 @@ h1, h2, legend, button, select, input, textarea { font-family: inherit; }
 h2 { font-size: 1.05rem; color: var(--navy); margin: 0.6rem 0; }
 label { display: block; margin: 0.7rem 0 0.25rem; font-weight: bold; font-size: 0.92rem; }
 input[type="text"], input[type="password"], input[type="datetime-local"], input[type="date"],
+input[type="time"], input[type="tel"], input[type="email"], input[type="file"],
 select, textarea { width: 100%; padding: 0.5rem; border: 1px solid var(--line); border-radius: 6px; background: #fff; font-size: 0.98rem; }
 textarea { line-height: 1.45; }
 fieldset { border: 1px solid var(--line); border-radius: 8px; margin: 1rem 0; background: #fffdf7; }
@@ -67,7 +68,12 @@ legend { font-weight: bold; color: var(--navy); padding: 0 0.4rem; }
 .note-full table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
 .note-full th, .note-full td { border: 1px solid var(--line); padding: 0.35rem 0.5rem; text-align: left; }
 .app-footer { max-width: 1280px; margin: 0 auto; padding: 0 1rem 1.4rem; font-size: 0.82rem; color: #55503f; display: flex; flex-direction: column; gap: 0.25rem; }
+/* Document viewer */
+#doc-viewer { margin-top: 1rem; border: 1px solid var(--gold-dark); border-radius: 10px; padding: 1rem; background: #fffdf7; }
+#doc-viewer .meta { font-size: 0.88rem; color: #55503f; }
+#doc-frame { width: 100%; height: 75vh; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+#doc-img { max-width: 100%; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
 @media print {
-  .app-header, aside.panel, .banner, #addendum-form, .no-print { display: none !important; }
+  .app-header, aside.panel, .banner, #addendum-form, .no-print, #doc-viewer, #paperwork-form, #document-form, #queue-view { display: none !important; }
   .layout { grid-template-columns: 1fr; }
 }

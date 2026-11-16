@@ -51,7 +51,9 @@
       </div>
       <p id="save-status" class="save-status" role="status"></p>
       <ul id="client-list" class="note-list"></ul>
-      <p class="hint">Select a client to view Enrollments, Encounters, and Referrals, or to export a Referral Packet.</p>
+      <p class="hint">Select a client to view Enrollments, Encounters, Referrals, and Documents, to fill in client paperwork, or to export a Referral Packet.</p>
+      <p><button id="queue-btn" class="btn-small" type="button">Binder filing queue</button></p>
+      <p class="hint">Completed paperwork waits in the binder filing queue until it has been carried into the client's locked binder and marked filed. Binders are the official record.</p>
     </aside>
 
     <section class="panel" id="main-panel">
@@ -160,6 +162,56 @@
       </form>
 
       <div id="packet-view" class="note-full" hidden></div>
+
+      <!-- Paperwork form (fields are built by app.js from assets/forms.js,
+           which is loaded only after sign-in — no form content here) -->
+      <form id="paperwork-form" hidden></form>
+
+      <form id="document-form" hidden>
+        <h2>Add a document to this client's record</h2>
+        <p class="hint">Record a document that belongs to the selected client. The locked client binder remains the official record — name where the original is filed. You may attach a small file (PDF or photo, about 1.2 MB at most) so it can be viewed here; larger originals stay in the binder and are recorded by name and location.</p>
+        <div class="grid2">
+          <div>
+            <label for="d-title">Document title</label>
+            <input type="text" id="d-title" required placeholder="e.g. Signed Release of Information — County HSA">
+          </div>
+          <div>
+            <label for="d-type">Document type</label>
+            <select id="d-type"></select>
+          </div>
+          <div>
+            <label for="d-date">Document date</label>
+            <input type="date" id="d-date">
+          </div>
+          <div>
+            <label for="d-source">Where the original is filed</label>
+            <input type="text" id="d-source" placeholder="e.g. Client binder, document 042">
+          </div>
+        </div>
+        <label for="d-desc">Description / notes</label>
+        <textarea id="d-desc" rows="3"></textarea>
+        <label for="d-file">Attach a file (optional — PDF or image, max ~1.2 MB)</label>
+        <input type="file" id="d-file" accept="application/pdf,image/*">
+        <button type="submit" class="btn-primary">Save document entry</button>
+        <button type="button" id="document-cancel" class="btn-small">Cancel</button>
+      </form>
+
+      <!-- Binder filing queue (populated by app.js) -->
+      <section id="queue-view" class="note-full" hidden></section>
+
+      <!-- In-dashboard document viewer (populated by app.js) -->
+      <section id="doc-viewer" hidden>
+        <div class="row-between">
+          <h2 id="viewer-title">Document</h2>
+          <span>
+            <button id="viewer-download" class="btn-small" type="button">Download</button>
+            <button id="viewer-close" class="btn-small" type="button">Close viewer</button>
+          </span>
+        </div>
+        <p class="meta" id="viewer-meta"></p>
+        <iframe id="doc-frame" title="Document viewer" hidden></iframe>
+        <img id="doc-img" alt="Document image" hidden>
+      </section>
     </section>
   </main>
 
