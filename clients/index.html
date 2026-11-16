@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Dashboard — Centipede Peer to Peer, LLC</title>
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<!-- ============ LOGIN GATE (no client data exists in the page before login) ============ -->
+<section id="login-screen">
+  <div class="login-card">
+    <img src="../dap/assets/centipede-logo.png" onerror="this.onerror=null;this.src='assets/centipede-logo.png';" alt="Centipede Peer to Peer, LLC logo" class="login-logo">
+    <h1>Client Dashboard</h1>
+    <p class="org">Centipede Peer to Peer, LLC<br>LIC: 0714781 · Stockton, California</p>
+    <p class="gate-note">Staff only. Client information is confidential and is not shown until you sign in with your name and access code.</p>
+    <form id="login-form">
+      <label for="login-user">Your name</label>
+      <select id="login-user" required></select>
+      <label for="login-pin">Access code</label>
+      <input type="password" id="login-pin" inputmode="numeric" autocomplete="current-password" required>
+      <button type="submit" class="btn-primary">Sign in</button>
+      <p id="login-error" class="error" role="alert"></p>
+    </form>
+    <p class="fineprint">Centipede provides non-clinical peer support. In an emergency, call 911.</p>
+  </div>
+</section>
+
+<!-- ============ APP (populated by app.js only after login) ============ -->
+<div id="app" hidden>
+  <header class="app-header">
+    <img src="../dap/assets/centipede-logo.png" onerror="this.onerror=null;this.src='assets/centipede-logo.png';" alt="Centipede Peer to Peer, LLC logo" class="header-logo">
+    <div class="header-titles">
+      <strong>Centipede Peer to Peer, LLC</strong>
+      <span>Client Dashboard · LIC: 0714781 · 717 E. Longview Ave., Stockton, CA 95207</span>
+    </div>
+    <div class="header-user">
+      <span id="who"></span>
+      <button id="logout-btn" class="btn-small" type="button">Sign out</button>
+    </div>
+  </header>
+
+  <div id="mode-banner" class="banner" role="status"></div>
+
+  <main class="layout">
+    <aside class="panel">
+      <div class="row-between">
+        <h2>Clients</h2>
+        <button id="refresh-btn" class="btn-small" type="button">Refresh</button>
+      </div>
+      <p id="save-status" class="save-status" role="status"></p>
+      <ul id="client-list" class="note-list"></ul>
+      <p class="hint">Select a client to view Enrollments, Encounters, and Referrals, or to export a Referral Packet.</p>
+    </aside>
+
+    <section class="panel" id="main-panel">
+      <div id="client-view"></div>
+
+      <form id="encounter-form" hidden>
+        <h2>New encounter</h2>
+        <p class="hint">Non-clinical peer support only. Mark gaps plainly as “Not observed” or “Not stated.” Do not infer absent facts.</p>
+        <div class="grid2">
+          <div>
+            <label for="e-occurred-at">Date &amp; time</label>
+            <input type="datetime-local" id="e-occurred-at" required>
+          </div>
+          <div>
+            <label for="e-author">Author</label>
+            <select id="e-author"></select>
+          </div>
+          <div>
+            <label for="e-location">Location type</label>
+            <select id="e-location"></select>
+          </div>
+          <div>
+            <label for="e-service">Service provided</label>
+            <select id="e-service"></select>
+          </div>
+          <div>
+            <label for="e-followup">Follow-up date (optional)</label>
+            <input type="date" id="e-followup">
+          </div>
+        </div>
+        <label for="e-needs">Needs identified (comma-separated)</label>
+        <input type="text" id="e-needs" placeholder="e.g. Shelter, Food, ID / documents">
+        <label for="e-data">Data — what happened (client’s own words in quotes)</label>
+        <textarea id="e-data" rows="5" required></textarea>
+        <label for="e-assessment">Assessment — peer observation</label>
+        <textarea id="e-assessment" rows="3"></textarea>
+        <label for="e-plan">Plan — next steps</label>
+        <textarea id="e-plan" rows="3"></textarea>
+        <button type="submit" class="btn-primary">Save encounter</button>
+        <p class="hint">Saved entries cannot be edited or deleted. A correction is added later as a dated addendum, so the original always stands as written.</p>
+      </form>
+
+      <form id="referral-form" hidden>
+        <h2>New referral</h2>
+        <div class="grid2">
+          <div>
+            <label for="r-type">Referral type</label>
+            <select id="r-type"></select>
+          </div>
+          <div>
+            <label for="r-status">Status</label>
+            <select id="r-status"></select>
+          </div>
+          <div>
+            <label for="r-provider">Provider / destination</label>
+            <input type="text" id="r-provider" placeholder="Organization or person referred to">
+          </div>
+          <div>
+            <label for="r-date">Referred date</label>
+            <input type="date" id="r-date">
+          </div>
+          <div>
+            <label for="r-author">Author</label>
+            <select id="r-author"></select>
+          </div>
+        </div>
+        <label for="r-notes">Notes</label>
+        <textarea id="r-notes" rows="3"></textarea>
+        <button type="submit" class="btn-primary">Save referral</button>
+        <p class="hint">Saved entries cannot be edited or deleted. A correction is added later as a dated addendum.</p>
+      </form>
+
+      <form id="enrollment-form" hidden>
+        <h2>New enrollment</h2>
+        <div class="grid2">
+          <div>
+            <label for="en-program">Program</label>
+            <select id="en-program"></select>
+          </div>
+          <div>
+            <label for="en-status">Status</label>
+            <select id="en-status"></select>
+          </div>
+          <div>
+            <label for="en-date">Enrolled date</label>
+            <input type="date" id="en-date">
+          </div>
+          <div>
+            <label for="en-author">Author</label>
+            <select id="en-author"></select>
+          </div>
+        </div>
+        <label for="en-notes">Notes</label>
+        <textarea id="en-notes" rows="3"></textarea>
+        <button type="submit" class="btn-primary">Save enrollment</button>
+        <p class="hint">Status labels are mandatory and must be honest: Active / In Development / Pending Board Approval / Draft.</p>
+      </form>
+
+      <form id="addendum-form" hidden>
+        <h2>Add a dated correction / addendum</h2>
+        <p class="hint" id="addendum-target"></p>
+        <label for="a-text">Correction or added information</label>
+        <textarea id="a-text" rows="4" required></textarea>
+        <button type="submit" class="btn-primary">Save addendum</button>
+        <button type="button" id="addendum-cancel" class="btn-small">Cancel</button>
+      </form>
+
+      <div id="packet-view" class="note-full" hidden></div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span>Centipede Peer to Peer, LLC — a California for-profit limited liability company. Peer support is non-clinical and is not medical, psychiatric, or legal advice. In an emergency, call 911.</span>
+    <span>Locked client binders remain the official record; Jarvis carries dashboard entries into them.</span>
+  </footer>
+</div>
+
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
