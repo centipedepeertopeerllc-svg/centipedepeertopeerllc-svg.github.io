@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banking Dashboard — Centipede Peer to Peer, LLC</title>
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<!-- ============ LOGIN GATE (no financial data exists in the page before login) ============ -->
+<section id="login-screen">
+  <div class="login-card">
+    <img src="../dap/assets/centipede-logo.png" onerror="this.onerror=null;this.src='assets/centipede-logo.png';" alt="Centipede Peer to Peer, LLC logo" class="login-logo">
+    <h1>Banking Dashboard</h1>
+    <p class="org">Centipede Peer to Peer, LLC<br>LIC: 0714781 · Stockton, California</p>
+    <p class="gate-note">Staff only. Financial records are confidential and are not shown until you sign in with your name and access code.</p>
+    <form id="login-form">
+      <label for="login-user">Your name</label>
+      <select id="login-user" required></select>
+      <label for="login-pin">Access code</label>
+      <input type="password" id="login-pin" inputmode="numeric" autocomplete="current-password" required>
+      <button type="submit" class="btn-primary">Sign in</button>
+      <p id="login-error" class="error" role="alert"></p>
+    </form>
+    <p class="fineprint">Centipede provides non-clinical peer support. In an emergency, call 911.</p>
+  </div>
+</section>
+
+<!-- ============ APP (built by app.js after login) ============ -->
+<div id="app" hidden>
+  <header class="app-header">
+    <img src="../dap/assets/centipede-logo.png" onerror="this.onerror=null;this.src='assets/centipede-logo.png';" alt="Centipede Peer to Peer, LLC logo" class="header-logo">
+    <div class="header-titles">
+      <strong>Centipede Peer to Peer, LLC</strong>
+      <span>Banking Dashboard · LIC: 0714781 · 717 E. Longview Ave., Stockton, CA 95207</span>
+    </div>
+    <div class="header-user">
+      <span id="who"></span>
+      <button id="logout-btn" class="btn-small" type="button">Sign out</button>
+    </div>
+  </header>
+
+  <div id="mode-banner" class="banner" role="status"></div>
+
+  <main class="layout banking-layout">
+    <section class="panel banking-main">
+      <div id="accounts-strip"></div>
+      <div id="cards-section"></div>
+      <div id="pending-section"></div>
+      <div id="tax-section"></div>
+      <div id="entries-section"></div>
+    </section>
+
+    <aside class="panel">
+      <div class="row-between">
+        <h2>Recorded entries</h2>
+        <button id="refresh-btn" class="btn-small" type="button">Refresh</button>
+      </div>
+      <p id="save-status" class="save-status" role="status"></p>
+      <ul id="entry-list" class="note-list"></ul>
+
+      <form id="assign-form" hidden>
+        <h2>Assign a transaction — manual only</h2>
+        <p class="hint" id="assign-target"></p>
+        <label for="assign-card">Program card</label>
+        <select id="assign-card"></select>
+        <label for="assign-note">Note (optional)</label>
+        <input type="text" id="assign-note" placeholder="Why this card — in the CEO's words">
+        <button type="submit" class="btn-primary">Record this manual assignment</button>
+        <button type="button" id="assign-cancel" class="btn-small">Cancel</button>
+      </form>
+
+      <form id="tax-form" hidden>
+        <h2>Mark a tax category — manual only</h2>
+        <p class="hint" id="tax-target"></p>
+        <label for="tax-category">Tax category</label>
+        <input type="text" id="tax-category" placeholder="Category name, as directed">
+        <label for="tax-note">Note (optional)</label>
+        <input type="text" id="tax-note" placeholder="Note for the record">
+        <button type="submit" class="btn-primary">Record this tax-category mark</button>
+        <button type="button" id="tax-cancel" class="btn-small">Cancel</button>
+      </form>
+
+      <form id="addendum-form" hidden>
+        <h2>Add a dated correction / addendum</h2>
+        <p class="hint" id="addendum-target"></p>
+        <label for="a-text">Correction or added information</label>
+        <textarea id="a-text" rows="4" required></textarea>
+        <button type="submit" class="btn-primary">Save addendum</button>
+        <button type="button" id="addendum-cancel" class="btn-small">Cancel</button>
+      </form>
+    </aside>
+  </main>
+
+  <footer class="app-footer">
+    <span>Centipede Peer to Peer, LLC — a California for-profit limited liability company. Peer support is non-clinical and is not medical, psychiatric, or legal advice. In an emergency, call 911.</span>
+    <span id="footer-disclosure"></span>
+  </footer>
+</div>
+
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
