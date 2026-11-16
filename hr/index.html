@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HR Dashboard — Centipede Peer to Peer, LLC</title>
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<!-- ============ LOGIN GATE (no HR data exists in the page before login) ============ -->
+<section id="login-screen">
+  <div class="login-card">
+    <img src="../dap/assets/centipede-logo.png" onerror="this.onerror=null;this.src='assets/centipede-logo.png';" alt="Centipede Peer to Peer, LLC logo" class="login-logo">
+    <h1>HR Dashboard</h1>
+    <p class="org">Centipede Peer to Peer, LLC<br>LIC: 0714781 · Stockton, California</p>
+    <p class="gate-note">Staff only. Human-resources records are confidential and are not shown until you sign in with your name and access code. Each member sees only their own record.</p>
+    <form id="login-form">
+      <label for="login-user">Your name</label>
+      <select id="login-user" required></select>
+      <label for="login-pin">Access code</label>
+      <input type="password" id="login-pin" inputmode="numeric" autocomplete="current-password" required>
+      <button type="submit" class="btn-primary">Sign in</button>
+      <p id="login-error" class="error" role="alert"></p>
+    </form>
+    <p class="fineprint">Centipede provides non-clinical peer support. In an emergency, call 911.</p>
+  </div>
+</section>
+
+<!-- ============ APP (built by app.js after login) ============ -->
+<div id="app" hidden>
+  <header class="app-header">
+    <img src="../dap/assets/centipede-logo.png" onerror="this.onerror=null;this.src='assets/centipede-logo.png';" alt="Centipede Peer to Peer, LLC logo" class="header-logo">
+    <div class="header-titles">
+      <strong>Centipede Peer to Peer, LLC</strong>
+      <span>HR Dashboard · LIC: 0714781 · 717 E. Longview Ave., Stockton, CA 95207</span>
+    </div>
+    <div class="header-user">
+      <span id="who"></span>
+      <button id="logout-btn" class="btn-small" type="button">Sign out</button>
+    </div>
+  </header>
+
+  <div id="mode-banner" class="banner" role="status"></div>
+
+  <main class="layout">
+    <aside class="panel">
+      <h2>People</h2>
+      <p id="people-scope" class="hint"></p>
+      <div id="people-list"></div>
+      <div class="row-between">
+        <h2>Records</h2>
+        <button id="refresh-btn" class="btn-small" type="button">Refresh</button>
+      </div>
+      <p id="save-status" class="save-status" role="status"></p>
+    </aside>
+
+    <section class="panel" id="main-panel">
+      <div id="person-view" class="record-full"></div>
+
+      <form id="time-form" hidden>
+        <h2>Add a time entry</h2>
+        <div class="grid2">
+          <div>
+            <label for="t-date">Date worked</label>
+            <input type="date" id="t-date" required>
+          </div>
+          <div>
+            <label for="t-hours">Hours</label>
+            <input type="text" id="t-hours" inputmode="decimal" placeholder="e.g. 4.5" required>
+          </div>
+        </div>
+        <label for="t-desc">What was done</label>
+        <textarea id="t-desc" rows="3" required></textarea>
+        <button type="submit" class="btn-primary">Save time entry</button>
+        <p class="hint">Saved entries cannot be edited or deleted. A correction is added later as a dated addendum, so the original always stands as written.</p>
+      </form>
+
+      <form id="doc-form" hidden>
+        <h2>Add a documents-register entry</h2>
+        <label for="d-title">Document title</label>
+        <input type="text" id="d-title" required>
+        <label for="d-type">Document type</label>
+        <input type="text" id="d-type" placeholder="e.g. Certification, Degree, Policy form">
+        <label for="d-note">Register note</label>
+        <textarea id="d-note" rows="2" placeholder="Where the document is held, verification note, etc."></textarea>
+        <button type="submit" class="btn-primary">Save register entry</button>
+        <p class="hint">This register records that a document exists and where it is held. The locked HR binder remains the official record.</p>
+      </form>
+
+      <form id="policy-form" hidden>
+        <h2>Acknowledge a policy</h2>
+        <label for="p-policy">Policy</label>
+        <select id="p-policy"></select>
+        <label class="check"><input type="checkbox" id="p-read"> I have read and understand this policy.</label>
+        <button type="submit" class="btn-primary">Save acknowledgment</button>
+      </form>
+
+      <form id="addendum-form" hidden>
+        <h2>Add a dated correction / addendum</h2>
+        <p class="hint" id="addendum-target"></p>
+        <label for="a-text">Correction or added information</label>
+        <textarea id="a-text" rows="4" required></textarea>
+        <button type="submit" class="btn-primary">Save addendum</button>
+        <button type="button" id="addendum-cancel" class="btn-small">Cancel</button>
+      </form>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span>Centipede Peer to Peer, LLC — a California for-profit limited liability company. Peer support is non-clinical and is not medical, psychiatric, or legal advice. In an emergency, call 911.</span>
+    <span>Locked HR binders remain the official record; dashboard entries are carried into them by the HR administrator.</span>
+  </footer>
+</div>
+
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
