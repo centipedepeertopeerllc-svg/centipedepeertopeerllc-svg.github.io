@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Veterans Program — Centipede Peer to Peer, LLC</title>
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<!-- ============ LOGIN GATE (nothing is shown before login) ============ -->
+<section id="login-screen">
+  <div class="login-card">
+    <img src="assets/program-seal.png" alt="Veterans Program seal" class="login-logo">
+    <h1>Veterans Program</h1>
+    <p class="org">Centipede Peer to Peer, LLC<br>LIC: 0714781 · Stockton, California</p>
+    <p class="gate-note">Program team only. This is the Veterans Program dashboard — the program's records, DAP-style notes, and email, inside the Company Portal. Nothing is shown until you sign in with your username, password, and authenticator code.</p>
+    <form id="login-form">
+      <div id="auth-step-login">
+        <label for="login-username">Username</label>
+        <input type="text" id="login-username" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" autocomplete="current-password" required>
+        <button type="submit" class="btn-primary">Sign in</button>
+      </div>
+      <div id="auth-step-change" hidden>
+        <p class="auth-step-title">Set your own password</p>
+        <p class="hint">You signed in with a temporary password. Choose your own password before continuing. Password rule: at least 10 characters, must contain at least one letter, and cannot be only numbers.</p>
+        <label for="change-password">New password</label>
+        <input type="password" id="change-password" autocomplete="new-password">
+        <label for="change-password2">Type it again</label>
+        <input type="password" id="change-password2" autocomplete="new-password">
+        <button type="submit" class="btn-primary">Set password</button>
+        <p><button type="button" class="btn-small auth-restart">Start over</button></p>
+      </div>
+      <div id="auth-step-enroll" hidden>
+        <p class="auth-step-title">Set up your authenticator app</p>
+        <p class="hint">Open your authenticator app (Google Authenticator, Microsoft Authenticator, Authy, or similar), add a new account, and type in this setup key:</p>
+        <code class="auth-key" id="enroll-key"></code>
+        <p class="auth-uri" id="enroll-uri"></p>
+        <p class="hint">Then enter the 6-digit code the app shows for Centipede to confirm.</p>
+        <label for="enroll-code">6-digit code</label>
+        <input type="text" id="enroll-code" inputmode="numeric" autocomplete="one-time-code" maxlength="7">
+        <button type="submit" class="btn-primary">Confirm and continue</button>
+        <p><button type="button" class="btn-small auth-restart">Start over</button></p>
+      </div>
+      <div id="auth-step-totp" hidden>
+        <p class="auth-step-title">Authenticator code</p>
+        <p class="hint">Enter the current 6-digit code from your authenticator app.</p>
+        <label for="totp-code">6-digit code</label>
+        <input type="text" id="totp-code" inputmode="numeric" autocomplete="one-time-code" maxlength="7">
+        <button type="submit" class="btn-primary">Verify</button>
+        <p><button type="button" class="btn-small auth-restart">Start over</button></p>
+      </div>
+      <p id="login-error" class="error" role="alert"></p>
+    </form>
+    <p class="fineprint">Board records are company records. Client information follows the client-records rule at all times. In an emergency, call 911.</p>
+  </div>
+</section>
+
+<!-- ============ APP (populated by app.js only after login) ============ -->
+<div id="app" hidden>
+  <header class="app-header">
+    <img src="assets/program-seal.png" alt="Veterans Program seal" class="header-logo">
+    <div class="header-titles">
+      <strong>Centipede Peer to Peer, LLC</strong>
+      <span>Veterans Program · LIC: 0714781 · 717 E. Longview Ave., Stockton, CA 95207</span>
+    </div>
+    <div class="header-user">
+      <span id="who"></span>
+      <button id="logout-btn" class="btn-small" type="button">Sign out</button>
+    </div>
+  </header>
+
+  <div id="mode-banner" class="banner" role="status"></div>
+
+  <main class="layout">
+    <section class="panel" id="main-panel">
+      <div id="prog-head"></div>
+      <h2>Veteran register</h2>
+      <form id="record-form"></form>
+      <ul id="records-list" class="note-list"></ul>
+      <p class="meta">Program binder: <strong>Program Binders/veterans</strong> — every document this dashboard produces is filed in the program's binder under its document number; the binder is the program's official record. Policy: CPP-POL-2026-042.</p>
+      <h2>DAP-style notes</h2>
+      <p class="hint">Notes are written the DAP way: Data — the person's own words and what happened; Assessment — what we observed, in peer-support terms; Plan — the next steps, who owns them, and when.</p>
+      <form id="note-form">
+        <label>About (name or record ID) <input id="nf-about" type="text"></label>
+        <label>Data <textarea id="nf-data" rows="3"></textarea></label>
+        <label>Assessment <textarea id="nf-assessment" rows="3"></textarea></label>
+        <label>Plan <textarea id="nf-plan" rows="3"></textarea></label>
+        <button type="submit">Save DAP note</button>
+        <span id="note-msg" class="hint" role="status"></span>
+      </form>
+      <ul id="notes-list" class="note-list"></ul>
+      <h2>Email</h2>
+      <div id="email-panel"></div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span>Centipede Peer to Peer, LLC — a California for-profit limited liability company. The binders remain the official record; this dashboard is the Board's register and change desk.</span>
+    <span>Access: the Board of Directors only.</span>
+  </footer>
+</div>
+
+<script src="assets/config.js"></script>
+<script src="assets/auth.js"></script>
+<script src="assets/email-panel.js"></script>
+  <script src="assets/insurance-card.js"></script>
+  <script src="assets/jarvis-panel.js"></script>
+  <script src="assets/app.js"></script>
+
+  <section class="panel"><h2>Jarvis</h2><div id="jarvis-panel"></div></section>
+  <section class="panel"><h2>Company insurance</h2><div id="insurance-card"></div></section>
+  <section class="panel"><h2>Email</h2><div id="email-panel"></div></section>
+  <script src="assets/email-panel.js"></script>
+</body>
+</html>

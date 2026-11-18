@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Insurance Dashboard — Centipede Peer to Peer, LLC</title>
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<!-- ============ LOGIN GATE (nothing is shown before login) ============ -->
+<section id="login-screen">
+  <div class="login-card">
+    <img src="assets/centipede-logo.png" alt="Centipede Peer to Peer, LLC logo" class="login-logo">
+    <h1>Insurance Dashboard</h1>
+    <p class="org">Centipede Peer to Peer, LLC<br>LIC: 0714781 · Stockton, California</p>
+    <p class="gate-note">The company insurance register — policies, certificates, claims, and renewals. Nothing is shown until you sign in with your username, password, and authenticator code.</p>
+    <form id="login-form">
+      <div id="auth-step-login">
+        <label for="login-username">Username</label>
+        <input type="text" id="login-username" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" autocomplete="current-password" required>
+        <button type="submit" class="btn-primary">Sign in</button>
+      </div>
+      <div id="auth-step-change" hidden>
+        <p class="auth-step-title">Set your own password</p>
+        <p class="hint">You signed in with a temporary password. Choose your own password before continuing. Password rule: at least 10 characters, must contain at least one letter, and cannot be only numbers.</p>
+        <label for="change-password">New password</label>
+        <input type="password" id="change-password" autocomplete="new-password">
+        <label for="change-password2">Type it again</label>
+        <input type="password" id="change-password2" autocomplete="new-password">
+        <button type="submit" class="btn-primary">Set password</button>
+        <p><button type="button" class="btn-small auth-restart">Start over</button></p>
+      </div>
+      <div id="auth-step-enroll" hidden>
+        <p class="auth-step-title">Set up your authenticator app</p>
+        <p class="hint">Open your authenticator app (Google Authenticator, Microsoft Authenticator, Authy, or similar), add a new account, and type in this setup key:</p>
+        <code class="auth-key" id="enroll-key"></code>
+        <p class="auth-uri" id="enroll-uri"></p>
+        <p class="hint">Then enter the 6-digit code the app shows for Centipede to confirm.</p>
+        <label for="enroll-code">6-digit code</label>
+        <input type="text" id="enroll-code" inputmode="numeric" autocomplete="one-time-code" maxlength="7">
+        <button type="submit" class="btn-primary">Confirm and continue</button>
+        <p><button type="button" class="btn-small auth-restart">Start over</button></p>
+      </div>
+      <div id="auth-step-totp" hidden>
+        <p class="auth-step-title">Authenticator code</p>
+        <p class="hint">Enter the current 6-digit code from your authenticator app.</p>
+        <label for="totp-code">6-digit code</label>
+        <input type="text" id="totp-code" inputmode="numeric" autocomplete="one-time-code" maxlength="7">
+        <button type="submit" class="btn-primary">Verify</button>
+        <p><button type="button" class="btn-small auth-restart">Start over</button></p>
+      </div>
+      <p id="login-error" class="error" role="alert"></p>
+    </form>
+    <p class="fineprint">Policies are entered from the policy paper itself, never from memory. In an emergency, call 911.</p>
+  </div>
+</section>
+
+<!-- ============ APP (populated by app.js only after login) ============ -->
+<div id="app" hidden>
+  <header class="app-header">
+    <img src="assets/centipede-logo.png" alt="Centipede Peer to Peer, LLC logo" class="header-logo">
+    <div class="header-titles">
+      <strong>Centipede Peer to Peer, LLC</strong>
+      <span>Insurance Dashboard · LIC: 0714781 · 717 E. Longview Ave., Stockton, CA 95207</span>
+    </div>
+    <div class="header-user">
+      <span id="who"></span>
+      <button id="logout-btn" class="btn-small" type="button">Sign out</button>
+    </div>
+  </header>
+
+  <div id="mode-banner" class="banner" role="status"></div>
+
+  <main class="layout">
+      <section class="panel"><h2>Jarvis</h2><div id="jarvis-panel"></div></section>
+<section class="panel" id="main-panel">
+      <h2>Open items — from the record</h2>
+      <ul id="open-list" class="note-list"></ul>
+      <h2>Policies</h2>
+      <form id="pol-form">
+        <label>Carrier <input id="pol-carrier" type="text"></label>
+        <label>Type <select id="pol-type"><option>General liability</option><option>Professional liability</option><option>Property</option><option>Auto</option><option>Event</option><option>Directors &amp; officers</option><option>Workers' compensation</option><option>Other</option></select></label>
+        <label>Policy number <input id="pol-number" type="text"></label>
+        <label>Coverage <input id="pol-coverage" type="text"></label>
+        <label>Effective date <input id="pol-from" type="date"></label>
+        <label>Renewal / end date <input id="pol-to" type="date"></label>
+        <label>Premium <input id="pol-premium" type="text"></label>
+        <label>Agent / broker <input id="pol-agent" type="text"></label>
+        <button type="submit">Enter policy</button>
+      </form>
+      <ul id="pol-list" class="note-list"></ul>
+      <h2>Insurance companies — San Joaquin County directory</h2>
+      <p class="hint">Roll down and pick the company. Each one carries its own email address for communications and how its billing is sent in — verified from the company's own published pages.</p>
+      <label>Insurance company <select id="payer-select"></select></label>
+      <p id="payer-detail"></p>
+      <h2>Billing</h2>
+      <form id="bill-form">
+        <label>Client ID (never a name on a billing line) <input id="bill-clientid" type="text"></label>
+        <label>Service <input id="bill-service" type="text"></label>
+        <label>Date of service <input id="bill-dos" type="date"></label>
+        <label>Amount <input id="bill-amount" type="text"></label>
+        <label>Sent in by (portal / EDI / mail) <input id="bill-via" type="text"></label>
+        <label>Status <select id="bill-status"><option>Draft</option><option>Submitted</option><option>Paid</option><option>Denied</option></select></label>
+        <button type="submit">Log billing</button>
+        <span id="bill-msg" class="hint" role="status"></span>
+      </form>
+      <ul id="bill-list" class="note-list"></ul>
+      <h2>Client insurance cards</h2>
+      <p class="hint">Upload a client's insurance card here — the card itself is the record. The official copy files into the client's locked binder.</p>
+      <form id="card-form">
+        <label>Client name <input id="card-client" type="text"></label>
+        <label>Client ID <input id="card-clientid" type="text"></label>
+        <label>Card type <select id="card-type"><option>Medi-Cal</option><option>Medicare</option><option>Private health insurance</option><option>Auto insurance</option><option>Other</option></select></label>
+        <label>Card image <input id="card-file" type="file" accept="image/*"></label>
+        <button type="submit">File insurance card</button>
+        <span id="card-msg" class="hint" role="status"></span>
+      </form>
+      <ul id="card-list" class="note-list"></ul>
+      <h2>Certificates of insurance issued</h2>
+      <form id="coi-form">
+        <label>Issued to <input id="coi-to" type="text"></label>
+        <label>Date <input id="coi-date" type="date"></label>
+        <label>For what <input id="coi-for" type="text"></label>
+        <button type="submit">Log certificate</button>
+      </form>
+      <ul id="coi-list" class="note-list"></ul>
+      <h2>Claims</h2>
+      <form id="claim-form">
+        <label>Date <input id="clm-date" type="date"></label>
+        <label>Policy <input id="clm-policy" type="text"></label>
+        <label>What happened <input id="clm-what" type="text"></label>
+        <label>Status <input id="clm-status" type="text"></label>
+        <button type="submit">Log claim</button>
+      </form>
+      <ul id="claim-list" class="note-list"></ul>
+      <h2>Email</h2>
+      <div id="email-panel"></div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span>Centipede Peer to Peer, LLC — a California for-profit limited liability company. The policy papers remain the official record.</span>
+    <span>Access: the Chief Executive Officer and the Record Keeper; the Financial Officer and Chief Compliance Officer join December 1.</span>
+  </footer>
+</div>
+
+<script src="assets/config.js"></script>
+<script src="assets/auth.js"></script>
+<script src="assets/email-panel.js"></script>
+  <script src="assets/jarvis-panel.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>

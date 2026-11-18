@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Company Portal — Centipede Peer to Peer, LLC</title>
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<!-- ============ LOGIN GATE (nothing is shown before login) ============ -->
+<section id="login-screen">
+  <div class="login-card">
+    <img src="assets/centipede-logo.png" alt="Centipede Peer to Peer, LLC logo" class="login-logo">
+    <h1>Company Portal</h1>
+    <p class="org">Centipede Peer to Peer, LLC<br>LIC: 0714781 · Stockton, California</p>
+    <p class="gate-note">Team only. One front door to every Centipede dashboard. Nothing is shown until you sign in with your username, password, and authenticator code — the same sign-in as the dashboards.</p>
+    <form id="login-form">
+      <div id="auth-step-login">
+        <label for="login-username">Username</label>
+        <input type="text" id="login-username" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" autocomplete="current-password" required>
+        <button type="submit" class="btn-primary">Sign in</button>
+      </div>
+      <div id="auth-step-change" hidden>
+        <p class="auth-step-title">Set your own password</p>
+        <p class="hint">You signed in with a temporary password. Choose your own password before continuing. Password rule: at least 10 characters, must contain at least one letter, and cannot be only numbers.</p>
+        <label for="change-password">New password</label>
+        <input type="password" id="change-password" autocomplete="new-password">
+        <label for="change-password2">Type it again</label>
+        <input type="password" id="change-password2" autocomplete="new-password">
+        <button type="submit" class="btn-primary">Set password</button>
+        <p><button type="button" class="btn-small auth-restart">Start over</button></p>
+      </div>
+      <div id="auth-step-enroll" hidden>
+        <p class="auth-step-title">Set up your authenticator app</p>
+        <p class="hint">Open your authenticator app (Google Authenticator, Microsoft Authenticator, Authy, or similar), add a new account, and type in this setup key:</p>
+        <code class="auth-key" id="enroll-key"></code>
+        <p class="auth-uri" id="enroll-uri"></p>
+        <p class="hint">Then enter the 6-digit code the app shows for Centipede to confirm.</p>
+        <label for="enroll-code">6-digit code</label>
+        <input type="text" id="enroll-code" inputmode="numeric" autocomplete="one-time-code" maxlength="7">
+        <button type="submit" class="btn-primary">Confirm and continue</button>
+        <p><button type="button" class="btn-small auth-restart">Start over</button></p>
+      </div>
+      <div id="auth-step-totp" hidden>
+        <p class="auth-step-title">Authenticator code</p>
+        <p class="hint">Enter the current 6-digit code from your authenticator app.</p>
+        <label for="totp-code">6-digit code</label>
+        <input type="text" id="totp-code" inputmode="numeric" autocomplete="one-time-code" maxlength="7">
+        <button type="submit" class="btn-primary">Verify</button>
+        <p><button type="button" class="btn-small auth-restart">Start over</button></p>
+      </div>
+      <p id="login-error" class="error" role="alert"></p>
+    </form>
+    <p class="fineprint">Company systems are for the Centipede team. Client information stays in the dashboards and binders where it belongs. In an emergency, call 911.</p>
+  </div>
+</section>
+
+<!-- ============ APP (populated by app.js only after login) ============ -->
+<div id="app" hidden>
+  <header class="app-header">
+    <img src="assets/centipede-logo.png" alt="Centipede Peer to Peer, LLC logo" class="header-logo">
+    <div class="header-titles">
+      <strong>Centipede Peer to Peer, LLC</strong>
+      <span>Company Portal · LIC: 0714781 · 717 E. Longview Ave., Stockton, CA 95207</span>
+    </div>
+    <div class="header-user">
+      <span id="who"></span>
+      <button id="logout-btn" class="btn-small" type="button">Sign out</button>
+    </div>
+  </header>
+
+  <div id="mode-banner" class="banner" role="status"></div>
+
+  <main class="layout">
+    <section class="panel" id="main-panel">
+      <h2>Every dashboard — one tap away</h2>
+      <p id="admin-note" class="banner" hidden></p>
+      <div id="tiles"></div>
+      <h2>Our programs — tap a seal to open the program</h2>
+      <div id="program-list"></div>
+      <h2>Instructions — how to use the dashboards</h2>
+      <div style="white-space:pre-wrap;" class="hint">HOW TO USE THE COMPANY DASHBOARDS — INSTRUCTIONS FOR THE WHOLE TEAM<br>Centipede Peer to Peer, LLC — November 18, 2026<br><br>THE ONE DOOR. Everything starts at the Company Portal:<br>https://centipedepeertopeerllc-svg.github.io/portal/<br>Use of the portal for company work is mandatory (Policy CPP-POL-2026-031). The public website is for outreach only.<br><br>YOUR SIGN-IN IS THE SAME EVERYWHERE. Username, password, and the 6-digit code from your authenticator app — the same on every dashboard. Your first sign-in used a temporary password; you changed it and set up your authenticator then. Never share your password or codes with anyone. If you are locked out, tell Jarvis.<br><br>WHAT IS INSIDE.<br>- Program tiles: every program has its own tile with its seal. Click it to open that program's own dashboard — its records, its DAP-style notes, its email, and a link to its own Google Drive folder.<br>- Dashboards row: Client Dashboard, DAP Notes, HR, Banking — and, for the Chief Executive Officer as administrator, the Board, IT, and Insurance dashboards.<br>- The Legal Department Portal is restricted to the CEO and counsel.<br><br>THE SHARED CALENDAR. Inside the portal is one shared calendar with a client appointment book for each program. Every employee can see every appointment and can make changes. Pick the program, or view all programs together.<br><br>EMAIL — INSIDE EVERY DASHBOARD. Each dashboard holds the company email app: your picture and name at the top, folders, and compose — email goes to any address. In "My signature & picture" you keep your own signature; your seal is your account picture. Our new addresses (@centipedepeertopeer.llc) go live December 1, 2026 — until then, anything you send from a dashboard waits in your Outbox, and company email runs through the company Gmail as it does today.<br><br>DAP-STYLE NOTES. Program notes are written the DAP way: Data — the person's own words and what happened; Assessment — what we observed, in peer-support words; Plan — next steps, who owns them, and when.<br><br>INSURANCE. The Insurance Dashboard holds the company policies, certificates, claims, a roll-down directory of the insurance companies in San Joaquin County (each with its email for communications and how its billing is sent in), and the place to file clients' insurance cards. Clients who do NOT have insurance are on their own dashboard — Clients Without Insurance — kept separate on purpose: there is no billing and no payments for them; the work there is getting them covered.<br><br>GOOGLE DRIVE. Each program has its own folder in the company Drive ("Centipede Programs"), reached from its dashboard. Program documents go there. Client case files NEVER go in Drive — they stay in the locked binders and the client dashboards.<br><br>THE RULES THAT DO NOT CHANGE. Client information stays inside the dashboards and binders — never in personal email or texts, in either direction. The binders are the official record. If anything here does not work, tell Jarvis and it goes on the IT log the same day.<br><br>— Jarvis, Board Officer / Record Keeper, for the Chief Executive Officer<br></div>
+      <h2>Shared calendar — client appointments, by program</h2>
+      <p class="hint">One shared calendar for the whole team. Every program has its own appointment book inside it; every employee can see every appointment and make changes.</p>
+      <label>View <select id="cal-program"></select></label>
+      <ul id="cal-list" class="note-list"></ul>
+      <form id="cal-form">
+        <label>Program <select id="cal-book"></select></label>
+        <label>Client <input id="cal-client" type="text"></label>
+        <label>Date &amp; time <input id="cal-when" type="datetime-local"></label>
+        <label>With (staff) <input id="cal-with" type="text"></label>
+        <label>Note <input id="cal-note" type="text"></label>
+        <button type="submit">Add appointment</button>
+        <span id="cal-msg" class="hint" role="status"></span>
+      </form>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span>Centipede Peer to Peer, LLC — a California for-profit limited liability company. The locked binders remain the official record.</span>
+    <span>One portal for every program and every dashboard.</span>
+  </footer>
+</div>
+
+<script src="assets/config.js"></script>
+<script src="assets/auth.js"></script>
+<script src="assets/app.js"></script>
+
+  <section class="panel"><h2>Centipede on Facebook</h2>
+<p class="hint">The company's public Facebook Page — daily posts, program news, and events — right here in the portal. To post, comment, or manage the Page, open it in Facebook: <a href="https://www.facebook.com/profile.php?id=100064765000378" target="_blank" rel="noopener">Centipede Peer To Peer.LLC on Facebook</a>.</p>
+<iframe src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fprofile.php%3Fid%3D100064765000378&tabs=timeline&width=500&height=620&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true" width="500" height="620" style="border:none;overflow:hidden;max-width:100%" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" title="Centipede Peer To Peer.LLC — Facebook Page"></iframe>
+</section>
+<section class="panel"><h2>Jarvis</h2><div id="jarvis-panel"></div></section>
+  <section class="panel"><h2>Company insurance</h2><div id="insurance-card"></div></section>
+  <section class="panel"><h2>Email</h2><div id="email-panel"></div></section>
+  <script src="assets/email-panel.js"></script>
+  <script src="assets/insurance-card.js"></script>
+  <script src="assets/jarvis-panel.js"></script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Legal Department Portal — Centipede Peer to Peer, LLC</title>
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<!-- ============ LOGIN GATE (nothing is shown before login) ============ -->
+<section id="login-screen">
+  <div class="login-card">
+    <img src="assets/justice-seal.png" alt="Justice Support Program seal — Legal Department" class="login-logo">
+    <h1>Legal Department Portal</h1>
+    <p class="org">Centipede Peer to Peer, LLC<br>LIC: 0714781 · Stockton, California</p>
+    <p class="gate-note">Restricted. Access is limited to the Chief Executive Officer and counsel for the Legal Department. Nothing is shown until you sign in with your username, password, and authenticator code.</p>
+    <form id="login-form">
+      <div id="auth-step-login">
+        <label for="login-username">Username</label>
+        <input type="text" id="login-username" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" autocomplete="current-password" required>
+        <button type="submit" class="btn-primary">Sign in</button>
+      </div>
+      <div id="auth-step-change" hidden>
+        <p class="auth-step-title">Set your own password</p>
+        <p class="hint">You signed in with a temporary password. Choose your own password before continuing. Password rule: at least 10 characters, must contain at least one letter, and cannot be only numbers.</p>
+        <label for="change-password">New password</label>
+        <input type="password" id="change-password" autocomplete="new-password">
+        <label for="change-password2">Type it again</label>
+        <input type="password" id="change-password2" autocomplete="new-password">
+        <button type="submit" class="btn-primary">Set password</button>
+        <p><button type="button" class="btn-small auth-restart">Start over</button></p>
+      </div>
+      <div id="auth-step-enroll" hidden>
+        <p class="auth-step-title">Set up your authenticator app</p>
+        <p class="hint">Open your authenticator app (Google Authenticator, Microsoft Authenticator, Authy, or similar), add a new account, and type in this setup key:</p>
+        <code class="auth-key" id="enroll-key"></code>
+        <p class="auth-uri" id="enroll-uri"></p>
+        <p class="hint">Then enter the 6-digit code the app shows for Centipede to confirm.</p>
+        <label for="enroll-code">6-digit code</label>
+        <input type="text" id="enroll-code" inputmode="numeric" autocomplete="one-time-code" maxlength="7">
+        <button type="submit" class="btn-primary">Confirm and continue</button>
+        <p><button type="button" class="btn-small auth-restart">Start over</button></p>
+      </div>
+      <div id="auth-step-totp" hidden>
+        <p class="auth-step-title">Authenticator code</p>
+        <p class="hint">Enter the current 6-digit code from your authenticator app.</p>
+        <label for="totp-code">6-digit code</label>
+        <input type="text" id="totp-code" inputmode="numeric" autocomplete="one-time-code" maxlength="7">
+        <button type="submit" class="btn-primary">Verify</button>
+        <p><button type="button" class="btn-small auth-restart">Start over</button></p>
+      </div>
+      <p id="login-error" class="error" role="alert"></p>
+    </form>
+    <p class="fineprint">Legal Department records are confidential. In an emergency, call 911.</p>
+  </div>
+</section>
+
+<!-- ============ APP (populated by app.js only after login) ============ -->
+<div id="app" hidden>
+  <header class="app-header">
+    <img src="assets/justice-seal.png" alt="Justice Support Program seal — Legal Department" class="header-logo">
+    <div class="header-titles">
+      <strong>Centipede Peer to Peer, LLC</strong>
+      <span>Legal Department Portal · LIC: 0714781 · 717 E. Longview Ave., Stockton, CA 95207</span>
+    </div>
+    <div class="header-user">
+      <span id="who"></span>
+      <button id="logout-btn" class="btn-small" type="button">Sign out</button>
+    </div>
+  </header>
+
+  <div id="mode-banner" class="banner" role="status"></div>
+
+  <main class="layout">
+    <aside class="panel">
+      <h2>Law library &amp; tools</h2>
+      <p class="hint">The Justice Support Program's reference shelf. These are research and navigation tools — peer support only, never legal advice and never legal representation. When a member needs advice, the answer is their attorney of record or counsel.</p>
+      <ul class="note-list">
+        <li><strong>Courts &amp; forms</strong><br>
+          <a href="https://www.sjcourts.org" target="_blank" rel="noopener">San Joaquin County Superior Court</a> — our court: departments, calendars, local rules, and forms.<br>
+          <a href="https://www.courts.ca.gov" target="_blank" rel="noopener">California Courts (courts.ca.gov)</a> — Judicial Council forms (including the CR criminal series), self-help, and record-cleaning (expungement) guidance.<br>
+          <a href="https://www.sjgov.org" target="_blank" rel="noopener">San Joaquin County (sjgov.org)</a> — Public Defender, District Attorney, and Probation pages.</li>
+        <li><strong>The law itself</strong><br>
+          <a href="https://leginfo.legislature.ca.gov" target="_blank" rel="noopener">California Legislative Information</a> — the Penal Code, Welfare &amp; Institutions Code, and every California code, official and current.<br>
+          <a href="https://www.law.cornell.edu" target="_blank" rel="noopener">Cornell Legal Information Institute (LII)</a> — plain-language legal reference and federal law.</li>
+        <li><strong>Case research</strong><br>
+          <a href="https://scholar.google.com" target="_blank" rel="noopener">Google Scholar — Case Law</a> — free published opinions.<br>
+          <a href="https://www.courtlistener.com" target="_blank" rel="noopener">CourtListener (Free Law Project)</a> — free court opinions and dockets.</li>
+        <li><strong>Reentry &amp; record relief</strong><br>
+          <a href="https://www.rootandrebound.org" target="_blank" rel="noopener">Root &amp; Rebound</a> — California reentry legal guides, including the Roadmap to Reentry.<br>
+          California Courts self-help (above) — petitions to dismiss under Penal Code 1203.4 and Prop 47 / Prop 64 relief.</li>
+        <li><strong>The bookshelf (reference books)</strong><br>
+          <em>California Penal Code</em> (official code — the book every case starts from) · <em>Witkin's California Criminal Law</em> (the standard California criminal-law treatise — read at the San Joaquin County Law Library) · <em>The Criminal Law Handbook: Know Your Rights</em> (Nolo — written for non-lawyers; how courts, charges, and pleas actually work) · <em>Roadmap to Reentry</em> (Root &amp; Rebound — California reentry law, free) · <em>California Criminal Law Procedure and Practice</em> (CEB — the practitioner's desk book, via the law library).<br>
+          <span class="hint">Book purchases go through the purchase-order process like everything else: no PO, no purchase.</span></li>
+      </ul>
+      <h2>Legal Binder — Register</h2>
+      <p class="hint">Binder CPP-BND-2026-001, the company's complete legal record. This register lists the tabs; the binder itself is the official record.</p>
+      <ul id="register-list" class="note-list"></ul>
+    </aside>
+
+    <section class="panel" id="main-panel">
+      <form id="intake-form">
+        <h2>Send to the Legal Department</h2>
+        <p class="hint">Anything sent here is documented with a queue number and held in the filing queue until the Record Keeper carries it into the Legal Binder and marks it filed.</p>
+        <label for="i-matter">Matter / subject</label>
+        <input type="text" id="i-matter" required placeholder="e.g. Justice Support Program — counsel review">
+        <label for="i-desc">What is being sent — description</label>
+        <textarea id="i-desc" rows="4" required></textarea>
+        <label for="i-ref">Document / reference (optional)</label>
+        <input type="text" id="i-ref" placeholder="e.g. Document title, binder tab, or file name">
+        <button type="submit" class="btn-primary">Send and document</button>
+        <p id="save-status" class="save-status" role="status"></p>
+      </form>
+
+      <h2>Filing queue — documented submissions</h2>
+      <div id="queue-list"></div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span>Centipede Peer to Peer, LLC — a California for-profit limited liability company. The Legal Binder (CPP-BND-2026-001) remains the official record.</span>
+    <span>Access: Chief Executive Officer and Legal Department counsel only.</span>
+  </footer>
+</div>
+
+<script src="assets/config.js"></script>
+<script src="assets/auth.js"></script>
+<script src="assets/app.js"></script>
+
+  <section class="panel"><h2>Jarvis</h2><div id="jarvis-panel"></div></section>
+  <section class="panel"><h2>Email</h2><div id="email-panel"></div></section>
+  <script src="assets/email-panel.js"></script>
+  <script src="assets/jarvis-panel.js"></script>
+</body>
+</html>
