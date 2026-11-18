@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Community Resource Navigation — Centipede Peer to Peer, LLC</title>
 <link rel="stylesheet" href="assets/styles.css">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#10243e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Centipede">
 </head>
 <body>
 
@@ -79,6 +84,9 @@
     <section class="panel" id="main-panel">
       <div id="prog-head"></div>
       <p class="meta">Program binder: <strong>Program Binders/resource-navigation</strong> — every document this dashboard produces is filed in the program's binder under its document number; the binder is the program's official record. Policy: CPP-POL-2026-035.</p>
+      <div style="border:1px solid #b8933a;background:#fdf6dd;border-radius:10px;padding:10px 12px;margin-bottom:1rem;">
+        <strong>San Joaquin County Shelter &amp; Housing Directory:</strong> verified shelters, transitional housing, and housing programs across the county, with phone numbers and who each serves &mdash; <a href="../../portal/shelters/index.html">open the directory</a> (Company Portal).
+      </div>
       <h2>Program records</h2>
       <form id="record-form"></form>
       <ul id="records-list" class="note-list"></ul>
@@ -115,5 +123,12 @@
   <section class="panel"><h2>Company insurance</h2><div id="insurance-card"></div></section>
   <section class="panel"><h2>Email</h2><div id="email-panel"></div></section>
   <script src="assets/email-panel.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(function () { /* a failed registration must never break the page */ });
+  });
+}
+</script>
 </body>
 </html>

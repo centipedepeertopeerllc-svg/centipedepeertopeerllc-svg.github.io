@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Company Portal — Centipede Peer to Peer, LLC</title>
 <link rel="stylesheet" href="assets/styles.css">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#10243e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Centipede">
 </head>
 <body>
 
@@ -87,6 +92,10 @@
         <p style="margin:0 0 8px 0;"><strong>Every company document, in one place.</strong> All company policies, the Peer Support Manual, the forms staff use, every program's dashboard and Google Drive folder, and the standards and references the company works by.</p>
         <p style="margin:0;"><a href="documents/index.html" style="font-size:1.1rem;font-weight:bold;">Open the Company Documents library &rarr;</a></p>
       </div>
+      <h2>Portal app</h2>
+      <div style="border:1px solid #b8933a;background:#fdf6dd;border-radius:10px;padding:14px;margin-bottom:1rem;">
+        <p style="margin:0;">Put the Portal on your phone: open this page in your phone's browser, tap Share, then Add to Home Screen (iPhone) or Install app (Android). The website keeps working on any computer exactly as before.</p>
+      </div>
       <h2>Every dashboard — one tap away</h2>
       <p id="admin-note" class="banner" hidden></p>
       <div id="tiles"></div>
@@ -112,6 +121,14 @@
     <section class="panel" id="reference-library-panel">
       <h2>Reference Library</h2>
       <div id="reference-library"></div>
+    </section>
+
+    <section class="panel" id="shelter-directory-panel">
+      <h2>Shelter &amp; Housing Directory</h2>
+      <div style="border:1px solid #b8933a;background:#fdf6dd;border-radius:10px;padding:12px;">
+        <p style="margin-top:0;"><strong>San Joaquin County Shelter &amp; Housing Directory</strong> &mdash; the county's verified emergency shelters, family shelters, youth and domestic-violence shelters, transitional housing, and housing programs, with addresses, phone numbers, and who each one serves. Program material for Homeless Outreach and Community Resource Navigation.</p>
+        <p style="margin-bottom:0;"><a href="shelters/index.html" style="font-size:1.05rem;font-weight:bold;">Open the Shelter &amp; Housing Directory &rarr;</a></p>
+      </div>
     </section>
 
     <section class="panel" id="drive-panel">
@@ -160,5 +177,12 @@
   <script src="assets/insurance-card.js"></script>
   <script src="assets/reference-library.js"></script>
   <script src="assets/jarvis-panel.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(function () { /* a failed registration must never break the page */ });
+  });
+}
+</script>
 </body>
 </html>
