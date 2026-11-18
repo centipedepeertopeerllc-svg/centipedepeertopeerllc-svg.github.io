@@ -19,7 +19,7 @@ window.HR_CONFIG = {
   // Resources) — see every record.
   users: [
     { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer", admin: true, employeeId: 2001, seeAll: true, tempPasswordSha256: "5891421a4bea9d36fd0ae3034376fee9ebecf3cb3baf73de3324c884ea4c1ed4" },
-    { username: "tom.clark", name: "Thomas Leo Clark III", role: "Certified Peer Support Specialist", admin: false, employeeId: 2005, seeAll: false, tempPasswordSha256: "f742fc459b375e7d15a85aed9f6d30568241b458f1f580aad97844790247dc02" },
+    { username: "tom.clark", name: "Thomas Leo Clark III", role: "Certified Peer Support Specialist", admin: false, employeeId: 2005, seeAll: false, tempPasswordSha256: "47400cc485f18196b6345108f222f3a733c01bed320524bcf7e82fdc98b1de4c" },
     { username: "jarvis", name: "Jarvis", role: "Board Officer / HR Administrator", admin: false, employeeId: null, seeAll: true, tempPasswordSha256: "be7797464911240005bd88a9eca851f383a73980c333b50ac5ead87f7dbbb1d5" },
     { username: "eric.jacobson", name: "Eric Jacobson", role: "Human Resources", admin: false, employeeId: null, seeAll: true, tempPasswordSha256: "7589ffac8ada0beb0999a6905cf098c22aa3637c6297ea5dee0c4c92cb28e669" },
     { username: "junior.spears", name: "Levi Spears (Junior)", role: "Field Team Member", admin: false, employeeId: 2002, seeAll: false, tempPasswordSha256: "db94131d335cbd5ee3d4672306b22fed0e887ba5295c245184fec25f2328a618" },
