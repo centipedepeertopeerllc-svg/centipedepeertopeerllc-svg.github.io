@@ -80,7 +80,12 @@
 
       '<p><strong>Company Manuals</strong></p>' +
       '<ul>' +
-      '<li><a href="manual/index.html">Centipede Peer Support Manual (CPP-MAN-2026-001)</a> — how peer support is done at Centipede: the SAMHSA core competencies as company practice, the peer relationship, trauma-informed peer support, intake, DAP documentation, confidentiality, field work, crisis response, ethics, supervision and certification, and the programs overview. <span class="hint">DRAFT — prepared November 18, 2026, for CEO review and adoption; not company policy until the CEO adopts it.</span></li>' +
+      '<li><a href="manual/index.html">Centipede Peer Support Manual (CPP-MAN-2026-001)</a> — how peer support is done at Centipede: the SAMHSA core competencies as company practice, the peer relationship, trauma-informed peer support, intake, DAP documentation, confidentiality, field work, crisis response, ethics, supervision and certification, and the programs overview. <span class="hint">Issued November 18, 2026, by direction of the Chief Executive Officer.</span></li>' +
+      '</ul>' +
+
+      '<p><strong>Company Policies</strong></p>' +
+      '<ul>' +
+      '<li><a href="policy-045/index.html">CPP-POL-2026-045 — Outreach Worker Skills, Training, and Field Gear Policy</a> — the standard for every outreach and field worker: the four skill standards (trauma-informed communication and empathy; crisis de-escalation and conflict resolution; resource navigation and same-day DAP documentation; adaptability, resilience, and self-care), the training and certification targets (First Aid/CPR, Mental Health First Aid, trauma-informed care, crisis prevention/de-escalation — the company does not itself certify; CalMHSA is the state peer certification route), and the standard field gear kit. <span class="hint">Issued November 18, 2026, by direction of the Chief Executive Officer. Section 9 (personal pepper spray) is marked in the policy for counsel review.</span></li>' +
       '</ul>' +
       '</div>';
   }
