@@ -20,6 +20,7 @@ window.PORTAL_CONFIG = {
   ],
   tiles: [
     { name: "Company Website", url: "https://centipedepeertopeerllc-svg.github.io/", note: "Our public website — the only website address we use." },
+    { name: "Company Documents", url: "https://centipedepeertopeerllc-svg.github.io/portal/documents/", note: "Every company document in one place — all policies, the Peer Support Manual, the forms staff use, every program's dashboard and Drive folder, and the Reference Library." },
     { name: "DAP Notes Dashboard", url: "https://centipedepeertopeerllc-svg.github.io/dap/", note: "Session notes in DAP format and encounter documentation." },
     { name: "Client Dashboard", url: "https://centipedepeertopeerllc-svg.github.io/clients/", note: "Client records, paperwork, and purchase orders." },
     { name: "HR Dashboard", url: "https://centipedepeertopeerllc-svg.github.io/hr/", note: "Employee records and human-resources work." },
