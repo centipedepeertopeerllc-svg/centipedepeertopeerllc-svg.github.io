@@ -4,7 +4,7 @@ window.PROGRAM_CONFIG = {
   guardrail: "Veteran status is recorded as the veteran states it. Never record a Social Security number or a Veteran ID Card number — only whether the card is held.",
   users: [
     { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer", admin: true, tempPasswordSha256: "5891421a4bea9d36fd0ae3034376fee9ebecf3cb3baf73de3324c884ea4c1ed4" },
-    { username: "tom.clark", name: "Thomas Leo Clark III", role: "Certified Peer Support Specialist", admin: false, tempPasswordSha256: "e3f0b0732d59d95d97a00ae5922d1ed6a7547c04dbc83b63f99759a2c1292a60" },
+    { username: "tom.clark", name: "Thomas Leo Clark III", role: "Certified Peer Support Specialist", admin: false, tempPasswordSha256: "47400cc485f18196b6345108f222f3a733c01bed320524bcf7e82fdc98b1de4c" },
     { username: "jarvis", name: "Jarvis", role: "Board Officer — Record Keeper", admin: false, tempPasswordSha256: "be7797464911240005bd88a9eca851f383a73980c333b50ac5ead87f7dbbb1d5" },
     { username: "eric.jacobson", name: "Eric Jacobson", role: "Human Resources", admin: false, tempPasswordSha256: "db3e9ec2992db457a2d1e0f6be47b3f2f10f9baefb0ec3e56bde2e28a3aefca" },
     { username: "junior.spears", name: "Levi Spears (Junior)", role: "Field Team Member", admin: false, tempPasswordSha256: "b2e67df9a35a2ea1c7d7b4ee47a1e2ce8c1b7f0ecee6a3e04d6b48d7fda2c31c" },
