@@ -77,6 +77,11 @@
       '<ul>' +
       '<li><a href="https://988lifeline.org/" target="_blank" rel="noopener">988 Suicide &amp; Crisis Lifeline</a> — call or text 988, for crisis situations — and <strong>911 for emergencies</strong>.</li>' +
       '</ul>' +
+
+      '<p><strong>Company Manuals</strong></p>' +
+      '<ul>' +
+      '<li><a href="manual/index.html">Centipede Peer Support Manual (CPP-MAN-2026-001)</a> — how peer support is done at Centipede: the SAMHSA core competencies as company practice, the peer relationship, trauma-informed peer support, intake, DAP documentation, confidentiality, field work, crisis response, ethics, supervision and certification, and the programs overview. <span class="hint">DRAFT — prepared November 18, 2026, for CEO review and adoption; not company policy until the CEO adopts it.</span></li>' +
+      '</ul>' +
       '</div>';
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", mount); else mount();
