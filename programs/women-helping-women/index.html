@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Women Helping Women — Centipede Peer to Peer, LLC</title>
 <link rel="stylesheet" href="assets/styles.css">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#10243e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Centipede">
 </head>
 <body>
 
@@ -130,5 +135,12 @@
   <section class="panel"><h2>Company insurance</h2><div id="insurance-card"></div></section>
   <section class="panel"><h2>Email</h2><div id="email-panel"></div></section>
   <script src="assets/email-panel.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(function () { /* a failed registration must never break the page */ });
+  });
+}
+</script>
 </body>
 </html>
