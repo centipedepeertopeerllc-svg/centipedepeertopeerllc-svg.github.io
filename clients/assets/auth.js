@@ -261,7 +261,18 @@
     CTX.step = name;
     for (const s of ["login", "change", "enroll", "totp"]) {
       const el = $("auth-step-" + s);
-      if (el) el.hidden = s !== name;
+      if (el) {
+        el.hidden = s !== name;
+        // Controls in a hidden step MUST be disabled, not just hidden.
+        // A hidden-but-enabled control still takes part in the form's
+        // built-in validation: after sign-in the login password box is
+        // cleared, and its "required" rule then silently vetoed every
+        // later step's submit (Nov 18, 2026 — the set-password step
+        // appeared to hang; no submit event, no error, nothing).
+        // Disabled controls are skipped by validation, so only the
+        // visible step's own fields can block its submit.
+        el.querySelectorAll("input, select, textarea, button").forEach((c) => { c.disabled = s !== name; });
+      }
     }
     setError("");
     const first = { login: "login-username", change: "change-password", enroll: "enroll-code", totp: "totp-code" }[name];
@@ -349,7 +360,12 @@
       pendingSecret: null
     };
     const form = $("login-form");
-    if (form) form.addEventListener("submit", onSubmit);
+    if (form) {
+      form.addEventListener("submit", onSubmit);
+      // Never let built-in field validation block a submit silently:
+      // if a visible field fails its rule, say so in the error line too.
+      form.addEventListener("invalid", () => setError("One of the fields above still needs attention — check the highlighted field and try again."), true);
+    }
     document.querySelectorAll(".auth-restart").forEach((b) => b.addEventListener("click", () => location.reload()));
     showStep("login");
   }
