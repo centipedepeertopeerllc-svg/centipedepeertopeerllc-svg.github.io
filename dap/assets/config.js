@@ -6,14 +6,18 @@ window.DAP_CONFIG = {
   supabasePublishableKey: "sb_publishable_nek2I10pkRAWf8_-m3X0UA_aQVAH-lR",
   table: "dap_notes",
 
-  // Named users. accessCodeSha256 is the SHA-256 hex of the user's access
-  // code (the code itself is never stored in this file). STARTER codes are
-  // documented in README.md and MUST be changed by the CEO before real
-  // client notes are entered.
+  // Sign-in users (username + password + 2FA — see assets/auth.js).
+  // Only the SHA-256 hash of each person's one-time TEMPORARY password is
+  // stored here; the temporary passwords themselves are never in any file.
+  // At first sign-in the person must set their own password (at least 10
+  // characters, at least one letter, never only numbers) and enroll an
+  // authenticator app. The CEO (admin: true) can reset passwords and 2FA
+  // from the "Admin — user access" panel after sign-in.
   users: [
-    { name: "Levi Allen Spears", role: "Chief Executive Officer", accessCodeSha256: "3b47492744946d5a188be73c702fb2e3cd1b635433f841381ae8d2e0ed67b45f" },
-    { name: "Thomas Leo Clark III", role: "Certified Peer Support Specialist", accessCodeSha256: "da26b77becf8bcc17aa4e59a0205d8910373e5a25e0d7993fd5b2856c21ecdbb" },
-    { name: "Jarvis", role: "Board Officer", accessCodeSha256: "7ac25d5d84cae3dcc037c52a93dfe320fe83b2a6abe787451b4fc15aeba2c9e7" }
+    { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer", admin: true, tempPasswordSha256: "5891421a4bea9d36fd0ae3034376fee9ebecf3cb3baf73de3324c884ea4c1ed4" },
+    { username: "tom.clark", name: "Thomas Leo Clark III", role: "Certified Peer Support Specialist", admin: false, tempPasswordSha256: "f742fc459b375e7d15a85aed9f6d30568241b458f1f580aad97844790247dc02" },
+    { username: "jarvis", name: "Jarvis", role: "Board Officer", admin: false, tempPasswordSha256: "be7797464911240005bd88a9eca851f383a73980c333b50ac5ead87f7dbbb1d5" },
+    { username: "eric.jacobson", name: "Eric Jacobson", role: "Human Resources", admin: false, tempPasswordSha256: "7589ffac8ada0beb0999a6905cf098c22aa3637c6297ea5dee0c4c92cb28e669" }
   ],
 
   // Authors for the note Author drop-down (per CEO direction, Nov 15, 2026).
