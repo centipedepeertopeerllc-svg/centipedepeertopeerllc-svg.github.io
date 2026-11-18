@@ -233,6 +233,7 @@ function buildApp() {
   $("policy-form").addEventListener("submit", onSavePolicy);
   $("addendum-form").addEventListener("submit", onSaveAddendum);
   $("addendum-cancel").addEventListener("click", () => { $("addendum-form").hidden = true; });
+  initPayroll();
 
   // Save-reliability standard: flush on leave, refresh on return.
   document.addEventListener("visibilitychange", () => {
@@ -261,7 +262,8 @@ function renderPeople() {
   for (const p of visiblePeople()) {
     const div = document.createElement("div");
     div.className = "person-card" + (p.employeeId === state.selectedEmployeeId ? " active" : "");
-    div.innerHTML = `<strong>${esc(p.name)}</strong>
+    div.innerHTML = `${p.photo ? `<img class="person-photo" src="${p.photo}" alt="Photo of ${esc(p.name)}">` : ""}
+      <strong>${esc(p.name)}</strong>
       <div class="meta">Employee ID ${esc(p.employeeId)} · ${esc(p.role)}</div>
       ${p.startDate ? `<div class="meta">Start date: ${esc(p.startDate)}</div>` : ""}`;
     div.addEventListener("click", () => {
@@ -302,6 +304,7 @@ function renderPerson() {
   const totalHours = times.reduce((sum, r) => sum + (parseFloat(r.payload && r.payload.hours) || 0), 0);
 
   view.innerHTML = `
+    ${person.photo ? `<img class="profile-photo" src="${person.photo}" alt="Photo of ${esc(person.name)}">` : ""}
     <h2>${esc(person.name)}</h2>
     <p class="meta">Employee ID ${esc(person.employeeId)} · ${esc(person.role)}${person.startDate ? " · Start date: " + esc(person.startDate) : ""}</p>
     <p class="no-print">
@@ -431,3 +434,107 @@ async function onSaveAddendum(e) {
   const user = CPPAuth.restoreSession();
   if (user) { state.user = user; enterApp(); }
 })();
+
+/* ---------------- payroll: clock + wages + owed ---------------- */
+const payGet = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
+const paySet = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+const money = (n) => "$" + Number(n || 0).toFixed(2);
+function wageFor(username) {
+  if (username === "levi.spears") return null; // CEO: hours only, no pay — his own settled rule
+  const w = payGet("cpp.hr.wages.v1", {});
+  const r = Number(w[username]);
+  return r > 0 ? r : null;
+}
+/* Monthly pay caps — CEO direction Nov 18, 2026: Tom Clark is paid $305 a month, and his
+   recorded dollars stop at $305 for the month. Hours keep recording; dollars do not pass the cap. */
+const MONTHLY_CAPS = { "tom.clark": 305 };
+function capFor(username) {
+  const c = payGet("cpp.hr.caps.v1", {});
+  const v = Number(c[username] ?? MONTHLY_CAPS[username]);
+  return v > 0 ? v : null;
+}
+function monthKey(dateStr) {
+  if (!dateStr) return "";
+  if (dateStr.includes("-")) return dateStr.slice(0, 7);
+  const p = String(dateStr).split("/"); return p.length === 3 ? p[2] + "-" + String(p[0]).padStart(2, "0") : String(dateStr);
+}
+function cappedGross(username, dateStr, hours, rate, shifts) {
+  let gross = rate ? Math.round(hours * rate * 100) / 100 : 0;
+  const cap = capFor(username);
+  if (!cap || !rate) return { gross, capped: false, cap };
+  const mk = monthKey(dateStr);
+  const used = shifts.filter((x) => x.username === username && monthKey(x.date) === mk).reduce((a, x) => a + (x.gross || 0), 0);
+  const room = Math.max(0, Math.round((cap - used) * 100) / 100);
+  return gross > room ? { gross: room, capped: true, cap } : { gross, capped: false, cap };
+}
+function renderPayroll() {
+  const me = state.user.username;
+  const clock = payGet("cpp.hr.clock.v1", {});
+  const open = clock[me];
+  $("pay-clock-status").innerHTML = open
+    ? `<strong>You are clocked in</strong> since ${esc(fmtDT(new Date(open).toISOString()))}.`
+    : "You are not clocked in.";
+  $("clock-in-btn").disabled = !!open;
+  $("clock-out-btn").disabled = !open;
+  // wages
+  const users = CFG.users.filter((u) => u.username !== "jarvis");
+  $("wage-rows").innerHTML = users.map((u) => {
+    if (u.username === "levi.spears") return `<p>${esc(u.name)} — <span class="hint">no pay (hours only, by the CEO's own rule)</span></p>`;
+    const w = payGet("cpp.hr.wages.v1", {})[u.username];
+    const cap = capFor(u.username);
+    if (state.user.admin) return `<p><label>${esc(u.name)} — $ <input type="number" step="0.25" min="0" data-wage="${esc(u.username)}" value="${w ?? ""}" placeholder="not set"> /hour</label> · <label>monthly cap $ <input type="number" step="1" min="0" data-cap="${esc(u.username)}" value="${cap ?? ""}" placeholder="none"></label></p>`;
+    return `<p>${esc(u.name)} — <span class="hint">${w ? money(w) + " /hour" : "wage not set yet"}${cap ? " · pay capped at " + money(cap) + " a month" : ""}</span></p>`;
+  }).join("");
+  if (state.user.admin) $("wage-rows").querySelectorAll("[data-wage]").forEach((inp) => inp.addEventListener("change", () => {
+    const w = payGet("cpp.hr.wages.v1", {}); const v = Number(inp.value); if (v > 0) w[inp.dataset.wage] = v; else delete w[inp.dataset.wage]; paySet("cpp.hr.wages.v1", w); renderPayroll();
+  }));
+  if (state.user.admin) $("wage-rows").querySelectorAll("[data-cap]").forEach((inp) => inp.addEventListener("change", () => {
+    const c = payGet("cpp.hr.caps.v1", {}); const v = Number(inp.value); if (v > 0) c[inp.dataset.cap] = v; else delete c[inp.dataset.cap]; paySet("cpp.hr.caps.v1", c); renderPayroll();
+  }));
+  // manual-hours employee picker
+  const sel = $("shift-user");
+  const opts = state.user.seeAll ? users : users.filter((u) => u.username === me);
+  sel.innerHTML = opts.map((u) => `<option value="${esc(u.username)}">${esc(u.name)}</option>`).join("");
+  // ledger
+  const shifts = payGet("cpp.hr.shifts.v1", []);
+  const visible = state.user.seeAll ? shifts : shifts.filter((s) => s.username === me);
+  const totals = {};
+  for (const s of visible) { totals[s.name] = totals[s.name] || { h: 0, d: 0 }; totals[s.name].h += s.hours; totals[s.name].d += s.gross; }
+  $("pay-list").innerHTML = visible.length ? visible.map((s) =>
+    `<li><strong>${esc(s.name)}</strong> — ${esc(s.date)} · ${s.hours.toFixed(2)} hrs${s.rate ? ` × ${money(s.rate)} = <strong>${money(s.gross)} owed</strong>` : ` · <span class="hint">no wage set — hours only</span>`}${s.note ? `<br><span class="hint">${esc(s.note)}</span>` : ""}<br><span class="hint">${esc(s.via)} · entered by ${esc(s.by)}</span></li>`).join("")
+    : '<li class="hint">No hours recorded yet. Clock in above, or add hours by hand.</li>';
+  const th = Object.values(totals).reduce((a, t) => a + t.h, 0), td = Object.values(totals).reduce((a, t) => a + t.d, 0);
+  $("pay-totals").innerHTML = Object.keys(totals).length
+    ? Object.entries(totals).map(([n, t]) => `${esc(n)}: ${t.h.toFixed(2)} hrs — <strong>${money(t.d)} owed</strong>`).join("<br>") + `<br><strong>Total: ${th.toFixed(2)} hrs — ${money(td)} owed</strong>`
+    : "";
+}
+function initPayroll() {
+  $("clock-in-btn").addEventListener("click", () => {
+    const clock = payGet("cpp.hr.clock.v1", {}); clock[state.user.username] = Date.now(); paySet("cpp.hr.clock.v1", clock); renderPayroll();
+  });
+  $("clock-out-btn").addEventListener("click", () => {
+    const clock = payGet("cpp.hr.clock.v1", {}); const start = clock[state.user.username]; if (!start) return;
+    delete clock[state.user.username]; paySet("cpp.hr.clock.v1", clock);
+    const hours = Math.round(((Date.now() - start) / 3600000) * 100) / 100;
+    const rate = wageFor(state.user.username);
+    const shifts = payGet("cpp.hr.shifts.v1", []);
+    const dstr = new Date(start).toLocaleDateString("en-US", { timeZone: "America/Los_Angeles" });
+    const cg = cappedGross(state.user.username, dstr, hours, rate, shifts);
+    shifts.unshift({ username: state.user.username, name: state.user.name, date: dstr, hours, rate: rate || 0, gross: cg.gross, note: cg.capped ? "Monthly cap of " + money(cg.cap) + " reached — dollars stop at the cap for this month; hours still recorded (CEO's direction)." : "", via: "time clock", by: state.user.name });
+    paySet("cpp.hr.shifts.v1", shifts); renderPayroll();
+  });
+  $("shift-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const uname = $("shift-user").value;
+    const u = CFG.users.find((x) => x.username === uname);
+    const hours = Number($("shift-hours").value);
+    const rate = wageFor(uname);
+    const shifts = payGet("cpp.hr.shifts.v1", []);
+    const cg2 = cappedGross(uname, $("shift-date").value, hours, rate, shifts);
+    const note2 = [$("shift-note").value.trim(), cg2.capped ? "Monthly cap of " + money(cg2.cap) + " reached — dollars stop at the cap for this month; hours still recorded (CEO's direction)." : ""].filter(Boolean).join(" ");
+    shifts.unshift({ username: uname, name: u ? u.name : uname, date: $("shift-date").value, hours, rate: rate || 0, gross: cg2.gross, note: note2, via: "added by hand", by: state.user.name });
+    paySet("cpp.hr.shifts.v1", shifts); e.target.reset(); renderPayroll();
+    $("shift-msg").textContent = "Hours added.";
+  });
+  renderPayroll();
+}
