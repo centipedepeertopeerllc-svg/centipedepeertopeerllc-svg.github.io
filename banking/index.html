@@ -14,13 +14,44 @@
     <img src="../dap/assets/centipede-logo.png" onerror="this.onerror=null;this.src='assets/centipede-logo.png';" alt="Centipede Peer to Peer, LLC logo" class="login-logo">
     <h1>Banking Dashboard</h1>
     <p class="org">Centipede Peer to Peer, LLC<br>LIC: 0714781 · Stockton, California</p>
-    <p class="gate-note">Staff only. Financial records are confidential and are not shown until you sign in with your name and access code.</p>
+    <p class="gate-note">Staff only. Financial records are confidential and are not shown until you sign in with your username, password, and authenticator code.</p>
     <form id="login-form">
-      <label for="login-user">Your name</label>
-      <select id="login-user" required></select>
-      <label for="login-pin">Access code</label>
-      <input type="password" id="login-pin" inputmode="numeric" autocomplete="current-password" required>
-      <button type="submit" class="btn-primary">Sign in</button>
+      <div id="auth-step-login">
+        <label for="login-username">Username</label>
+        <input type="text" id="login-username" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" autocomplete="current-password" required>
+        <button type="submit" class="btn-primary">Sign in</button>
+      </div>
+      <div id="auth-step-change" hidden>
+        <p class="auth-step-title">Set your own password</p>
+        <p class="hint">You signed in with a temporary password. Choose your own password before continuing. Password rule: at least 10 characters, must contain at least one letter, and cannot be only numbers.</p>
+        <label for="change-password">New password</label>
+        <input type="password" id="change-password" autocomplete="new-password">
+        <label for="change-password2">Type it again</label>
+        <input type="password" id="change-password2" autocomplete="new-password">
+        <button type="submit" class="btn-primary">Set password</button>
+        <p><button type="button" class="btn-small auth-restart">Start over</button></p>
+      </div>
+      <div id="auth-step-enroll" hidden>
+        <p class="auth-step-title">Set up your authenticator app</p>
+        <p class="hint">Open your authenticator app (Google Authenticator, Microsoft Authenticator, Authy, or similar), add a new account, and type in this setup key:</p>
+        <code class="auth-key" id="enroll-key"></code>
+        <p class="auth-uri" id="enroll-uri"></p>
+        <p class="hint">Then enter the 6-digit code the app shows for Centipede to confirm.</p>
+        <label for="enroll-code">6-digit code</label>
+        <input type="text" id="enroll-code" inputmode="numeric" autocomplete="one-time-code" maxlength="7">
+        <button type="submit" class="btn-primary">Confirm and continue</button>
+        <p><button type="button" class="btn-small auth-restart">Start over</button></p>
+      </div>
+      <div id="auth-step-totp" hidden>
+        <p class="auth-step-title">Authenticator code</p>
+        <p class="hint">Enter the current 6-digit code from your authenticator app.</p>
+        <label for="totp-code">6-digit code</label>
+        <input type="text" id="totp-code" inputmode="numeric" autocomplete="one-time-code" maxlength="7">
+        <button type="submit" class="btn-primary">Verify</button>
+        <p><button type="button" class="btn-small auth-restart">Start over</button></p>
+      </div>
       <p id="login-error" class="error" role="alert"></p>
     </form>
     <p class="fineprint">Centipede provides non-clinical peer support. In an emergency, call 911.</p>
@@ -100,6 +131,7 @@
 </div>
 
 <script src="assets/config.js"></script>
+<script src="assets/auth.js"></script>
 <script src="assets/app.js"></script>
 </body>
 </html>

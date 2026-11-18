@@ -6,19 +6,25 @@ window.HR_CONFIG = {
   supabasePublishableKey: "sb_publishable_nek2I10pkRAWf8_-m3X0UA_aQVAH-lR",
   table: "hr_records",
 
-  // Named users. accessCodeSha256 is the SHA-256 hex of the user's access
-  // code (the code itself is never stored in this file). STARTER codes are
-  // documented in README.md and MUST be changed by the CEO.
+  // Sign-in users (username + password + 2FA — see assets/auth.js).
+  // Only the SHA-256 hash of each person's one-time TEMPORARY password is
+  // stored here; the temporary passwords themselves are never in any file.
+  // At first sign-in the person must set their own password (at least 10
+  // characters, at least one letter, never only numbers) and enroll an
+  // authenticator app. The CEO (admin: true) can reset passwords and 2FA
+  // from the "Admin — user access" panel after sign-in.
   // Member-view rule: each user sees ONLY their own record (filtered on
   // employeeId in app.js). Users with seeAll: true — the CEO (employeeId
-  // 2001) and Jarvis as HR administrator — see every record.
+  // 2001), Jarvis as HR administrator, and Eric Jacobson (Human
+  // Resources) — see every record.
   users: [
-    { name: "Levi Allen Spears", role: "Chief Executive Officer", employeeId: 2001, seeAll: true, accessCodeSha256: "3b47492744946d5a188be73c702fb2e3cd1b635433f841381ae8d2e0ed67b45f" },
-    { name: "Levi Spears (Junior)", role: "Field Team Member", employeeId: 2002, seeAll: false, accessCodeSha256: "0af7d7158becc6d02dc41536107090e77195cf90c556cadb37866528cc94e8a9" },
-    { name: "Monica Frishkorn-Wellner", role: "Board Director", employeeId: 2003, seeAll: false, accessCodeSha256: "2cec8cf0e321c284fa0c2ebef804aac18bf1cbb85546f89e7e3d0b6aa8b9d2cf" },
-    { name: "Jeremy Hughes", role: "Board Member", employeeId: 2004, seeAll: false, accessCodeSha256: "9a20ae78840d1a444686d7ef12f62082888b1f764151438badc3f5e0122f1429" },
-    { name: "Thomas Leo Clark III", role: "Certified Peer Support Specialist", employeeId: 2005, seeAll: false, accessCodeSha256: "da26b77becf8bcc17aa4e59a0205d8910373e5a25e0d7993fd5b2856c21ecdbb" },
-    { name: "Jarvis", role: "Board Officer / HR Administrator", employeeId: null, seeAll: true, accessCodeSha256: "7ac25d5d84cae3dcc037c52a93dfe320fe83b2a6abe787451b4fc15aeba2c9e7" }
+    { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer", admin: true, employeeId: 2001, seeAll: true, tempPasswordSha256: "5891421a4bea9d36fd0ae3034376fee9ebecf3cb3baf73de3324c884ea4c1ed4" },
+    { username: "tom.clark", name: "Thomas Leo Clark III", role: "Certified Peer Support Specialist", admin: false, employeeId: 2005, seeAll: false, tempPasswordSha256: "f742fc459b375e7d15a85aed9f6d30568241b458f1f580aad97844790247dc02" },
+    { username: "jarvis", name: "Jarvis", role: "Board Officer / HR Administrator", admin: false, employeeId: null, seeAll: true, tempPasswordSha256: "be7797464911240005bd88a9eca851f383a73980c333b50ac5ead87f7dbbb1d5" },
+    { username: "eric.jacobson", name: "Eric Jacobson", role: "Human Resources", admin: false, employeeId: null, seeAll: true, tempPasswordSha256: "7589ffac8ada0beb0999a6905cf098c22aa3637c6297ea5dee0c4c92cb28e669" },
+    { username: "junior.spears", name: "Levi Spears (Junior)", role: "Field Team Member", admin: false, employeeId: 2002, seeAll: false, tempPasswordSha256: "db94131d335cbd5ee3d4672306b22fed0e887ba5295c245184fec25f2328a618" },
+    { username: "monica.frishkorn", name: "Monica Frishkorn-Wellner", role: "Board Director", admin: false, employeeId: 2003, seeAll: false, tempPasswordSha256: "f549de3b90666c5a6aa7dbf95b2cbbf988649920333f9d9e52fc86af324be6c2" },
+    { username: "jeremy.hughes", name: "Jeremy Hughes", role: "Board Member", admin: false, employeeId: 2004, seeAll: false, tempPasswordSha256: "ff1e49ffde7e23625b84276021eeba74fe42e5b35fc649bb290ca347d7b1e783" }
   ],
 
   // People seed — names, employee IDs, and roles ONLY. No personal data

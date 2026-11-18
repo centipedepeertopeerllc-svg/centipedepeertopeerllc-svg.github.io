@@ -83,3 +83,12 @@ legend { font-weight: bold; color: var(--navy); padding: 0 0.4rem; }
 .record-full blockquote { margin: 0.4rem 0; padding: 0.5rem 0.8rem; background: #fffdf7; border-left: 4px solid var(--gold); white-space: pre-wrap; }
 .record-full table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
 .record-full th, .record-full td { border: 1px solid var(--line); padding: 0.35rem 0.5rem; text-align: left; }
+
+/* ---- username + password + 2FA sign-in (assets/auth.js) ---- */
+.auth-step-title { font-weight: 700; color: var(--navy); margin: 0.6rem 0 0.2rem; text-align: left; }
+.auth-key { display: block; background: #f7f3e3; border: 1px solid var(--gold); border-radius: 8px; padding: 0.55rem; margin: 0.4rem 0; font-size: 1.02rem; letter-spacing: 0.08em; word-break: break-all; text-align: center; }
+.auth-uri { font-size: 0.72rem; color: #55503f; word-break: break-all; text-align: left; }
+#auth-admin-panel { margin: 1rem 1rem 0; }
+.auth-user-row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid var(--line); text-align: left; }
+.auth-user-actions { white-space: nowrap; }
+.auth-temp-once { background: #fdf6d8; border: 1px solid var(--gold); border-radius: 8px; padding: 0.6rem; margin: 0.6rem 0; text-align: left; }

@@ -198,19 +198,11 @@ async function flushOutbox() {
 
 /* ---------------- login ---------------- */
 function initLogin() {
-  const sel = $("login-user");
-  sel.innerHTML = CFG.users.map((u) => `<option value="${esc(u.name)}">${esc(u.name)} — ${esc(u.role)}</option>`).join("");
-  $("login-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const user = CFG.users.find((u) => u.name === sel.value);
-    const hash = await sha256Hex($("login-pin").value.trim());
-    if (!user || hash !== user.accessCodeSha256) {
-      $("login-error").textContent = "That name and access code do not match. Check the code and try once more, carefully.";
-      return;
-    }
-    state.user = user;
-    sessionStorage.setItem("hrdash.user", user.name);
-    enterApp();
+  CPPAuth.mount({
+    seedUsers: CFG.users,
+    storeKey: "cpp.auth.hr.v1",
+    sessionKey: "hrdash.user",
+    onSignIn: (user) => { state.user = user; enterApp(); }
   });
 }
 async function enterApp() {
@@ -436,9 +428,6 @@ async function onSaveAddendum(e) {
 /* ---------------- boot ---------------- */
 (function boot() {
   initLogin();
-  const saved = sessionStorage.getItem("hrdash.user");
-  if (saved) {
-    const user = CFG.users.find((u) => u.name === saved);
-    if (user) { state.user = user; enterApp(); }
-  }
+  const user = CPPAuth.restoreSession();
+  if (user) { state.user = user; enterApp(); }
 })();
