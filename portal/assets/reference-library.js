@@ -78,6 +78,11 @@
       '<li><a href="https://988lifeline.org/" target="_blank" rel="noopener">988 Suicide &amp; Crisis Lifeline</a> — call or text 988, for crisis situations — and <strong>911 for emergencies</strong>.</li>' +
       '</ul>' +
 
+      '<p><strong>Privacy &amp; Confidentiality — HIPAA and California Law</strong></p>' +
+      '<ul>' +
+      '<li><a href="hipaa/index.html">HIPAA &amp; California Confidentiality — What Every Centipede Staff Member Must Know</a> — the HIPAA Privacy Rule, PHI, minimum necessary, safeguards, and breach duties; 42 CFR Part 2 for substance use records (stricter than HIPAA); and California\'s CMIA and LPS Act — California law can be stricter than HIPAA, and the stricter rule governs. Official sources only (HHS, SAMHSA, California Attorney General, official California law text). The standing rule: client information is disclosed only on a signed client Release of Information or a judge-signed court order — a subpoena alone is not a court order.</li>' +
+      '</ul>' +
+
       '<p><strong>Company Manuals</strong></p>' +
       '<ul>' +
       '<li><a href="manual/index.html">Centipede Peer Support Manual (CPP-MAN-2026-001)</a> — how peer support is done at Centipede: the SAMHSA core competencies as company practice, the peer relationship, trauma-informed peer support, intake, DAP documentation, confidentiality, field work, crisis response, ethics, supervision and certification, and the programs overview. <span class="hint">Issued November 18, 2026, by direction of the Chief Executive Officer.</span></li>' +
