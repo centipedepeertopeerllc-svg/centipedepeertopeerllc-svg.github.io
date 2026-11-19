@@ -129,6 +129,20 @@
         <button type="submit">Add appointment</button>
         <span id="cal-msg" class="hint" role="status"></span>
       </form>
+      <h3>Client Appointments</h3>
+      <p class="hint">Book a client appointment here: it appears on the shared calendar with a gold "Client Appointment" label and the client's name, in the Portal and in that program's own dashboard. This calendar is a scheduling and record tool only — it does not notify anyone. Staff assignments are still given by email or text, never by calendar alone.</p>
+      <form id="appt-form">
+        <label>Client name <input id="appt-client" type="text" required></label>
+        <label>Program <select id="appt-program"></select></label>
+        <label>Staff member <input id="appt-staff" type="text"></label>
+        <label>Date <input id="appt-date" type="date" required></label>
+        <label>Start time <input id="appt-start" type="time"></label>
+        <label>End time <input id="appt-end" type="time"></label>
+        <label>Location <input id="appt-location" type="text"></label>
+        <label>Notes <input id="appt-note" type="text"></label>
+        <button type="submit">Add client appointment</button>
+        <span id="appt-msg" class="hint" role="status"></span>
+      </form>
     </section>
 
     <section class="panel" id="reference-library-panel">

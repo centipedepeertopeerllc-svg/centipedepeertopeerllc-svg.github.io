@@ -121,6 +121,22 @@
   <script src="assets/jarvis-panel.js"></script>
   <script src="assets/app.js"></script>
 
+  <section class="panel">
+    <h2>Client Appointments</h2>
+    <p class="hint">This program's book in the shared company calendar. Program: <strong id="apt-prog"></strong> — locked to this dashboard. Appointments booked here also appear in the Portal calendar, and Portal bookings for this program appear here. Scheduling and record only — the calendar does not notify anyone, and staff assignments are still given by email or text.</p>
+    <form id="apt-form">
+      <label>Client name <input id="apt-client" type="text" required></label>
+      <label>Staff member <input id="apt-staff" type="text"></label>
+      <label>Date <input id="apt-date" type="date" required></label>
+      <label>Start time <input id="apt-start" type="time"></label>
+      <label>End time <input id="apt-end" type="time"></label>
+      <label>Location <input id="apt-location" type="text"></label>
+      <label>Notes <input id="apt-note" type="text"></label>
+      <button type="submit">Add client appointment</button>
+      <span id="apt-msg" class="hint" role="status"></span>
+    </form>
+    <ul id="apt-list" class="note-list"></ul>
+  </section>
   <section class="panel"><h2>Jarvis</h2><div id="jarvis-panel"></div></section>
   <section class="panel"><h2>Company insurance</h2><div id="insurance-card"></div></section>
   <section class="panel"><h2>Email</h2><div id="email-panel"></div></section>

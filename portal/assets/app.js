@@ -25,11 +25,14 @@ function renderCalendar() {
   const sel = $("cal-program");
   sel.innerHTML = '<option value="">All programs — shared view</option>' + CFG.programs.map((p) => `<option>${esc(p.name)}</option>`).join("");
   $("cal-book").innerHTML = CFG.programs.map((p) => `<option>${esc(p.name)}</option>`).join("");
+  $("appt-program").innerHTML = CFG.programs.map((p) => `<option>${esc(p.name)}</option>`).join("");
+  const fmtT = (t) => { if (!t) return ""; const p = t.split(":").map(Number); const ap = p[0] >= 12 ? "PM" : "AM"; return (p[0] % 12 || 12) + ":" + String(p[1] || 0).padStart(2, "0") + " " + ap; };
   const draw = () => {
     const f = sel.value;
     const items = get().filter((x) => !f || x.program === f).sort((x, y) => (x.when || "").localeCompare(y.when || ""));
-    $("cal-list").innerHTML = items.length ? items.map((x) =>
-      `<li><strong>${esc(x.when)}</strong> — ${esc(x.program)}<br>Client: ${esc(x.client)} · With: ${esc(x.with)}<br><span class="hint">${esc(x.note || "")} (entered by ${esc(x.by)})</span> <button type="button" data-del="${esc(x.id)}">Remove</button></li>`).join("")
+    $("cal-list").innerHTML = items.length ? items.map((x) => x.type === "client-appointment"
+      ? `<li class="appt-item"><span class="badge badge-appt">Client Appointment</span> <strong>${esc(x.date || "")}${x.start ? " · " + fmtT(x.start) + (x.end ? "–" + fmtT(x.end) : "") : ""}</strong> — ${esc(x.program)}<br>Client: <strong>${esc(x.client)}</strong> · With: ${esc(x.staff || "")}${x.location ? `<br>Location: ${esc(x.location)}` : ""}<br><span class="hint">${esc(x.note || "")} (entered by ${esc(x.by)})</span> <button type="button" data-del="${esc(x.id)}">Remove</button></li>`
+      : `<li><strong>${esc(x.when)}</strong> — ${esc(x.program)}<br>Client: ${esc(x.client)} · With: ${esc(x.with)}<br><span class="hint">${esc(x.note || "")} (entered by ${esc(x.by)})</span> <button type="button" data-del="${esc(x.id)}">Remove</button></li>`).join("")
       : '<li class="hint">No appointments on this calendar yet.</li>';
     document.querySelectorAll("[data-del]").forEach((b) => b.addEventListener("click", () => { set(get().filter((x) => x.id !== b.dataset.del)); draw(); }));
   };
@@ -40,6 +43,14 @@ function renderCalendar() {
     items.unshift({ id: "APT-" + Date.now(), program: $("cal-book").value, client: $("cal-client").value.trim(), when: $("cal-when").value, with: $("cal-with").value.trim(), note: $("cal-note").value.trim(), by: state.user.name });
     set(items); e.target.reset(); draw();
     $("cal-msg").textContent = "Appointment added — every employee can see it and make changes.";
+  });
+  $("appt-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const date = $("appt-date").value, start = $("appt-start").value, end = $("appt-end").value;
+    const items = get();
+    items.unshift({ id: "CAPT-" + Date.now(), type: "client-appointment", program: $("appt-program").value, client: $("appt-client").value.trim(), staff: $("appt-staff").value.trim(), date: date, start: start, end: end, when: date + "T" + (start || "00:00"), location: $("appt-location").value.trim(), note: $("appt-note").value.trim(), by: state.user.name });
+    set(items); e.target.reset(); draw();
+    $("appt-msg").textContent = "Client appointment added — scheduling record only; it does not notify anyone.";
   });
   draw();
 }
