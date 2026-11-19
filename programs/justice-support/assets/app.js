@@ -134,6 +134,52 @@ function initAppts() {
 }
 
 
+
+/* -------- appointment requests queue — this program's website requests --------
+   One shared store (cpp.portal.apptreq.v1) for the Portal and every program
+   dashboard, on this device. Requests from the website's Request an Appointment
+   form arrive in the company inbox; staff enter them here or in the Portal.
+   This panel shows this program's requests. Accept converts a request into a
+   client appointment in the shared calendar store (cpp.portal.cal.v1);
+   Decline records the outcome on the entry and closes it. */
+const QKEY = "cpp.portal.apptreq.v1";
+function renderReqs() {
+  const all = store.get(QKEY, []);
+  const open = all.filter((r) => r.status === "new" && myPrograms().includes(r.program));
+  const done = all.filter((r) => r.status !== "new" && myPrograms().includes(r.program)).length;
+  $("req-list").innerHTML = open.length ? open.map((r) => `<li class="appt-item"><span class="badge badge-appt">Appointment Request</span><br><span class="appt-client">From: <strong>${esc(r.name)}</strong></span> \u00b7 Program: ${esc(r.program)}<br>For: ${esc(r.purpose)}<br>Phone: ${esc(r.phone || "")}${r.email ? " \u00b7 Email: " + esc(r.email) : ""}<br>Preferred: ${esc(r.preferred || "")} \u00b7 Meet: ${esc(r.meet || "")}<br><span class="hint">Entered by ${esc(r.by)} \u2014 a request only; not confirmed until the office confirms with the person.</span><div class="appt-actions"><label>Date <input type="date" id="acc-date-${esc(r.id)}"></label> <label>Start <input type="time" id="acc-start-${esc(r.id)}"></label> <label>End <input type="time" id="acc-end-${esc(r.id)}"></label> <button type="button" class="btn-small" data-accept="${esc(r.id)}">Accept \u2014 add to calendar</button> <button type="button" class="btn-small" data-decline="${esc(r.id)}">Decline</button></div></li>`).join("")
+    : '<li class="hint">No appointment requests waiting for this program.</li>';
+  $("req-count").textContent = done ? done + " closed request" + (done === 1 ? "" : "s") + " for this program kept on record in the store (accepted and declined, with who decided and when)." : "";
+  document.querySelectorAll("[data-accept]").forEach((b) => b.addEventListener("click", () => {
+    const r = store.get(QKEY, []).find((x) => x.id === b.dataset.accept); if (!r) return;
+    const date = $("acc-date-" + r.id).value, start = $("acc-start-" + r.id).value, end = $("acc-end-" + r.id).value;
+    if (!date) { $("req-msg").textContent = "Set the appointment date first \u2014 the office confirms the day with the person, then accept."; return; }
+    const items = store.get(AKEY, []);
+    const appt = { id: "CAPT-" + Date.now(), type: "client-appointment", program: r.program, client: r.name, staff: "", date: date, start: start, end: end, when: date + "T" + (start || "00:00"), location: r.meet === "In person" ? "" : (r.meet || ""), purpose: r.purpose, note: "Accepted from a website appointment request. Phone: " + (r.phone || "") + (r.email ? " \u00b7 Email: " + r.email : "") + (r.preferred ? " \u00b7 Preferred: " + r.preferred : "") + " \u00b7 Meet: " + (r.meet || ""), source: "website-request", by: state.user.name };
+    items.unshift(appt); store.set(AKEY, items);
+    const reqs = store.get(QKEY, []); const q = reqs.find((x) => x.id === r.id);
+    if (q) { q.status = "accepted"; q.outcomeBy = state.user.name; q.outcomeAt = new Date().toLocaleString(); q.apptId = appt.id; store.set(QKEY, reqs); }
+    renderReqs(); renderAppts();
+    $("req-msg").textContent = "Accepted \u2014 " + r.name + " is on the shared calendar. The office still confirms with the person directly.";
+  }));
+  document.querySelectorAll("[data-decline]").forEach((b) => b.addEventListener("click", () => {
+    const reqs = store.get(QKEY, []); const q = reqs.find((x) => x.id === b.dataset.decline); if (!q) return;
+    q.status = "declined"; q.outcomeBy = state.user.name; q.outcomeAt = new Date().toLocaleString(); store.set(QKEY, reqs); renderReqs();
+    $("req-msg").textContent = "Request declined and kept on record.";
+  }));
+}
+function initReqs() {
+  $("req-prog").textContent = CFG.name;
+  $("req-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const reqs = store.get(QKEY, []);
+    reqs.unshift({ id: "REQ-" + Date.now(), status: "new", name: $("req-name").value.trim(), phone: $("req-phone").value.trim(), email: $("req-email").value.trim(), purpose: $("req-purpose").value.trim(), program: CFG.name, preferred: $("req-preferred").value.trim(), meet: $("req-meet").value, by: state.user.name, at: new Date().toLocaleString() });
+    store.set(QKEY, reqs); e.target.reset(); renderReqs();
+    $("req-msg").textContent = "Request entered in the queue.";
+  });
+  renderReqs();
+}
+
 function enterApp() {
   $("login-screen").hidden = true; $("app").hidden = false;
   $("who").textContent = "Signed in: " + state.user.name + " (" + state.user.role + ")";
@@ -141,7 +187,7 @@ function enterApp() {
   $("prog-head").innerHTML = `<h2>${esc(CFG.name)}</h2><p class="hint">Status: ${esc(CFG.status)} · Lead: ${esc(CFG.lead)}</p>
     <p><a href="${esc(CFG.driveUrl)}" target="_blank" rel="noopener"><strong>Open this program's Google Drive folder</strong></a> · <a href="https://centipedepeertopeerllc-svg.github.io/portal/">Back to the Company Portal (shared calendar &amp; appointments)</a></p>
     ${CFG.guardrail ? `<p class="hint">${esc(CFG.guardrail)}</p>` : ""}`;
-  buildForms(); renderRecords(); renderNotes(); initAppts(); renderIds();
+  buildForms(); renderRecords(); renderNotes(); initAppts(); initReqs(); renderIds();
   if (window.CPPMail) CPPMail.mount($("email-panel"), {});
   $("logout-btn").addEventListener("click", () => { try { CPPAuth.signOut(); } catch { location.reload(); } });
 }
