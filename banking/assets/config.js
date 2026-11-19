@@ -50,6 +50,15 @@ window.BANKING_CONFIG = {
     { nickname: "Tom Clark Payroll Card", last4: null, limit: "$5,000", drawsOn: "Checking \u2022\u20222468" }
   ],
 
+  // Company credit cards on record (CEO direction, November 19, 2026).
+  // A credit card is its own credit line — it does NOT draw on any bank
+  // account. Only the last-4 of a card is ever recorded here, never a
+  // full card number. Authorized users are recorded exactly as the CEO
+  // states them; until he does, the list is empty and the page says so.
+  creditCards: [
+    { nickname: "American Express — Company Card", last4: null, limit: null, authorizedUsers: [], note: "Building project card — EDMC building project, $26,852 (Company Financial Records binder, Entry 001). NOT on the bank account. Last-4 and authorized users to be provided by the CEO." }
+  ],
+
   // Tax Center seed — counts only, as recorded with date.
   taxCenter: {
     asOf: "As of November 15, 2026",
