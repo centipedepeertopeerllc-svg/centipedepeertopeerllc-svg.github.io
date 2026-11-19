@@ -301,40 +301,70 @@ function renderCards() {
       </div>`).join("")}
     </div>`;
 }
+function fmtUSD(n) {
+  return "$" + Number(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function creditUsed(c) {
+  return (c.charges || []).reduce((sum, ch) => sum + (Number(ch.amount) || 0), 0);
+}
+function creditAvailable(c) {
+  if (typeof c.limitAmount !== "number") return null;
+  return c.limitAmount - creditUsed(c);
+}
 function renderCredit() {
   const el = $("credit-section");
   if (!el) return;
   const cards = CFG.creditCards || [];
   el.innerHTML = `<h2>Company credit cards</h2>
     <p class="hint">Credit cards are their own credit lines \u2014 they do not draw on any bank account. Only the last-4 of each card is ever recorded.</p>
-    <div class="card-grid">${cards.map((c, i) => `
+    <div class="card-grid">${cards.map((c, i) => {
+      const used = creditUsed(c);
+      const avail = creditAvailable(c);
+      return `
       <div class="card-tile">
         <div class="card-name">${esc(c.nickname)}</div>
         <div class="card-last4">${c.last4 ? "\u2022\u2022" + esc(c.last4) : "last-4 pending \u2014 to be provided by the CEO"}</div>
-        <div class="meta">Limit: ${c.limit ? esc(c.limit) : "limit not on record"}</div>
+        <div class="meta">Credit limit: ${typeof c.limitAmount === "number" ? fmtUSD(c.limitAmount) : (c.limit ? esc(c.limit) : "limit not on record")}</div>
+        <div class="meta">Total used: ${fmtUSD(used)}</div>
+        <div class="meta">Available credit: ${avail !== null ? fmtUSD(avail) : "not on record"}</div>
+        ${(c.charges && c.charges.length) ? `<div class="meta">Charges on record:</div>` + c.charges.map((ch) => `<div class="meta">&bull; ${esc(ch.date || "")} \u2014 ${esc(ch.description || "Charge")} \u2014 ${fmtUSD(ch.amount || 0)}</div>`).join("") : `<div class="meta">No charges on record.</div>`}
         <div class="meta">Authorized users: ${c.authorizedUsers && c.authorizedUsers.length ? esc(c.authorizedUsers.join(", ")) : "to be provided by the CEO"}</div>
         <div class="meta">${esc(c.note || "")}</div>
+        <div class="meta">A purchase order is required to use this card, approved by Eric Jacobson.</div>
         <div class="meta"><button type="button" class="btn-small" onclick="downloadCreditStatement(${i})">Download statement of record</button></div>
-      </div>`).join("")}
+      </div>`; }).join("")}
     </div>`;
 }
 function downloadCreditStatement(i) {
   const c = (CFG.creditCards || [])[i];
   if (!c) return;
+  const used = creditUsed(c);
+  const avail = creditAvailable(c);
   const lines = [
     "CENTIPEDE PEER TO PEER, LLC",
     "Company Financial Records \u2014 Statement of Record",
     "",
     "Card: " + c.nickname + (c.last4 ? " \u2022\u2022\u2022\u2022 " + c.last4 : " \u2014 last-4 to be provided by the CEO"),
     "Authorized users: " + (c.authorizedUsers && c.authorizedUsers.length ? c.authorizedUsers.join(", ") : "to be provided by the CEO"),
-    "Limit: " + (c.limit || "not on record"),
+    "Credit limit: " + (typeof c.limitAmount === "number" ? fmtUSD(c.limitAmount) : (c.limit || "not on record")),
+    "",
+    "Charges on record:"
+  ];
+  (c.charges || []).forEach((ch) => {
+    lines.push("- " + (ch.date || "") + " \u2014 " + (ch.description || "Charge") + " \u2014 " + fmtUSD(ch.amount || 0));
+  });
+  lines.push(
+    "",
+    "Total used: " + fmtUSD(used),
+    "Available credit: " + (avail !== null ? fmtUSD(avail) : "not on record"),
     "Note: " + (c.note || ""),
     "",
+    "A purchase order is required to use this card, approved by Eric Jacobson.",
     "This card is a company credit line. It is not on the company bank account.",
     "Only the last four digits of the card are ever recorded \u2014 never the full number.",
     "Full statement of record: Company Financial Records binder (Finance), statement-american-express.pdf.",
     "Kept by Jarvis, Board Officer / Record Keeper. Figures are the company's own records as stated by the CEO, with their as-of date."
-  ];
+  );
   const blob = new Blob([lines.join("\n")], { type: "text/plain" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
