@@ -110,6 +110,57 @@ function renderCalendar() {
   draw();
 }
 
+
+/* -------- appointment requests queue — website requests, office-reviewed --------
+   One shared store (cpp.portal.apptreq.v1) for the Portal and every program
+   dashboard, on this device. Requests from the website's Request an Appointment
+   form arrive in the company inbox; staff enter them here from the inbox or the
+   form's responses — this queue does not pull from the form by itself. Accept
+   converts a request into a client appointment in the shared calendar store
+   (cpp.portal.cal.v1); Decline records the outcome on the entry and closes it. */
+function renderRequests() {
+  const RKEY = "cpp.portal.apptreq.v1", CKEY = "cpp.portal.cal.v1";
+  const getR = () => { try { return JSON.parse(localStorage.getItem(RKEY)) || []; } catch { return []; } };
+  const setR = (v) => localStorage.setItem(RKEY, JSON.stringify(v));
+  const getC = () => { try { return JSON.parse(localStorage.getItem(CKEY)) || []; } catch { return []; } };
+  const setC = (v) => localStorage.setItem(CKEY, JSON.stringify(v));
+  $("req-program").innerHTML = CFG.programs.map((p) => `<option>${esc(p.name)}</option>`).join("") + '<option>Not sure</option>';
+  const draw = () => {
+    const all = getR();
+    const open = all.filter((r) => r.status === "new");
+    const done = all.filter((r) => r.status !== "new").length;
+    $("req-list").innerHTML = open.length ? open.map((r) => `<li class="appt-item"><span class="badge badge-appt">Appointment Request</span><br><span class="appt-client">From: <strong>${esc(r.name)}</strong></span> \u00b7 Program: ${esc(r.program)}<br>For: ${esc(r.purpose)}<br>Phone: ${esc(r.phone || "")}${r.email ? " \u00b7 Email: " + esc(r.email) : ""}<br>Preferred: ${esc(r.preferred || "")} \u00b7 Meet: ${esc(r.meet || "")}<br><span class="hint">Entered by ${esc(r.by)} \u2014 a request only; not confirmed until the office confirms with the person.</span><div class="appt-actions"><label>Date <input type="date" id="acc-date-${esc(r.id)}"></label> <label>Start <input type="time" id="acc-start-${esc(r.id)}"></label> <label>End <input type="time" id="acc-end-${esc(r.id)}"></label> <button type="button" class="btn-small" data-accept="${esc(r.id)}">Accept \u2014 add to calendar</button> <button type="button" class="btn-small" data-decline="${esc(r.id)}">Decline</button></div></li>`).join("")
+      : '<li class="hint">No appointment requests waiting.</li>';
+    $("req-count").textContent = done ? done + " closed request" + (done === 1 ? "" : "s") + " kept on record in the store (accepted and declined, with who decided and when)." : "";
+    document.querySelectorAll("[data-accept]").forEach((b) => b.addEventListener("click", () => {
+      const r = getR().find((x) => x.id === b.dataset.accept); if (!r) return;
+      const date = $("acc-date-" + r.id).value, start = $("acc-start-" + r.id).value, end = $("acc-end-" + r.id).value;
+      if (!date) { $("req-msg").textContent = "Set the appointment date first \u2014 the office confirms the day with the person, then accept."; return; }
+      const items = getC();
+      const appt = { id: "CAPT-" + Date.now(), type: "client-appointment", program: r.program === "Not sure" ? "" : r.program, client: r.name, staff: "", date: date, start: start, end: end, when: date + "T" + (start || "00:00"), location: r.meet === "In person" ? "" : (r.meet || ""), purpose: r.purpose, note: "Accepted from a website appointment request. Phone: " + (r.phone || "") + (r.email ? " \u00b7 Email: " + r.email : "") + (r.preferred ? " \u00b7 Preferred: " + r.preferred : "") + " \u00b7 Meet: " + (r.meet || ""), source: "website-request", by: state.user.name };
+      items.unshift(appt); setC(items);
+      const reqs = getR(); const q = reqs.find((x) => x.id === r.id);
+      if (q) { q.status = "accepted"; q.outcomeBy = state.user.name; q.outcomeAt = new Date().toLocaleString(); q.apptId = appt.id; setR(reqs); }
+      draw();
+      const sel2 = $("cal-program"); if (sel2) sel2.dispatchEvent(new Event("change"));
+      $("req-msg").textContent = "Accepted \u2014 " + r.name + " is on the shared calendar. The office still confirms with the person directly.";
+    }));
+    document.querySelectorAll("[data-decline]").forEach((b) => b.addEventListener("click", () => {
+      const reqs = getR(); const q = reqs.find((x) => x.id === b.dataset.decline); if (!q) return;
+      q.status = "declined"; q.outcomeBy = state.user.name; q.outcomeAt = new Date().toLocaleString(); setR(reqs); draw();
+      $("req-msg").textContent = "Request declined and kept on record.";
+    }));
+  };
+  $("req-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const reqs = getR();
+    reqs.unshift({ id: "REQ-" + Date.now(), status: "new", name: $("req-name").value.trim(), phone: $("req-phone").value.trim(), email: $("req-email").value.trim(), purpose: $("req-purpose").value.trim(), program: $("req-program").value, preferred: $("req-preferred").value.trim(), meet: $("req-meet").value, by: state.user.name, at: new Date().toLocaleString() });
+    setR(reqs); e.target.reset(); draw();
+    $("req-msg").textContent = "Request entered in the queue.";
+  });
+  draw();
+}
+
 function enterApp() {
   $("login-screen").hidden = true;
   $("app").hidden = false;
@@ -129,6 +180,7 @@ function enterApp() {
        <span><strong style="font-size:1.1rem;">${esc(p.name)}</strong><br><span class="hint">${esc(p.status)}</span></span>
      </a>`).join("");
   renderCalendar();
+  renderRequests();
   $("logout-btn").addEventListener("click", () => { try { CPPAuth.signOut(); } catch { location.reload(); } });
 }
 
