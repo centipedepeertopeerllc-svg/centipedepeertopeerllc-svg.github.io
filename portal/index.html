@@ -116,8 +116,9 @@
       <div id="program-list"></div>
       <h2>Instructions — how to use the dashboards</h2>
       <div style="white-space:pre-wrap;" class="hint">HOW TO USE THE COMPANY DASHBOARDS — INSTRUCTIONS FOR THE WHOLE TEAM<br>Centipede Peer to Peer, LLC — November 18, 2026<br><br>THE ONE DOOR. Everything starts at the Company Portal:<br>https://centipedepeertopeerllc-svg.github.io/portal/<br>Use of the portal for company work is mandatory (Policy CPP-POL-2026-031). The public website is for outreach only.<br><br>YOUR SIGN-IN IS THE SAME EVERYWHERE. Username, password, and the 6-digit code from your authenticator app — the same on every dashboard. Your first sign-in used a temporary password; you changed it and set up your authenticator then. Never share your password or codes with anyone. If you are locked out, tell Jarvis.<br><br>WHAT IS INSIDE.<br>- Program tiles: every program has its own tile with its seal. Click it to open that program's own dashboard — its records, its DAP-style notes, its email, and a link to its own Google Drive folder.<br>- Dashboards row: Client Dashboard, DAP Notes, HR, Banking — and, for the Chief Executive Officer as administrator, the Board, IT, and Insurance dashboards.<br>- The Legal Department Portal is restricted to the CEO and counsel.<br><br>THE SHARED CALENDAR. Inside the portal is one shared calendar with a client appointment book for each program. Every employee can see every appointment and can make changes. Pick the program, or view all programs together.<br><br>EMAIL — INSIDE EVERY DASHBOARD. Each dashboard holds the company email app: your picture and name at the top, folders, and compose — email goes to any address. In "My signature & picture" you keep your own signature; your seal is your account picture. Our new addresses (@centipedepeertopeer.llc) go live December 1, 2026 — until then, anything you send from a dashboard waits in your Outbox, and company email runs through the company Gmail as it does today.<br><br>DAP-STYLE NOTES. Program notes are written the DAP way: Data — the person's own words and what happened; Assessment — what we observed, in peer-support words; Plan — next steps, who owns them, and when.<br><br>INSURANCE. The Insurance Dashboard holds the company policies, certificates, claims, a roll-down directory of the insurance companies in San Joaquin County (each with its email for communications and how its billing is sent in), and the place to file clients' insurance cards. Clients who do NOT have insurance are on their own dashboard — Clients Without Insurance — kept separate on purpose: there is no billing and no payments for them; the work there is getting them covered.<br><br>GOOGLE DRIVE. Each program has its own folder in the company Drive ("Centipede Programs"), reached from its dashboard. Program documents go there. Client case files NEVER go in Drive — they stay in the locked binders and the client dashboards.<br><br>THE RULES THAT DO NOT CHANGE. Client information stays inside the dashboards and binders — never in personal email or texts, in either direction. The binders are the official record. If anything here does not work, tell Jarvis and it goes on the IT log the same day.<br><br>— Jarvis, Board Officer / Record Keeper, for the Chief Executive Officer<br></div>
-      <h2>Shared calendar — client appointments, by program</h2>
+      <h2>Shared calendar \u2014 client appointments, by program</h2>
       <p class="hint">One shared calendar for the whole team. Every program has its own appointment book inside it; every employee can see every appointment and make changes.</p>
+      <p><a class="btn-small" href="sms:?&body=Centipede%20Company%20Portal%20%E2%80%94%20shared%20calendar%3A%20https%3A%2F%2Fcentipedepeertopeerllc-svg.github.io%2Fportal%2F">Share calendar by text</a> <span class="hint">Texts the Portal's web address to a phone \u2014 open it in the phone's browser and sign in as usual. No client information travels in the link itself.</span></p>
       <label>View <select id="cal-program"></select></label>
       <ul id="cal-list" class="note-list"></ul>
       <form id="cal-form">
@@ -126,23 +127,32 @@
         <label>Date &amp; time <input id="cal-when" type="datetime-local"></label>
         <label>With (staff) <input id="cal-with" type="text"></label>
         <label>Note <input id="cal-note" type="text"></label>
-        <button type="submit">Add appointment</button>
+        <button type="submit" id="cal-submit" class="btn-navy">Add appointment</button>
+        <button type="button" id="cal-cancel" class="btn-small" hidden>Cancel edit</button>
+        <button type="button" id="cal-del" class="btn-small btn-danger" hidden>Delete this entry</button>
         <span id="cal-msg" class="hint" role="status"></span>
       </form>
-      <h3>Client Appointments</h3>
-      <p class="hint">Book a client appointment here: it appears on the shared calendar with a gold "Client Appointment" label and the client's name, in the Portal and in that program's own dashboard. This calendar is a scheduling and record tool only — it does not notify anyone. Staff assignments are still given by email or text, never by calendar alone.</p>
-      <form id="appt-form">
-        <label>Client name <input id="appt-client" type="text" required></label>
-        <label>Program <select id="appt-program"></select></label>
-        <label>Staff member <input id="appt-staff" type="text"></label>
-        <label>Date <input id="appt-date" type="date" required></label>
-        <label>Start time <input id="appt-start" type="time"></label>
-        <label>End time <input id="appt-end" type="time"></label>
-        <label>Location <input id="appt-location" type="text"></label>
-        <label>Notes <input id="appt-note" type="text"></label>
-        <button type="submit">Add client appointment</button>
-        <span id="appt-msg" class="hint" role="status"></span>
-      </form>
+      <div class="cal-block">
+        <div class="cal-band">Client Appointments</div>
+        <p class="hint">Book a client appointment: it appears on the shared calendar with a gold "Client Appointment" label and the client's name, here and in that program's own dashboard. Any appointment can be changed or deleted at any time with its Edit button. This calendar is a scheduling and record tool only \u2014 it does not notify anyone. "Text this appointment" opens your own Messages app, addressed to the company cell (209) 871-3939, with the one appointment written out for you to review and send yourself. Staff assignments are still given by email or text, never by calendar alone.</p>
+        <form id="appt-form" class="appt-form">
+          <label>Client name <span class="req">*</span> <input id="appt-client" type="text" required></label>
+          <label>Program <select id="appt-program"></select></label>
+          <label>Staff member <input id="appt-staff" type="text"></label>
+          <div class="grid2">
+            <label>Date <span class="req">*</span> <input id="appt-date" type="date" required></label>
+            <label>Start time <input id="appt-start" type="time"></label>
+            <label>End time <input id="appt-end" type="time"></label>
+            <label>Location <input id="appt-location" type="text"></label>
+          </div>
+          <label>What it's for <input id="appt-purpose" type="text"></label>
+          <label>Notes <input id="appt-note" type="text"></label>
+          <button type="submit" id="appt-submit" class="btn-navy">Add client appointment</button>
+          <button type="button" id="appt-cancel" class="btn-small" hidden>Cancel edit</button>
+          <button type="button" id="appt-del" class="btn-small btn-danger" hidden>Delete this appointment</button>
+          <span id="appt-msg" class="hint" role="status"></span>
+        </form>
+      </div>
     </section>
 
     <section class="panel" id="reference-library-panel">

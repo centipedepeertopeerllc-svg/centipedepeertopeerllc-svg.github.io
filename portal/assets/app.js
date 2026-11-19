@@ -23,35 +23,90 @@ function renderCalendar() {
   const get = () => { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; } };
   const set = (v) => localStorage.setItem(KEY, JSON.stringify(v));
   const sel = $("cal-program");
-  sel.innerHTML = '<option value="">All programs — shared view</option>' + CFG.programs.map((p) => `<option>${esc(p.name)}</option>`).join("");
+  sel.innerHTML = '<option value="">All programs \u2014 shared view</option>' + CFG.programs.map((p) => `<option>${esc(p.name)}</option>`).join("");
   $("cal-book").innerHTML = CFG.programs.map((p) => `<option>${esc(p.name)}</option>`).join("");
   $("appt-program").innerHTML = CFG.programs.map((p) => `<option>${esc(p.name)}</option>`).join("");
   const fmtT = (t) => { if (!t) return ""; const p = t.split(":").map(Number); const ap = p[0] >= 12 ? "PM" : "AM"; return (p[0] % 12 || 12) + ":" + String(p[1] || 0).padStart(2, "0") + " " + ap; };
+  const fmtDay = (d) => { if (!d) return ""; try { return new Date(d + "T12:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" }); } catch { return d; } };
+  const smsHref = (x) => {
+    const lines = ["Centipede Peer to Peer \u2014 Client Appointment", "Client: " + (x.client || "")];
+    if (x.purpose) lines.push("For: " + x.purpose);
+    lines.push("When: " + fmtDay(x.date) + (x.start ? " \u00b7 " + fmtT(x.start) + (x.end ? "\u2013" + fmtT(x.end) : "") : ""));
+    lines.push("Program: " + (x.program || ""));
+    if (x.staff) lines.push("Staff: " + x.staff);
+    if (x.location) lines.push("Location: " + x.location);
+    return "sms:2098713939?&body=" + encodeURIComponent(lines.join("\n"));
+  };
+  let editCalId = null, editApptId = null;
+  const setEditUI = (form, on, submitId, cancelId, delId, addLabel) => {
+    $(submitId).textContent = on ? "Save changes" : addLabel;
+    $(cancelId).hidden = !on; $(delId).hidden = !on;
+  };
+  const exitCalEdit = () => { editCalId = null; $("cal-form").reset(); setEditUI(null, false, "cal-submit", "cal-cancel", "cal-del", "Add appointment"); };
+  const exitApptEdit = () => { editApptId = null; $("appt-form").reset(); setEditUI(null, false, "appt-submit", "appt-cancel", "appt-del", "Add client appointment"); };
   const draw = () => {
+    if (editCalId && !get().some((x) => x.id === editCalId)) exitCalEdit();
+    if (editApptId && !get().some((x) => x.id === editApptId)) exitApptEdit();
     const f = sel.value;
     const items = get().filter((x) => !f || x.program === f).sort((x, y) => (x.when || "").localeCompare(y.when || ""));
     $("cal-list").innerHTML = items.length ? items.map((x) => x.type === "client-appointment"
-      ? `<li class="appt-item"><span class="badge badge-appt">Client Appointment</span> <strong>${esc(x.date || "")}${x.start ? " · " + fmtT(x.start) + (x.end ? "–" + fmtT(x.end) : "") : ""}</strong> — ${esc(x.program)}<br>Client: <strong>${esc(x.client)}</strong> · With: ${esc(x.staff || "")}${x.location ? `<br>Location: ${esc(x.location)}` : ""}<br><span class="hint">${esc(x.note || "")} (entered by ${esc(x.by)})</span> <button type="button" data-del="${esc(x.id)}">Remove</button></li>`
-      : `<li><strong>${esc(x.when)}</strong> — ${esc(x.program)}<br>Client: ${esc(x.client)} · With: ${esc(x.with)}<br><span class="hint">${esc(x.note || "")} (entered by ${esc(x.by)})</span> <button type="button" data-del="${esc(x.id)}">Remove</button></li>`).join("")
+      ? `<li class="appt-item"><span class="badge badge-appt">Client Appointment</span><span class="appt-when">${esc(fmtDay(x.date))}${x.start ? " \u00b7 " + fmtT(x.start) + (x.end ? "\u2013" + fmtT(x.end) : "") : ""}</span> \u2014 ${esc(x.program)}<br><span class="appt-client">Client: <strong>${esc(x.client)}</strong></span> \u00b7 With: ${esc(x.staff || "")}${x.purpose ? `<br>For: ${esc(x.purpose)}` : ""}${x.location ? `<br>Location: ${esc(x.location)}` : ""}<br><span class="hint">${esc(x.note || "")} (entered by ${esc(x.by)}${x.editedBy ? " \u00b7 edited by " + esc(x.editedBy) : ""})</span><div class="appt-actions"><a class="btn-small" href="${esc(smsHref(x))}">Text this appointment</a><button type="button" class="btn-small" data-aedit="${esc(x.id)}">Edit</button><button type="button" class="btn-small" data-del="${esc(x.id)}">Remove</button></div></li>`
+      : `<li><strong>${esc(x.when)}</strong> \u2014 ${esc(x.program)}<br>Client: ${esc(x.client)} \u00b7 With: ${esc(x.with)}<br><span class="hint">${esc(x.note || "")} (entered by ${esc(x.by)}${x.editedBy ? " \u00b7 edited by " + esc(x.editedBy) : ""})</span><div class="appt-actions"><button type="button" class="btn-small" data-edit="${esc(x.id)}">Edit</button><button type="button" class="btn-small" data-del="${esc(x.id)}">Remove</button></div></li>`).join("")
       : '<li class="hint">No appointments on this calendar yet.</li>';
     document.querySelectorAll("[data-del]").forEach((b) => b.addEventListener("click", () => { set(get().filter((x) => x.id !== b.dataset.del)); draw(); }));
+    document.querySelectorAll("[data-edit]").forEach((b) => b.addEventListener("click", () => {
+      const x = get().find((y) => y.id === b.dataset.edit); if (!x) return;
+      editCalId = x.id;
+      $("cal-book").value = x.program || ""; $("cal-client").value = x.client || ""; $("cal-when").value = x.when || ""; $("cal-with").value = x.with || ""; $("cal-note").value = x.note || "";
+      setEditUI(null, true, "cal-submit", "cal-cancel", "cal-del", "Add appointment");
+      $("cal-msg").textContent = "Editing this entry \u2014 change the fields and Save changes, or Cancel.";
+      $("cal-form").scrollIntoView();
+    }));
+    document.querySelectorAll("[data-aedit]").forEach((b) => b.addEventListener("click", () => {
+      const x = get().find((y) => y.id === b.dataset.aedit); if (!x) return;
+      editApptId = x.id;
+      $("appt-client").value = x.client || ""; $("appt-program").value = x.program || ""; $("appt-staff").value = x.staff || "";
+      $("appt-date").value = x.date || ""; $("appt-start").value = x.start || ""; $("appt-end").value = x.end || "";
+      $("appt-location").value = x.location || ""; $("appt-purpose").value = x.purpose || ""; $("appt-note").value = x.note || "";
+      setEditUI(null, true, "appt-submit", "appt-cancel", "appt-del", "Add client appointment");
+      $("appt-msg").textContent = "Editing this appointment \u2014 change the fields and Save changes, or Cancel.";
+      $("appt-form").scrollIntoView();
+    }));
   };
   sel.addEventListener("change", draw);
   $("cal-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const items = get();
-    items.unshift({ id: "APT-" + Date.now(), program: $("cal-book").value, client: $("cal-client").value.trim(), when: $("cal-when").value, with: $("cal-with").value.trim(), note: $("cal-note").value.trim(), by: state.user.name });
-    set(items); e.target.reset(); draw();
-    $("cal-msg").textContent = "Appointment added — every employee can see it and make changes.";
+    if (editCalId) {
+      const x = items.find((y) => y.id === editCalId);
+      if (x) { x.program = $("cal-book").value; x.client = $("cal-client").value.trim(); x.when = $("cal-when").value; x.with = $("cal-with").value.trim(); x.note = $("cal-note").value.trim(); x.editedBy = state.user.name; set(items); }
+      exitCalEdit(); draw();
+      $("cal-msg").textContent = "Appointment updated.";
+    } else {
+      items.unshift({ id: "APT-" + Date.now(), program: $("cal-book").value, client: $("cal-client").value.trim(), when: $("cal-when").value, with: $("cal-with").value.trim(), note: $("cal-note").value.trim(), by: state.user.name });
+      set(items); e.target.reset(); draw();
+      $("cal-msg").textContent = "Appointment added \u2014 every employee can see it and make changes.";
+    }
   });
+  $("cal-cancel").addEventListener("click", () => { exitCalEdit(); $("cal-msg").textContent = "Edit cancelled."; });
+  $("cal-del").addEventListener("click", () => { if (editCalId) { set(get().filter((x) => x.id !== editCalId)); exitCalEdit(); draw(); $("cal-msg").textContent = "Entry deleted."; } });
   $("appt-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const date = $("appt-date").value, start = $("appt-start").value, end = $("appt-end").value;
     const items = get();
-    items.unshift({ id: "CAPT-" + Date.now(), type: "client-appointment", program: $("appt-program").value, client: $("appt-client").value.trim(), staff: $("appt-staff").value.trim(), date: date, start: start, end: end, when: date + "T" + (start || "00:00"), location: $("appt-location").value.trim(), note: $("appt-note").value.trim(), by: state.user.name });
-    set(items); e.target.reset(); draw();
-    $("appt-msg").textContent = "Client appointment added — scheduling record only; it does not notify anyone.";
+    if (editApptId) {
+      const x = items.find((y) => y.id === editApptId);
+      if (x) { x.program = $("appt-program").value; x.client = $("appt-client").value.trim(); x.staff = $("appt-staff").value.trim(); x.date = date; x.start = start; x.end = end; x.when = date + "T" + (start || "00:00"); x.location = $("appt-location").value.trim(); x.purpose = $("appt-purpose").value.trim(); x.note = $("appt-note").value.trim(); x.editedBy = state.user.name; set(items); }
+      exitApptEdit(); draw();
+      $("appt-msg").textContent = "Client appointment updated.";
+    } else {
+      items.unshift({ id: "CAPT-" + Date.now(), type: "client-appointment", program: $("appt-program").value, client: $("appt-client").value.trim(), staff: $("appt-staff").value.trim(), date: date, start: start, end: end, when: date + "T" + (start || "00:00"), location: $("appt-location").value.trim(), purpose: $("appt-purpose").value.trim(), note: $("appt-note").value.trim(), by: state.user.name });
+      set(items); e.target.reset(); draw();
+      $("appt-msg").textContent = "Client appointment added \u2014 scheduling record only; it does not notify anyone.";
+    }
   });
+  $("appt-cancel").addEventListener("click", () => { exitApptEdit(); $("appt-msg").textContent = "Edit cancelled."; });
+  $("appt-del").addEventListener("click", () => { if (editApptId) { set(get().filter((x) => x.id !== editApptId)); exitApptEdit(); draw(); $("appt-msg").textContent = "Client appointment deleted."; } });
   draw();
 }
 

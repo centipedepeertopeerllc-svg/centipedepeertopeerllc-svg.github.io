@@ -48,21 +48,45 @@ function buildForms() {
     $("note-msg").textContent = "Note saved as " + n.id + ".";
   });
 }
-/* -------- client appointments — this program's book in the shared calendar --------
-   Same store as the Portal calendar (cpp.portal.cal.v1), so an appointment
-   booked here shows in the Portal and the other way around. Scheduling and
-   record only: nothing here notifies anyone. */
+/* -------- client appointments \u2014 this program's book in the shared calendar --------
+   One shared store for the Portal and every program dashboard
+   (cpp.portal.cal.v1), so an appointment entered anywhere shows everywhere
+   on this device. Scheduling and record only: nothing here notifies anyone;
+   "Text this appointment" opens the phone's own Messages app. */
 const AKEY = "cpp.portal.cal.v1";
 const PROG_ALIASES = { "hygiene-outreach": ["Hygiene"], "homeless-shelter": ["Shelter \u2014 Stockton"] };
 function myPrograms() { return [CFG.name].concat(PROG_ALIASES[CFG.slug] || []); }
+const fmtT = (t) => { if (!t) return ""; const p = t.split(":").map(Number); const ap = p[0] >= 12 ? "PM" : "AM"; return (p[0] % 12 || 12) + ":" + String(p[1] || 0).padStart(2, "0") + " " + ap; };
+const fmtDay = (d) => { if (!d) return ""; try { return new Date(d + "T12:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" }); } catch { return d; } };
+const smsHref = (x) => {
+  const lines = ["Centipede Peer to Peer \u2014 Client Appointment", "Client: " + (x.client || "")];
+  if (x.purpose) lines.push("For: " + x.purpose);
+  lines.push("When: " + fmtDay(x.date) + (x.start ? " \u00b7 " + fmtT(x.start) + (x.end ? "\u2013" + fmtT(x.end) : "") : ""));
+  lines.push("Program: " + (x.program || ""));
+  if (x.staff) lines.push("Staff: " + x.staff);
+  if (x.location) lines.push("Location: " + x.location);
+  return "sms:2098713939?&body=" + encodeURIComponent(lines.join("\n"));
+};
+let editAptId = null;
+function exitAptEdit() { editAptId = null; $("apt-form").reset(); $("apt-submit").textContent = "Add client appointment"; $("apt-cancel").hidden = true; $("apt-del").hidden = true; }
 function renderAppts() {
+  if (editAptId && !store.get(AKEY, []).some((x) => x.id === editAptId)) exitAptEdit();
   const items = store.get(AKEY, []).filter((x) => myPrograms().includes(x.program)).sort((x, y) => (x.when || "").localeCompare(y.when || ""));
-  const fmtT = (t) => { if (!t) return ""; const p = t.split(":").map(Number); const ap = p[0] >= 12 ? "PM" : "AM"; return (p[0] % 12 || 12) + ":" + String(p[1] || 0).padStart(2, "0") + " " + ap; };
   $("apt-list").innerHTML = items.length ? items.map((x) => x.type === "client-appointment"
-    ? `<li class="appt-item"><span class="badge badge-appt">Client Appointment</span> <strong>${esc(x.date || "")}${x.start ? " · " + fmtT(x.start) + (x.end ? "–" + fmtT(x.end) : "") : ""}</strong><br>Client: <strong>${esc(x.client)}</strong> · With: ${esc(x.staff || "")}${x.location ? `<br>Location: ${esc(x.location)}` : ""}<br><span class="hint">${esc(x.note || "")} (entered by ${esc(x.by)})</span> <button type="button" data-adel="${esc(x.id)}">Remove</button></li>`
-    : `<li><strong>${esc(x.when)}</strong><br>Client: ${esc(x.client)} · With: ${esc(x.with || "")}<br><span class="hint">${esc(x.note || "")} (entered by ${esc(x.by)})</span> <button type="button" data-adel="${esc(x.id)}">Remove</button></li>`).join("")
-    : '<li class="hint">No appointments for this program yet.</li>';
+    ? `<li class="appt-item"><span class="badge badge-appt">Client Appointment</span><span class="appt-when">${esc(fmtDay(x.date))}${x.start ? " \u00b7 " + fmtT(x.start) + (x.end ? "\u2013" + fmtT(x.end) : "") : ""}</span><br><span class="appt-client">Client: <strong>${esc(x.client)}</strong></span> \u00b7 With: ${esc(x.staff || "")}${x.purpose ? `<br>For: ${esc(x.purpose)}` : ""}${x.location ? `<br>Location: ${esc(x.location)}` : ""}<br><span class="hint">${esc(x.note || "")} (entered by ${esc(x.by)}${x.editedBy ? " \u00b7 edited by " + esc(x.editedBy) : ""})</span><div class="appt-actions"><a class="btn-small" href="${esc(smsHref(x))}">Text this appointment</a><button type="button" class="btn-small" data-aedit="${esc(x.id)}">Edit</button><button type="button" class="btn-small" data-adel="${esc(x.id)}">Remove</button></div></li>`
+    : `<li><strong>${esc(x.when)}</strong><br>Client: ${esc(x.client)} \u00b7 With: ${esc(x.with || "")}<br><span class="hint">${esc(x.note || "")} (entered by ${esc(x.by)}${x.editedBy ? " \u00b7 edited by " + esc(x.editedBy) : ""})</span><div class="appt-actions"><button type="button" class="btn-small" data-adel="${esc(x.id)}">Remove</button></div></li>`).join("")
+    : '<li class="hint">No client appointments scheduled.</li>';
   document.querySelectorAll("[data-adel]").forEach((b) => b.addEventListener("click", () => { store.set(AKEY, store.get(AKEY, []).filter((x) => x.id !== b.dataset.adel)); renderAppts(); }));
+  document.querySelectorAll("[data-aedit]").forEach((b) => b.addEventListener("click", () => {
+    const x = store.get(AKEY, []).find((y) => y.id === b.dataset.aedit); if (!x) return;
+    editAptId = x.id;
+    $("apt-client").value = x.client || ""; $("apt-staff").value = x.staff || "";
+    $("apt-date").value = x.date || ""; $("apt-start").value = x.start || ""; $("apt-end").value = x.end || "";
+    $("apt-location").value = x.location || ""; $("apt-purpose").value = x.purpose || ""; $("apt-note").value = x.note || "";
+    $("apt-submit").textContent = "Save changes"; $("apt-cancel").hidden = false; $("apt-del").hidden = false;
+    $("apt-msg").textContent = "Editing this appointment \u2014 change the fields and Save changes, or Cancel.";
+    $("apt-form").scrollIntoView();
+  }));
 }
 function initAppts() {
   $("apt-prog").textContent = CFG.name;
@@ -70,12 +94,22 @@ function initAppts() {
     e.preventDefault();
     const date = $("apt-date").value, start = $("apt-start").value, end = $("apt-end").value;
     const items = store.get(AKEY, []);
-    items.unshift({ id: "CAPT-" + Date.now(), type: "client-appointment", program: CFG.name, client: $("apt-client").value.trim(), staff: $("apt-staff").value.trim(), date: date, start: start, end: end, when: date + "T" + (start || "00:00"), location: $("apt-location").value.trim(), note: $("apt-note").value.trim(), by: state.user.name });
-    store.set(AKEY, items); e.target.reset(); renderAppts();
-    $("apt-msg").textContent = "Client appointment added to the shared calendar — scheduling record only; it does not notify anyone.";
+    if (editAptId) {
+      const x = items.find((y) => y.id === editAptId);
+      if (x) { x.client = $("apt-client").value.trim(); x.staff = $("apt-staff").value.trim(); x.date = date; x.start = start; x.end = end; x.when = date + "T" + (start || "00:00"); x.location = $("apt-location").value.trim(); x.purpose = $("apt-purpose").value.trim(); x.note = $("apt-note").value.trim(); x.editedBy = state.user.name; store.set(AKEY, items); }
+      exitAptEdit(); renderAppts();
+      $("apt-msg").textContent = "Client appointment updated.";
+    } else {
+      items.unshift({ id: "CAPT-" + Date.now(), type: "client-appointment", program: CFG.name, client: $("apt-client").value.trim(), staff: $("apt-staff").value.trim(), date: date, start: start, end: end, when: date + "T" + (start || "00:00"), location: $("apt-location").value.trim(), purpose: $("apt-purpose").value.trim(), note: $("apt-note").value.trim(), by: state.user.name });
+      store.set(AKEY, items); e.target.reset(); renderAppts();
+      $("apt-msg").textContent = "Client appointment added to the shared calendar \u2014 scheduling record only; it does not notify anyone.";
+    }
   });
+  $("apt-cancel").addEventListener("click", () => { exitAptEdit(); $("apt-msg").textContent = "Edit cancelled."; });
+  $("apt-del").addEventListener("click", () => { if (editAptId) { store.set(AKEY, store.get(AKEY, []).filter((x) => x.id !== editAptId)); exitAptEdit(); renderAppts(); $("apt-msg").textContent = "Client appointment deleted."; } });
   renderAppts();
 }
+
 
 function enterApp() {
   $("login-screen").hidden = true; $("app").hidden = false;
