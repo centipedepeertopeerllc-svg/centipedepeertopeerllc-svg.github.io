@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign a Form — Centipede Peer to Peer, LLC</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#10243e">
+<style>
+  .sign-wrap { max-width: 900px; margin: 0 auto; padding: 1rem; }
+  .backlink { display:inline-block; margin:0.4rem 0 0.8rem; }
+  #sig-pad { width: 100%; height: 220px; border: 2px solid var(--navy); border-radius: 8px; background: #fff; touch-action: none; cursor: crosshair; display: block; }
+  .sig-line { border-top: 1px solid #999; margin: 0.2rem 0 0.6rem; font-size: 0.8rem; color: #55503f; }
+  .draft-warn { border: 1px solid var(--danger); background: #fbeeee; color: var(--danger); border-radius: 8px; padding: 0.6rem 0.8rem; margin: 0.5rem 0; font-size: 0.92rem; }
+  .rec-item { border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.8rem; margin-bottom: 0.6rem; background: #fffdf7; }
+  .rec-item .meta { font-size: 0.84rem; color: #55503f; }
+  .rec-item img.sig-thumb { max-width: 260px; max-height: 80px; border: 1px solid var(--line); border-radius: 6px; background: #fff; display: block; margin: 0.4rem 0; }
+  #print-area { display: none; }
+  @media print {
+    body > #sign-app { display: none !important; }
+    #print-area { display: block !important; font-family: Georgia, "Times New Roman", serif; color: #000; }
+    #print-area h1 { font-size: 15pt; color: #000; margin-bottom: 2pt; }
+    #print-area table { border-collapse: collapse; width: 100%; margin: 10pt 0; }
+    #print-area th, #print-area td { border: 1px solid #666; padding: 4pt 6pt; text-align: left; font-size: 10.5pt; }
+    #print-area th { width: 1.9in; background: #eee; }
+    #print-area img.sig-print { max-width: 3.4in; max-height: 1.1in; border: 1px solid #999; }
+    #print-area .fineprint { font-size: 8.5pt; color: #333; margin-top: 12pt; }
+  }
+</style>
+</head>
+<body>
+<div id="sign-app">
+<header class="app-header">
+  <img src="../assets/centipede-logo.png" alt="Centipede Peer to Peer, LLC logo" class="header-logo">
+  <div class="header-titles">
+    <strong>Sign a Form</strong>
+    <span>Centipede Peer to Peer, LLC &middot; LIC: 0714781</span>
+  </div>
+</header>
+<main class="sign-wrap">
+  <a class="backlink" href="../index.html">&larr; Back to the Company Portal</a>
+
+  <section class="panel">
+    <h2>Sign a Form — outside intake</h2>
+    <p class="hint">Use this page when a client or staff member signs any company form outside the intake flow. The signer reads the form, agrees to sign electronically, and signs on this device with a staff member present, under the company's Electronic Signatures Policy (CPP-POL-2026-047). Signing is always in person. A paper form is always available instead — no one is ever required to sign electronically. When the signing is done, print the record from the list below and file it in the client's locked binder; the binder is the official record.</p>
+
+    <form id="sign-form">
+      <label for="form-select">Form being signed</label>
+      <select id="form-select" required>
+        <option value="">— Choose the form —</option>
+        <optgroup label="Company forms">
+          <option>Intake &amp; Participation Agreement</option>
+          <option>Release of Information</option>
+          <option>Authorization to Receive Services</option>
+          <option>HIPAA Privacy Understanding &amp; Confidentiality Acknowledgment</option>
+          <option>Photograph Authorization Form</option>
+          <option>Referral Form for Services</option>
+          <option>Billing Information Form</option>
+          <option>IHSS Enrollment Form</option>
+        </optgroup>
+        <optgroup label="Program forms">
+          <option>ID Assistance Request Form — Referrals &amp; ID Assistance</option>
+          <option>Centipede Member ID Referral Form — Referrals &amp; ID Assistance</option>
+          <option>Shelter Check-In Form &amp; Stay Agreement — Homeless Shelter</option>
+          <option>Shelter Drug Testing Policy Agreement — Homeless Shelter</option>
+          <option>Job Search Verification Form</option>
+          <option>Housing Search Verification Form</option>
+          <option>Justice Support Participant Accountability Agreement (DRAFT — not yet in use)</option>
+        </optgroup>
+        <optgroup label="Super Hero Program forms">
+          <option>Super Hero Family Intake/Application (DRAFT — not yet in use)</option>
+          <option>Super Hero Family Sign-Up (DRAFT — not yet in use)</option>
+          <option>Super Hero Business/Organization Host Sign-Up (DRAFT — not yet in use)</option>
+          <option>Super Hero Volunteer Sign-Up (DRAFT — not yet in use)</option>
+          <option>Super Hero Host-Business Agreement (DRAFT — not yet in use)</option>
+        </optgroup>
+        <option value="__other__">Other company form</option>
+      </select>
+      <div id="other-wrap" hidden>
+        <label for="form-other">Name of the form</label>
+        <input type="text" id="form-other" autocomplete="off">
+      </div>
+      <p id="draft-warn" class="draft-warn" hidden>This form is marked DRAFT — not yet in use. Under CPP-POL-2026-047, a form marked DRAFT is not signed until the company puts it in use. Choose a form that is in use, or sign on paper once the form is in use.</p>
+
+      <label for="signer-name">Signer's printed full name</label>
+      <input type="text" id="signer-name" autocomplete="off" required>
+
+      <label class="check" for="consent">
+        <input type="checkbox" id="consent">
+        <span><strong>Signer:</strong> I agree to sign this document electronically and understand my electronic signature has the same effect as a handwritten one.</span>
+      </label>
+
+      <label>Signature — sign in the box with a finger, stylus, or mouse</label>
+      <canvas id="sig-pad" width="900" height="260" aria-label="Signature pad"></canvas>
+      <div class="sig-line">Sign above the line</div>
+      <p><button type="button" class="btn-small" id="sig-clear">Clear / redo signature</button></p>
+
+      <label for="staff-name">Staff member present (witness)</label>
+      <input type="text" id="staff-name" autocomplete="off" required>
+
+      <label>Date &amp; time of signing (set automatically)</label>
+      <input type="text" id="stamp" readonly>
+
+      <p id="sign-error" class="error" role="alert"></p>
+      <p id="sign-status" class="save-status" role="status"></p>
+      <button type="submit" class="btn-primary">Save signed record</button>
+    </form>
+  </section>
+
+  <section class="panel" style="margin-top:1rem;">
+    <h2>Completed signings on this device</h2>
+    <p class="hint">Signed records are kept on this device only. Print each record and file it in the client's locked binder — the binder is the official record.</p>
+    <div id="rec-list"></div>
+    <p id="rec-empty" class="hint">No signings recorded on this device yet.</p>
+  </section>
+
+  <div id="selftest-result" hidden></div>
+</main>
+<footer class="app-footer">
+  <span>Centipede Peer to Peer, LLC — a California for-profit limited liability company. The locked binders remain the official record.</span>
+  <span>Electronic signatures under CPP-POL-2026-047. A paper alternative is always available.</span>
+</footer>
+</div>
+
+<div id="print-area" aria-hidden="true"></div>
+
+<script>
+(function () {
+  "use strict";
+  var KEY = "centipede.signRecords.v1";
+  var formSelect = document.getElementById("form-select");
+  var otherWrap = document.getElementById("other-wrap");
+  var formOther = document.getElementById("form-other");
+  var draftWarn = document.getElementById("draft-warn");
+  var signerName = document.getElementById("signer-name");
+  var consent = document.getElementById("consent");
+  var staffName = document.getElementById("staff-name");
+  var stampEl = document.getElementById("stamp");
+  var errEl = document.getElementById("sign-error");
+  var statusEl = document.getElementById("sign-status");
+  var canvas = document.getElementById("sig-pad");
+  var ctx = canvas.getContext("2d");
+  var recList = document.getElementById("rec-list");
+  var recEmpty = document.getElementById("rec-empty");
+  var hasSig = false;
+  var drawing = false;
+
+  ctx.lineWidth = 3;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.strokeStyle = "#10243e";
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function nowStamp() {
+    var d = new Date();
+    return d.toLocaleString("en-US", { year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "2-digit", second: "2-digit" });
+  }
+  function refreshStamp() { stampEl.value = nowStamp(); }
+  refreshStamp();
+  setInterval(refreshStamp, 5000);
+
+  function isDraftChoice() {
+    return formSelect.value.indexOf("(DRAFT") !== -1;
+  }
+  function chosenFormName() {
+    if (formSelect.value === "__other__") return formOther.value.trim();
+    return formSelect.value;
+  }
+
+  formSelect.addEventListener("change", function () {
+    otherWrap.hidden = formSelect.value !== "__other__";
+    draftWarn.hidden = !isDraftChoice();
+  });
+
+  function padPos(e) {
+    var r = canvas.getBoundingClientRect();
+    return {
+      x: (e.clientX - r.left) * (canvas.width / r.width),
+      y: (e.clientY - r.top) * (canvas.height / r.height)
+    };
+  }
+  function startDraw(e) {
+    drawing = true;
+    var p = padPos(e);
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y);
+    if (e.cancelable) e.preventDefault();
+  }
+  function moveDraw(e) {
+    if (!drawing) return;
+    var p = padPos(e);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y);
+    hasSig = true;
+    if (e.cancelable) e.preventDefault();
+  }
+  function endDraw() { drawing = false; }
+  canvas.addEventListener("pointerdown", startDraw);
+  canvas.addEventListener("pointermove", moveDraw);
+  window.addEventListener("pointerup", endDraw);
+  canvas.addEventListener("pointerleave", endDraw);
+
+  function clearPad() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    hasSig = false;
+  }
+  document.getElementById("sig-clear").addEventListener("click", clearPad);
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      var arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  }
+  function store(arr) { localStorage.setItem(KEY, JSON.stringify(arr)); }
+
+  function render() {
+    var recs = load();
+    recList.innerHTML = "";
+    recEmpty.hidden = recs.length > 0;
+    recs.slice().reverse().forEach(function (r) {
+      var div = document.createElement("div");
+      div.className = "rec-item";
+      div.innerHTML =
+        "<strong>" + esc(r.form) + "</strong>" +
+        "<div class=\"meta\">Signed by " + esc(r.signer) + " &middot; " + esc(r.stamp) + " &middot; Staff present: " + esc(r.staff) + "</div>" +
+        "<img class=\"sig-thumb\" alt=\"Signature of " + esc(r.signer) + "\" src=\"" + r.signature + "\">" +
+        "<p style=\"margin:0.2rem 0 0;\"><button type=\"button\" class=\"btn-small\" data-print=\"" + r.id + "\">Print / export for the binder</button> " +
+        "<button type=\"button\" class=\"btn-small\" data-del=\"" + r.id + "\">Delete</button></p>";
+      recList.appendChild(div);
+    });
+  }
+
+  recList.addEventListener("click", function (e) {
+    var t = e.target;
+    if (!t || !t.getAttribute) return;
+    var pid = t.getAttribute("data-print");
+    var did = t.getAttribute("data-del");
+    var recs = load();
+    if (pid) {
+      var r = null;
+      recs.forEach(function (x) { if (x.id === pid) r = x; });
+      if (r) printRecord(r);
+    }
+    if (did) {
+      if (window.confirm("Delete this signed record from this device? The printed copy in the binder is the official record.")) {
+        store(recs.filter(function (x) { return x.id !== did; }));
+        render();
+      }
+    }
+  });
+
+  function printRecord(r) {
+    var pa = document.getElementById("print-area");
+    pa.innerHTML =
+      "<h1>Centipede Peer to Peer, LLC</h1>" +
+      "<div>Signed Form Record &middot; Electronic Signatures Policy CPP-POL-2026-047</div>" +
+      "<table>" +
+      "<tr><th>Form signed</th><td>" + esc(r.form) + "</td></tr>" +
+      "<tr><th>Signer (printed name)</th><td>" + esc(r.signer) + "</td></tr>" +
+      "<tr><th>Date &amp; time signed</th><td>" + esc(r.stamp) + "</td></tr>" +
+      "<tr><th>Staff member present</th><td>" + esc(r.staff) + "</td></tr>" +
+      "<tr><th>Consent</th><td>The signer agreed: &ldquo;I agree to sign this document electronically and understand my electronic signature has the same effect as a handwritten one.&rdquo;</td></tr>" +
+      "<tr><th>Signature</th><td><img class=\"sig-print\" alt=\"Signature\" src=\"" + r.signature + "\"></td></tr>" +
+      "</table>" +
+      "<p class=\"fineprint\">Printed from the Company Portal Sign a Form page. File this record with the signed form in the client's locked binder — the binder is the official record. Centipede Peer to Peer, LLC, 717 E. Longview Ave., Stockton, CA 95207 &middot; LIC: 0714781.</p>";
+    window.print();
+  }
+
+  function saveRecord() {
+    errEl.textContent = "";
+    var form = chosenFormName();
+    if (!form) { errEl.textContent = "Choose the form being signed (and name it, if you chose Other company form)."; return null; }
+    if (isDraftChoice()) { errEl.textContent = "That form is marked DRAFT — not yet in use, and is not signed until the company puts it in use."; return null; }
+    if (!signerName.value.trim()) { errEl.textContent = "Enter the signer's printed full name."; return null; }
+    if (!consent.checked) { errEl.textContent = "The signer must agree to sign electronically before signing."; return null; }
+    if (!hasSig) { errEl.textContent = "The signature box is empty — the signer signs in the box first."; return null; }
+    if (!staffName.value.trim()) { errEl.textContent = "Enter the name of the staff member present."; return null; }
+    var rec = {
+      id: "SIG-" + Date.now().toString(36).toUpperCase(),
+      form: form,
+      signer: signerName.value.trim(),
+      staff: staffName.value.trim(),
+      stamp: nowStamp(),
+      iso: new Date().toISOString(),
+      signature: canvas.toDataURL("image/png")
+    };
+    var recs = load();
+    recs.push(rec);
+    store(recs);
+    render();
+    statusEl.textContent = "Saved: " + rec.form + " — signed by " + rec.signer + ", " + rec.stamp + ". Print it from the list below and file it in the binder.";
+    document.getElementById("sign-form").reset();
+    clearPad();
+    draftWarn.hidden = true;
+    otherWrap.hidden = true;
+    refreshStamp();
+    return rec;
+  }
+
+  document.getElementById("sign-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    saveRecord();
+  });
+
+  render();
+
+  /* ---- gated self-test (maintenance verification only; runs only with #selftest / #selftest-clean in the URL) ---- */
+  function testStroke() {
+    ctx.beginPath();
+    ctx.moveTo(60, 170);
+    ctx.bezierCurveTo(220, 40, 420, 240, 620, 90);
+    ctx.lineTo(840, 150);
+    ctx.stroke();
+    hasSig = true;
+  }
+  function selfTest() {
+    var out = document.getElementById("selftest-result");
+    out.hidden = false;
+    try {
+      formSelect.value = "Release of Information";
+      formSelect.dispatchEvent(new Event("change"));
+      signerName.value = "TEST — DELETE (self-test)";
+      staffName.value = "TEST STAFF (self-test)";
+      consent.checked = true;
+      testStroke();
+      var rec = saveRecord();
+      var recs = load();
+      var found = rec && recs.some(function (x) { return x.id === rec.id && x.signer.indexOf("TEST") === 0; });
+      var listed = recList.textContent.indexOf("TEST — DELETE (self-test)") !== -1;
+      out.textContent = "SELFTEST:" + (found && listed ? "PASS" : "FAIL") + " id=" + (rec ? rec.id : "none") + " stored=" + recs.length;
+    } catch (e) {
+      out.textContent = "SELFTEST:ERROR " + e.message;
+    }
+  }
+  function selfTestClean() {
+    var out = document.getElementById("selftest-result");
+    out.hidden = false;
+    var before = load();
+    var kept = before.filter(function (x) { return x.signer.indexOf("TEST") !== 0; });
+    store(kept);
+    render();
+    var after = load();
+    var testLeft = after.filter(function (x) { return x.signer.indexOf("TEST") === 0; }).length;
+    out.textContent = "SELFTEST-CLEAN:removed=" + (before.length - kept.length) + " testRemaining=" + testLeft + " total=" + after.length;
+  }
+  if (location.hash.indexOf("selftest-clean") !== -1) { selfTestClean(); }
+  else if (location.hash.indexOf("selftest") !== -1) { selfTest(); }
+})();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(function () { /* a failed registration must never break the page */ });
+  });
+}
+</script>
+</body>
+</html>
