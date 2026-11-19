@@ -199,6 +199,10 @@
 
       <div id="packet-view" class="note-full" hidden></div>
 
+      <!-- Intake signature view (built by app.js; the signable document texts
+           live in assets/signdocs.js, loaded only after sign-in) -->
+      <div id="sign-view" class="note-full" hidden></div>
+
       <!-- Paperwork form (fields are built by app.js from assets/forms.js,
            which is loaded only after sign-in — no form content here) -->
       <form id="paperwork-form" hidden></form>
@@ -260,6 +264,144 @@
 <script src="assets/config.js"></script>
 <script src="assets/auth.js"></script>
 <script src="assets/app.js"></script>
+
+  <section class="panel" id="intake-panel">
+    <h2>Intake — before membership</h2>
+    <p class="hint">Intake comes first (CPP-POL-2026-043). No one becomes a member of Centipede Peer to Peer, LLC, or of any of its programs, until an intake is completed and approved here. An approved intake creates the person's record in the Clients list; the client's locked binder remains the official record.</p>
+    <h3>The information every intake collects</h3>
+    <ul class="hint">
+      <li>About you</li>
+      <li>How to reach you</li>
+      <li>Living situation</li>
+      <li>Emergency contact</li>
+      <li>How you found us</li>
+      <li>Income and benefits</li>
+      <li>Documents you hold — never any ID numbers</li>
+      <li>Health and support needs — peer support only, nothing clinical</li>
+      <li>Safety and urgent needs</li>
+      <li>Justice — only if it applies</li>
+      <li>Veterans — only if it applies</li>
+      <li>Your goals and preferences</li>
+      <li>Contact permissions</li>
+      <li>Intake follow-up</li>
+      <li>What they need help with, and the programs they are asking about</li>
+    </ul>
+    <h3>The documents needed to approve an intake</h3>
+    <ul class="hint">
+      <li><strong>Required:</strong> government photo ID — a copy is held in the binder; the ID number is never recorded</li>
+      <li><strong>Required:</strong> signed Release of Information / consent</li>
+      <li><strong>Required:</strong> signed Intake &amp; Participation Agreement (peer support, non-clinical)</li>
+      <li>Insurance card copy — or the person is routed to the Clients Without Insurance list</li>
+      <li>Proof of living situation where it exists (shelter letter, HMIS printout) — a signed self-declaration stands when no document exists</li>
+      <li>Justice Support: court paperwork and attorney-of-record information</li>
+      <li>Veterans Program: DD-214 or VA documentation of service</li>
+    </ul>
+    <p class="hint">An intake can be approved only when the three required documents are in. Everything else is marked as it stands — received, self-declared, or still to come — and followed up.</p>
+    <form id="intake-form">
+      <h3>Start an intake — every question</h3>
+      <p class="hint">Ask what applies and leave the rest blank — a blank is an honest answer, never a guess. Identification numbers are never asked for and never recorded: no Social Security number, no ID card number, no Veteran ID Card number.</p>
+      <h4>About you</h4>
+      <p><label>Full legal name<br><input id="int-name" required style="width:100%"></label></p>
+      <p><label>Preferred name — what should we call you<br><input id="int-pname" style="width:100%"></label></p>
+      <p><label>Date of birth<br><input id="int-dob" type="date"></label></p>
+      <p><label>Gender (optional)<br><select id="int-gender"><option></option><option>Female</option><option>Male</option><option>Nonbinary</option><option>Prefer to self-describe</option><option>Prefer not to say</option></select></label></p>
+      <p><label>Pronouns (optional)<br><input id="int-pronouns" style="width:100%"></label></p>
+      <p><label>Preferred language<br><input id="int-language" style="width:100%"></label></p>
+      <p><label>Interpreter needed?<br><select id="int-interpreter"><option>No</option><option>Yes</option></select></label></p>
+      <h4>How to reach you</h4>
+      <p><label>Phone number<br><input id="int-phone" style="width:100%"></label></p>
+      <p><label>May we text this number?<br><select id="int-textok"><option>Yes</option><option>No</option><option>No phone</option></select></label></p>
+      <p><label>Email (if any)<br><input id="int-email" style="width:100%"></label></p>
+      <p><label>Best time to reach you<br><input id="int-besttime" style="width:100%"></label></p>
+      <p><label>Mailing address, or where we can reach you<br><input id="int-reach" style="width:100%"></label></p>
+      <p><label>Is it safe to leave messages?<br><select id="int-messages"><option>Yes</option><option>No</option></select></label></p>
+      <h4>Living situation</h4>
+      <p><label>Current living situation<br><select id="int-living"><option>Homeless</option><option>Shelter</option><option>Housed</option><option>Transitional</option><option>Traveling</option><option>Other</option></select></label></p>
+      <p><label>Where did you sleep last night?<br><input id="int-slept" style="width:100%"></label></p>
+      <p><label>How long in your current situation?<br><input id="int-howlong" style="width:100%"></label></p>
+      <p><label>Who is in your household?<br><select id="int-household"><option>Alone</option><option>With partner</option><option>With children</option><option>With family</option><option>With others</option></select></label></p>
+      <p><label>Children with you — how many, and their ages<br><input id="int-kids" style="width:100%"></label></p>
+      <p><label>Pets or service animal<br><select id="int-pets"><option>None</option><option>Dog</option><option>Cat</option><option>Service animal</option><option>Other</option></select></label></p>
+      <p><label>Do you live in a vehicle?<br><select id="int-vehicle"><option>No</option><option>Yes</option></select></label></p>
+      <h4>Emergency contact</h4>
+      <p><label>Emergency contact — name<br><input id="int-ecname" style="width:100%"></label></p>
+      <p><label>Relationship<br><input id="int-ecrel" style="width:100%"></label></p>
+      <p><label>Emergency contact — phone<br><input id="int-ecphone" style="width:100%"></label></p>
+      <p><label>May we contact them in an emergency?<br><select id="int-ecok"><option>Yes</option><option>No</option></select></label></p>
+      <h4>How you found us</h4>
+      <p><label>How did you find Centipede?<br><input id="int-source" style="width:100%"></label></p>
+      <p><label>Referred by (person or agency)<br><input id="int-referredby" style="width:100%"></label></p>
+      <p><label>Have you worked with Centipede before?<br><select id="int-prior"><option>No</option><option>Yes</option></select></label></p>
+      <h4>What do you need help with? (check all that apply)</h4>
+      <p class="hint"><label style="display:block"><input type="checkbox" class="int-need" value="Peer support"> Peer support</label><label style="display:block"><input type="checkbox" class="int-need" value="Shelter tonight"> Shelter tonight</label><label style="display:block"><input type="checkbox" class="int-need" value="Housing navigation"> Housing navigation</label><label style="display:block"><input type="checkbox" class="int-need" value="Benefits help (SSI/SSDI)"> Benefits help (SSI/SSDI)</label><label style="display:block"><input type="checkbox" class="int-need" value="CalFresh / food benefits"> CalFresh / food benefits</label><label style="display:block"><input type="checkbox" class="int-need" value="Medi-Cal / insurance"> Medi-Cal / insurance</label><label style="display:block"><input type="checkbox" class="int-need" value="ID / documents"> ID / documents</label><label style="display:block"><input type="checkbox" class="int-need" value="Medical appointments support"> Medical appointments support</label><label style="display:block"><input type="checkbox" class="int-need" value="Mental health peer support"> Mental health peer support</label><label style="display:block"><input type="checkbox" class="int-need" value="Substance-use recovery support"> Substance-use recovery support</label><label style="display:block"><input type="checkbox" class="int-need" value="Food / water / supplies"> Food / water / supplies</label><label style="display:block"><input type="checkbox" class="int-need" value="Clothing / hygiene"> Clothing / hygiene</label><label style="display:block"><input type="checkbox" class="int-need" value="Transportation"> Transportation</label><label style="display:block"><input type="checkbox" class="int-need" value="Employment help"> Employment help</label><label style="display:block"><input type="checkbox" class="int-need" value="Legal / justice support"> Legal / justice support</label><label style="display:block"><input type="checkbox" class="int-need" value="Veterans services"> Veterans services</label><label style="display:block"><input type="checkbox" class="int-need" value="Family support"> Family support</label><label style="display:block"><input type="checkbox" class="int-need" value="Other"> Other</label></p>
+      <h4>Programs you are asking about (check all that apply)</h4>
+      <p class="hint"><label style="display:block"><input type="checkbox" class="int-prog" value="1-on-1 Peer Support"> 1-on-1 Peer Support</label><label style="display:block"><input type="checkbox" class="int-prog" value="Homeless Outreach"> Homeless Outreach</label><label style="display:block"><input type="checkbox" class="int-prog" value="Referrals & ID Assistance"> Referrals & ID Assistance</label><label style="display:block"><input type="checkbox" class="int-prog" value="Community Resource Navigation"> Community Resource Navigation</label><label style="display:block"><input type="checkbox" class="int-prog" value="Substance Abuse Recovery Support"> Substance Abuse Recovery Support</label><label style="display:block"><input type="checkbox" class="int-prog" value="Justice Support"> Justice Support</label><label style="display:block"><input type="checkbox" class="int-prog" value="Women Helping Women"> Women Helping Women</label><label style="display:block"><input type="checkbox" class="int-prog" value="Super Hero Program"> Super Hero Program</label><label style="display:block"><input type="checkbox" class="int-prog" value="Centipede Day of Hope"> Centipede Day of Hope</label><label style="display:block"><input type="checkbox" class="int-prog" value="Hygiene Outreach"> Hygiene Outreach</label><label style="display:block"><input type="checkbox" class="int-prog" value="Homeless Shelter"> Homeless Shelter</label><label style="display:block"><input type="checkbox" class="int-prog" value="Veterans Program"> Veterans Program</label></p>
+      <h4>Income and benefits</h4>
+      <p><label>Employment status<br><select id="int-employment"><option>Employed</option><option>Looking for work</option><option>Unable to work</option><option>Retired</option><option>Student</option><option>Other</option></select></label></p>
+      <p><label>Income sources (SSI, SSDI, GA, VA, work, none, other)<br><input id="int-income" style="width:100%"></label></p>
+      <p><label>Benefits you receive now<br><input id="int-benefits" style="width:100%"></label></p>
+      <p><label>Benefits you want help applying for<br><input id="int-applyfor" style="width:100%"></label></p>
+      <p><label>Do you have a representative payee?<br><select id="int-payee"><option>No</option><option>Yes</option><option>Not sure</option></select></label></p>
+      <p><label>Do you have a bank account? (Banking Program)<br><select id="int-bankacct"><option>No</option><option>Yes</option></select></label></p>
+      <h4>Documents you hold — never any ID numbers</h4>
+      <p><label>Photo ID<br><select id="int-docid"><option>Have it</option><option>Do not have it</option><option>Lost it</option></select></label></p>
+      <p><label>Birth certificate<br><select id="int-docbc"><option>Have it</option><option>Do not have it</option><option>Lost it</option></select></label></p>
+      <p><label>Social Security card (never the number)<br><select id="int-docssc"><option>Have it</option><option>Do not have it</option><option>Lost it</option></select></label></p>
+      <p><label>Insurance card<br><select id="int-docins"><option>Have it</option><option>Do not have it</option><option>No insurance</option></select></label></p>
+      <p><label>Insurance coverage<br><select id="int-insurance"><option>Card held</option><option>No insurance</option><option>Not yet known</option></select></label></p>
+      <h4>Health and support needs — peer support only, nothing clinical</h4>
+      <p><label>Do you have a regular doctor? Where do you get care?<br><input id="int-doctor" style="width:100%"></label></p>
+      <p><label>Pharmacy you use<br><input id="int-pharmacy" style="width:100%"></label></p>
+      <p><label>Other case managers or agencies helping you<br><input id="int-providers" style="width:100%"></label></p>
+      <p><label>Medication support you want (peer help only)<br><select id="int-medsupport"><option>None</option><option>Appointment reminders</option><option>Refill reminders</option><option>Rides to the pharmacy</option></select></label></p>
+      <p><label>Anything we should plan around so you can use our services (mobility, appointments, reminders)<br><textarea id="int-planaround" rows="2" style="width:100%"></textarea></label></p>
+      <p><label>Food allergies or dietary needs (for food bags)<br><input id="int-dietary" style="width:100%"></label></p>
+      <h4>Safety and urgent needs</h4>
+      <p><label>Do you feel safe where you are staying?<br><select id="int-safe"><option>Yes</option><option>No</option><option>Not sure</option></select></label></p>
+      <p><label>Anything urgent tonight? (shelter, food, medical — in an emergency we call 911)<br><textarea id="int-urgent" rows="2" style="width:100%"></textarea></label></p>
+      <p><label>Anything about your safety we should know? (optional)<br><textarea id="int-safetynote" rows="2" style="width:100%"></textarea></label></p>
+      <h4>Justice — only if it applies</h4>
+      <p><label>Do you have a current court case?<br><select id="int-courtcase"><option>No</option><option>Yes</option></select></label></p>
+      <p><label>Court / county<br><input id="int-courtcounty" style="width:100%"></label></p>
+      <p><label>Attorney of record — name<br><input id="int-atty" style="width:100%"></label></p>
+      <p><label>Attorney phone<br><input id="int-attyphone" style="width:100%"></label></p>
+      <p><label>Probation or parole<br><select id="int-probation"><option>None</option><option>Probation</option><option>Parole</option></select></label></p>
+      <p><label>Probation / parole officer<br><input id="int-officer" style="width:100%"></label></p>
+      <p><label>Next court date<br><input id="int-courtdate" type="date"></label></p>
+      <h4>Veterans — only if it applies</h4>
+      <p><label>Are you a veteran? (your status is yours to share)<br><select id="int-veteran"><option>No</option><option>Yes</option></select></label></p>
+      <p><label>Branch of service<br><input id="int-branch" style="width:100%"></label></p>
+      <p><label>Era of service<br><input id="int-era" style="width:100%"></label></p>
+      <p><label>DD-214<br><select id="int-dd214"><option>Have it</option><option>Do not have it</option><option>Not a veteran</option></select></label></p>
+      <p><label>Enrolled with the VA?<br><select id="int-vaenrolled"><option>No</option><option>Yes</option><option>Not a veteran</option></select></label></p>
+      <p><label>VA benefits<br><select id="int-vabenefits"><option>Receiving</option><option>Applying</option><option>None</option><option>Not a veteran</option></select></label></p>
+      <p><label>Veteran ID Card held? (never the number)<br><select id="int-vic"><option>No</option><option>Yes</option></select></label></p>
+      <h4>Your goals and preferences</h4>
+      <p><label>What is your main goal right now?<br><textarea id="int-goal" rows="2" style="width:100%"></textarea></label></p>
+      <p><label>How often do you want us to check in?<br><select id="int-checkins"><option>Weekly</option><option>Daily</option><option>As needed</option></select></label></p>
+      <p><label>Best place to meet you<br><input id="int-meetplace" style="width:100%"></label></p>
+      <p><label>Anything else we should know?<br><textarea id="int-anythingelse" rows="2" style="width:100%"></textarea></label></p>
+      <p><label>Anything you do NOT want us to do?<br><textarea id="int-boundaries" rows="2" style="width:100%"></textarea></label></p>
+      <h4>Contact permissions</h4>
+      <p><label>May we contact you by phone?<br><select id="int-consentphone"><option>Yes</option><option>No</option></select></label></p>
+      <p><label>May we contact you by text?<br><select id="int-consenttext"><option>Yes</option><option>No</option></select></label></p>
+      <p><label>May we coordinate with other agencies helping you? Which ones?<br><input id="int-consentcoord" style="width:100%"></label></p>
+      <p><label>Photo / media consent (optional — never required)<br><select id="int-consentmedia"><option>No</option><option>Yes</option></select></label></p>
+      <h4>Intake follow-up</h4>
+      <p><label>Follow-up appointment set for<br><input id="int-followup" type="date"></label></p>
+      <p><label>Next steps agreed<br><input id="int-nextsteps" style="width:100%"></label></p>
+      <p><label>Intake notes<br><textarea id="int-notes" rows="2" style="width:100%"></textarea></label></p>
+      <p><button class="btn-small" type="submit">Open intake</button> <span id="intake-msg" class="hint"></span></p>
+    </form>
+    <h3>Intake register</h3>
+    <p id="intake-summary" class="hint"></p>
+    <ul id="intake-list" class="note-list"></ul>
+  </section>
+
+  <section class="panel"><h2>Jarvis</h2><div id="jarvis-panel"></div></section>
+  <section class="panel"><h2>Email</h2><div id="email-panel"></div></section>
+  <script src="assets/email-panel.js"></script>
+  <script src="assets/jarvis-panel.js"></script>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {

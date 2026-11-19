@@ -107,7 +107,16 @@ function sha256Pure(ascii) {
   return result;
 }
 function setStatus(msg) { const el = $("save-status"); if (el) el.textContent = msg; }
-function clientByCode(code) { return CFG.clients.find((c) => c.code === code) || null; }
+function clientByCode(code) { return allClients().find((c) => c.code === code) || null; }
+/* Approved intakes become members: they join the client list with the CP code and
+   client number assigned at approval (CPP-POL-2026-043). */
+function allClients() {
+  const approved = loadIntakes().filter((i) => i.status === "Approved").map((i) => ({
+    code: i.memberCode, label: i.name + " — " + i.memberCode + " (" + i.memberNo + ") — approved from intake " + i.id,
+    name: i.name, clientNo: i.memberNo, missing: false, fromIntake: i.id
+  }));
+  return CFG.clients.concat(approved);
+}
 function isSelectable(code) { const c = clientByCode(code); return !!c && !c.missing; }
 
 /* ---------------- Supabase REST layer (publishable key only) ---------------- */
@@ -220,6 +229,7 @@ async function enterApp() {
   state.outbox = loadOutbox();
   await refreshRecords();
   flushOutbox();
+  initIntake();
 }
 
 /* ---------------- paperwork assets (loaded only after login) ----------------
@@ -234,9 +244,10 @@ function loadPaperworkAssets() {
     sc.src = src; sc.onload = res; sc.onerror = res;
     document.body.appendChild(sc);
   });
-  Promise.all([add("assets/forms.js"), add("assets/pdfgen.js")]).then(() => {
+  Promise.all([add("assets/forms.js"), add("assets/pdfgen.js"), add("assets/signdocs.js")]).then(() => {
     renderClientList();
     if (state.selectedClient) renderClientView();
+    if (typeof renderIntakes === "function") renderIntakes();
   });
 }
 function formById(id) { return (window.CLIENT_FORMS || []).find((f) => f.id === id) || null; }
@@ -314,7 +325,7 @@ function renderClientList() {
   const ul = $("client-list");
   if (!ul) return;
   ul.innerHTML = "";
-  for (const c of CFG.clients) {
+  for (const c of allClients()) {
     const li = document.createElement("li");
     if (c.code === state.selectedClient) li.className = "active";
     const counts = c.missing ? "" : `<div class="meta">${recordsFor(c.code, "encounter").length} encounter(s) · ${recordsFor(c.code, "referral").length} referral(s) · ${recordsFor(c.code, "enrollment").length} enrollment(s) · ${recordsFor(c.code, "document").length + recordsFor(c.code, "form_completion").length} document(s)</div>`;
@@ -329,7 +340,7 @@ function renderClientList() {
   }
 }
 function hideForms() {
-  for (const id of ["encounter-form", "referral-form", "enrollment-form", "addendum-form", "packet-view", "paperwork-form", "document-form", "queue-view"]) {
+  for (const id of ["encounter-form", "referral-form", "enrollment-form", "addendum-form", "packet-view", "paperwork-form", "document-form", "queue-view", "sign-view"]) {
     const el = $(id); if (el) el.hidden = true;
   }
 }
@@ -421,6 +432,9 @@ function renderClientView() {
       <p class="hint">${esc(f.reason)}</p>
     </div>`).join("")}` : "<p>Paperwork forms are loading… if this message stays, reload the page.</p>";
 
+  const srcIntake = c.fromIntake ? intakeById(c.fromIntake) : null;
+  const signedSection = srcIntake && ((srcIntake.signatures && Object.keys(srcIntake.signatures).length) || srcIntake.roiDeclined)
+    ? `${signedDocsHtml(srcIntake)}<p class="no-print"><button class="btn-small" id="btn-print-signed-view" type="button">Print signed intake summary (for the locked binder)</button></p>` : "";
   view.innerHTML = `
     <h2>${esc(c.label)}</h2>
     <p class="no-print">
@@ -430,6 +444,7 @@ function renderClientView() {
       <button class="btn-small" id="btn-new-doc" type="button">+ Add document</button>
       <button class="btn-small" id="btn-packet" type="button">Referral Packet (print)</button>
     </p>
+    ${signedSection}
     <h3>Enrollments</h3>${enrHtml}
     <h3>Encounters</h3>${encHtml}
     <h3>Referrals</h3>${refHtml}
@@ -440,6 +455,8 @@ function renderClientView() {
   $("btn-new-enr").addEventListener("click", () => { hideForms(); $("enrollment-form").hidden = false; $("en-date").value = new Date().toISOString().slice(0, 10); });
   $("btn-new-doc").addEventListener("click", () => { hideForms(); $("document-form").hidden = false; $("d-date").value = new Date().toISOString().slice(0, 10); });
   $("btn-packet").addEventListener("click", () => showPacket(c));
+  const psv = $("btn-print-signed-view");
+  if (psv && c.fromIntake) psv.addEventListener("click", () => showSignedSummary(c.fromIntake));
   view.querySelectorAll(".btn-fill-form").forEach((btn) => btn.addEventListener("click", () => openPaperworkForm(btn.dataset.form)));
   view.querySelectorAll(".btn-view-pdf").forEach((btn) => btn.addEventListener("click", () => viewCompletionPdf(btn.dataset.id, false)));
   view.querySelectorAll(".btn-dl-pdf").forEach((btn) => btn.addEventListener("click", () => viewCompletionPdf(btn.dataset.id, true)));
@@ -850,3 +867,346 @@ async function onSaveAddendum(e) {
   const user = CPPAuth.restoreSession();
   if (user) { state.user = user; enterApp(); }
 })();
+
+/* ---------------- intake: before membership (CPP-POL-2026-043) ---------------- */
+const LS_INTAKES = "cpp.clients.intakes.v1";
+function loadIntakes() { try { return JSON.parse(localStorage.getItem(LS_INTAKES) || "[]"); } catch { return []; } }
+function intakeById(id) { return loadIntakes().find((x) => x.id === id) || null; }
+function saveIntakes(rows) { localStorage.setItem(LS_INTAKES, JSON.stringify(rows)); }
+const INTAKE_DOCS = [
+  { key: "photoId", label: "Government photo ID — copy held (number never recorded)", required: true },
+  { key: "roi", label: "Signed Release of Information / consent", required: true },
+  { key: "agreement", label: "Signed Intake & Participation Agreement", required: true },
+  { key: "insuranceCard", label: "Insurance card copy (or routed to Clients Without Insurance)", required: false },
+  { key: "livingProof", label: "Proof of living situation (or signed self-declaration)", required: false },
+  { key: "courtDocs", label: "Justice Support: court paperwork + attorney of record", required: false },
+  { key: "dd214", label: "Veterans: DD-214 or VA documentation of service", required: false }
+];
+const DOC_STATES = ["Not yet", "Received", "Self-declared", "Does not apply"];
+/* Approval guardrails (CPP-POL-2026-043): the photo ID copy must be in (its
+   number is never recorded); the agreement must be signed (in this dashboard
+   or received on paper); the ROI must be signed OR explicitly declined with
+   the decline recorded — a declined ROI never blocks the rest of intake. */
+function intakeReady(i) {
+  const docs = i.docs || {};
+  const sigs = i.signatures || {};
+  const photoIdIn = docs.photoId === "Received";
+  const agreementIn = !!sigs.agreement || docs.agreement === "Received";
+  const roiIn = !!sigs.roi || !!i.roiDeclined || docs.roi === "Received";
+  return photoIdIn && agreementIn && roiIn;
+}
+function nextMemberIds() {
+  let cp = 10, no = 6;
+  for (const c of CFG.clients) { const m = String(c.code).match(/CP-(\d+)/); if (m) cp = Math.max(cp, Number(m[1])); const n = String(c.clientNo).match(/#(\d+)/); if (n) no = Math.max(no, Number(n[1])); }
+  for (const i of loadIntakes()) { if (i.memberCode) { const m = i.memberCode.match(/CP-(\d+)/); if (m) cp = Math.max(cp, Number(m[1])); } if (i.memberNo) { const n = i.memberNo.match(/#(\d+)/); if (n) no = Math.max(no, Number(n[1])); } }
+  return { code: "CP-" + String(cp + 1).padStart(4, "0"), no: "Client #" + String(no + 1).padStart(3, "0") };
+}
+const SIGN_DOC_KEYS = ["agreement", "roi"];
+function signedDocsHtml(i) {
+  const sigs = i.signatures || {};
+  const parts = [];
+  for (const key of SIGN_DOC_KEYS) {
+    const s = sigs[key];
+    if (s) {
+      parts.push(`<div class="signed-doc"><strong>${esc(s.docTitle)}</strong> — signed electronically in this dashboard
+        <div class="meta">Signed by: ${esc(s.signerName)} · ${esc(fmtDT(s.signedAt))} · Staff present: ${esc(s.staffName)}</div>
+        <img class="sig-img" src="${s.image}" alt="Signature of ${esc(s.signerName)}"></div>`);
+    }
+  }
+  if (i.roiDeclined) {
+    parts.push(`<div class="signed-doc"><strong>Release of Information (ROI)</strong> — <strong>declined by the client</strong>
+      <div class="meta">Decline recorded ${esc(fmtDT(i.roiDeclined.recordedAt))} · Client: ${esc(i.roiDeclined.clientName)} · Recorded by: ${esc(i.roiDeclined.staffName)}</div></div>`);
+  }
+  return parts.length ? `<div style="margin-top:.4rem"><strong>Signed documents</strong>${parts.join("")}</div>` : "";
+}
+function renderIntakes() {
+  const ul = $("intake-list"); if (!ul) return;
+  const rows = loadIntakes();
+  const sum = $("intake-summary");
+  if (sum) { const open = rows.filter((i) => i.status !== "Approved" && i.status !== "Not approved").length; sum.textContent = rows.length ? open + " intake(s) in progress · " + rows.filter((i) => i.status === "Approved").length + " approved into membership." : "No intakes yet."; }
+  ul.innerHTML = rows.length ? "" : '<li class="hint">No intakes yet — open the first one above.</li>';
+  for (const i of rows) {
+    const li = document.createElement("li");
+    const ready = intakeReady(i);
+    const status = i.status === "Approved" ? "Approved — member " + i.memberCode + " (" + i.memberNo + ")" : i.status === "Not approved" ? "Not approved" : ready ? "Ready for approval" : i.status;
+    const docs = INTAKE_DOCS.map((d) => {
+      let st = (i.docs || {})[d.key] || "Not yet";
+      if (d.key === "roi" && i.roiDeclined && !(i.signatures || {}).roi) st = "Declined — recorded";
+      if ((i.signatures || {})[d.key]) st = "Signed in dashboard";
+      return `<div class="meta">${d.required ? "<strong>Required:</strong> " : ""}${esc(d.label)} — <strong>${esc(st)}</strong> <button class="btn-small btn-doc" type="button" data-int="${esc(i.id)}" data-doc="${esc(d.key)}">Change</button></div>`;
+    }).join("");
+    const sigs = i.signatures || {};
+    const isOpen = i.status !== "Approved" && i.status !== "Not approved";
+    const signBtns = isOpen ? `<p class="no-print">
+      ${!sigs.agreement ? `<button class="btn-small btn-sign" type="button" data-int="${esc(i.id)}" data-doc="agreement">Sign Intake &amp; Participation Agreement</button> ` : ""}
+      ${!sigs.roi && !i.roiDeclined ? `<button class="btn-small btn-sign" type="button" data-int="${esc(i.id)}" data-doc="roi">Sign Release of Information</button> <button class="btn-small btn-decline-roi" type="button" data-int="${esc(i.id)}">Record ROI declined</button> ` : ""}
+      ${sigs.agreement || sigs.roi || i.roiDeclined ? `<button class="btn-small btn-print-signed" type="button" data-int="${esc(i.id)}">Print signed intake summary</button>` : ""}</p>` : "";
+    li.innerHTML = `<strong>${esc(i.id)} — ${esc(i.name)}</strong> <span class="meta">${esc(i.date)} · by ${esc(i.by)} · ${esc(i.living)} · ${esc(status)}</span>
+      <div class="meta">Programs: ${esc(i.programs || "—")} · Insurance: ${esc(i.insurance)}${i.needs ? " · Needs: " + esc(i.needs) : ""}${i.notes ? "<br>" + esc(i.notes) : ""}</div>${i.answers && i.answers.length ? `<details><summary class="meta">Full intake answers (${i.answers.length})</summary>` + i.answers.map((a) => `<div class="meta">${esc(a[0])}: ${esc(a[1])}</div>`).join("") + `</details>` : ""}${docs}
+      ${signedDocsHtml(i)}${signBtns}
+      ${isOpen ? `<p class="no-print"><button class="btn-small btn-approve" type="button" data-int="${esc(i.id)}" ${ready ? "" : "disabled"}>Approve intake — becomes a member</button> <button class="btn-small btn-deny" type="button" data-int="${esc(i.id)}">Not approved</button>${ready ? "" : ' <span class="hint">Approval unlocks when the photo ID copy is in, the agreement is signed, and the ROI is signed or its decline is recorded.</span>'}</p>` : ""}`;
+    ul.appendChild(li);
+  }
+  ul.querySelectorAll(".btn-doc").forEach((b) => b.addEventListener("click", () => {
+    const rows2 = loadIntakes(); const it = rows2.find((x) => x.id === b.dataset.int); if (!it) return;
+    it.docs = it.docs || {}; const cur = it.docs[b.dataset.doc] || "Not yet";
+    it.docs[b.dataset.doc] = DOC_STATES[(DOC_STATES.indexOf(cur) + 1) % DOC_STATES.length];
+    saveIntakes(rows2); renderIntakes();
+  }));
+  ul.querySelectorAll(".btn-approve").forEach((b) => b.addEventListener("click", () => {
+    const rows2 = loadIntakes(); const it = rows2.find((x) => x.id === b.dataset.int); if (!it || !intakeReady(it)) return;
+    const ids = nextMemberIds(); it.memberCode = ids.code; it.memberNo = ids.no; it.status = "Approved"; it.approvedOn = new Date().toLocaleDateString("en-US", { timeZone: "America/Los_Angeles" });
+    saveIntakes(rows2); renderIntakes(); renderClientList();
+    setStatus(it.name + " approved — now a member, " + ids.code + " (" + ids.no + "). Carry the intake into their new locked binder.");
+  }));
+  ul.querySelectorAll(".btn-deny").forEach((b) => b.addEventListener("click", () => {
+    const rows2 = loadIntakes(); const it = rows2.find((x) => x.id === b.dataset.int); if (!it) return;
+    it.status = "Not approved"; saveIntakes(rows2); renderIntakes();
+  }));
+  ul.querySelectorAll(".btn-sign").forEach((b) => b.addEventListener("click", () => openSignView(b.dataset.int, b.dataset.doc)));
+  ul.querySelectorAll(".btn-decline-roi").forEach((b) => b.addEventListener("click", () => openDeclineView(b.dataset.int)));
+  ul.querySelectorAll(".btn-print-signed").forEach((b) => b.addEventListener("click", () => showSignedSummary(b.dataset.int)));
+}
+/* ---------------- intake signature capture (CPP-POL-2026-043) ----------------
+   The client signs in person, on the staff device, inside this dashboard —
+   no outside signature service, and nothing leaves this device. The
+   signature image, signer name, document name, automatic date/time stamp,
+   and the staff member present save onto the intake record in the same
+   local store as the rest of the intake. The signed intake summary prints
+   from here and is carried into the client's locked binder, which remains
+   the official record. */
+const ESIGN_CONSENT = "I agree to sign this document electronically and understand my electronic signature has the same effect as a handwritten one.";
+function openSignView(intakeId, docKey) {
+  const it = intakeById(intakeId);
+  const doc = (window.SIGN_DOCS || {})[docKey];
+  if (!it) return;
+  if (!doc) { setStatus("The signable documents are still loading — wait a moment and try again."); return; }
+  hideForms();
+  const view = $("sign-view");
+  view.hidden = false;
+  view.innerHTML = `
+    <h2>Sign — ${esc(doc.title)}</h2>
+    <p class="meta">For: ${esc(it.name)} (${esc(it.id)}) · Document: ${esc(doc.source)}</p>
+    <p class="hint">Read the document with the client first. The client signs below, on this device, with a finger or the mouse. The date and time are stamped automatically when the signature is saved.</p>
+    <div class="sign-doc-scroll">${doc.text ? `<pre class="sign-doc-pre">${esc(doc.text)}</pre>` : doc.html}</div>
+    <div class="grid2">
+      <div><label for="sg-name">Signer — print full name</label>
+      <input type="text" id="sg-name" value="${esc(it.name)}" autocomplete="off"></div>
+      <div><label for="sg-staff">Staff member present</label>
+      <input type="text" id="sg-staff" value="${esc(state.user ? state.user.name : "")}" autocomplete="off"></div>
+    </div>
+    <p><label><input type="checkbox" id="sg-consent"> ${esc(ESIGN_CONSENT)}</label></p>
+    <div class="sig-pad-wrap">
+      <label>Signature — draw in the box</label>
+      <canvas id="sg-pad" class="sig-pad"></canvas>
+      <p class="no-print"><button class="btn-small" id="sg-clear" type="button">Clear / redo signature</button></p>
+    </div>
+    <p class="no-print"><button class="btn-small" id="sg-save" type="button" disabled>Sign and save</button>
+    <button class="btn-small" id="sg-cancel" type="button">Cancel</button>
+    <span class="hint" id="sg-msg"></span></p>`;
+  view.scrollIntoView({ behavior: "smooth", block: "start" });
+  const canvas = $("sg-pad");
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.max(300, Math.round(rect.width * dpr));
+  canvas.height = Math.round(190 * dpr);
+  const ctx = canvas.getContext("2d");
+  ctx.scale(dpr, dpr);
+  ctx.strokeStyle = "#10243e"; ctx.lineWidth = 2.2; ctx.lineCap = "round"; ctx.lineJoin = "round";
+  let drawing = false, dirty = false, last = null;
+  const pos = (e) => { const r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+  const validate = () => {
+    const ok = dirty && $("sg-consent").checked && $("sg-name").value.trim() && $("sg-staff").value.trim();
+    $("sg-save").disabled = !ok;
+    $("sg-msg").textContent = ok ? "" : "Needs: the signature drawn, the consent box checked, and both names filled in.";
+  };
+  canvas.addEventListener("pointerdown", (e) => { e.preventDefault(); drawing = true; last = pos(e); canvas.setPointerCapture(e.pointerId); });
+  canvas.addEventListener("pointermove", (e) => {
+    if (!drawing) return;
+    const p = pos(e);
+    ctx.beginPath(); ctx.moveTo(last.x, last.y); ctx.lineTo(p.x, p.y); ctx.stroke();
+    last = p; dirty = true; validate();
+  });
+  const stop = () => { drawing = false; };
+  canvas.addEventListener("pointerup", stop);
+  canvas.addEventListener("pointercancel", stop);
+  $("sg-clear").addEventListener("click", () => { ctx.clearRect(0, 0, rect.width, 190); dirty = false; validate(); });
+  $("sg-consent").addEventListener("change", validate);
+  $("sg-name").addEventListener("input", validate);
+  $("sg-staff").addEventListener("input", validate);
+  validate();
+  $("sg-cancel").addEventListener("click", () => { view.hidden = true; view.innerHTML = ""; });
+  $("sg-save").addEventListener("click", () => {
+    const rows = loadIntakes();
+    const rec = rows.find((x) => x.id === intakeId);
+    if (!rec) return;
+    const out = document.createElement("canvas");
+    out.width = Math.round(rect.width); out.height = 190;
+    out.getContext("2d").drawImage(canvas, 0, 0, out.width, out.height);
+    rec.signatures = rec.signatures || {};
+    rec.signatures[docKey] = {
+      docKey, docTitle: doc.title,
+      signerName: $("sg-name").value.trim(),
+      staffName: $("sg-staff").value.trim(),
+      signedAt: new Date().toISOString(),
+      consent: ESIGN_CONSENT,
+      image: out.toDataURL("image/png")
+    };
+    rec.docs = rec.docs || {};
+    rec.docs[docKey] = "Received";
+    saveIntakes(rows);
+    view.hidden = true; view.innerHTML = "";
+    renderIntakes();
+    setStatus(doc.title + " signed by " + rec.signatures[docKey].signerName + " — saved on this device. Print the signed intake summary to file it in the client's locked binder.");
+  });
+}
+function openDeclineView(intakeId) {
+  const it = intakeById(intakeId);
+  if (!it) return;
+  hideForms();
+  const view = $("sign-view");
+  view.hidden = false;
+  view.innerHTML = `
+    <h2>Record declined — Release of Information</h2>
+    <p class="meta">For: ${esc(it.name)} (${esc(it.id)})</p>
+    <p class="hint">The client was offered the Release of Information and declined to sign it. Record the decline here, with the date and time stamped automatically. A declined ROI does not block the rest of intake, and the client can sign one later at any time.</p>
+    <div class="grid2">
+      <div><label for="dc-name">Client — print full name</label>
+      <input type="text" id="dc-name" value="${esc(it.name)}" autocomplete="off"></div>
+      <div><label for="dc-staff">Staff member recording the decline</label>
+      <input type="text" id="dc-staff" value="${esc(state.user ? state.user.name : "")}" autocomplete="off"></div>
+    </div>
+    <p class="no-print"><button class="btn-small" id="dc-save" type="button">Record decline</button>
+    <button class="btn-small" id="dc-cancel" type="button">Cancel</button></p>`;
+  view.scrollIntoView({ behavior: "smooth", block: "start" });
+  $("dc-cancel").addEventListener("click", () => { view.hidden = true; view.innerHTML = ""; });
+  $("dc-save").addEventListener("click", () => {
+    if (!$("dc-name").value.trim() || !$("dc-staff").value.trim()) { setStatus("Both names are needed to record the ROI decline."); return; }
+    const rows = loadIntakes();
+    const rec = rows.find((x) => x.id === intakeId);
+    if (!rec) return;
+    rec.roiDeclined = { clientName: $("dc-name").value.trim(), staffName: $("dc-staff").value.trim(), recordedAt: new Date().toISOString() };
+    saveIntakes(rows);
+    view.hidden = true; view.innerHTML = "";
+    renderIntakes();
+    setStatus("ROI decline recorded for " + rec.name + " — the rest of intake continues.");
+  });
+}
+function showSignedSummary(intakeId) {
+  const it = intakeById(intakeId);
+  if (!it) return;
+  hideForms();
+  const pv = $("packet-view");
+  pv.hidden = false;
+  const docStatus = INTAKE_DOCS.map((d) => {
+    let st = (it.docs || {})[d.key] || "Not yet";
+    if (d.key === "roi" && it.roiDeclined && !(it.signatures || {}).roi) st = "Declined — recorded";
+    if ((it.signatures || {})[d.key]) st = "Signed in dashboard";
+    return `<p><strong>${esc(d.label)}</strong> — ${esc(st)}</p>`;
+  }).join("");
+  pv.innerHTML = `
+    <h2>Signed Intake Summary — ${esc(it.name)}</h2>
+    <p class="meta">Centipede Peer to Peer, LLC · LIC: 0714781 · 717 E. Longview Ave., Stockton, CA 95207</p>
+    <p class="meta">Intake ${esc(it.id)} · Opened ${esc(it.date)} by ${esc(it.by)}${it.status === "Approved" ? " · Approved — member " + esc(it.memberCode || "") + " (" + esc(it.memberNo || "") + ")" : " · Status: " + esc(it.status)}</p>
+    <p class="meta">Prepared: ${esc(fmtDT(new Date().toISOString()))} · Print this summary and file it in the client's locked binder — the binder is the official record. The electronic record stays on the device where the intake was worked until the live database step.</p>
+    ${it.answers && it.answers.length ? `<h3>Intake answers</h3>` + it.answers.map((a) => `<p class="meta"><strong>${esc(a[0])}:</strong> ${esc(a[1])}</p>`).join("") : ""}
+    <h3>Required documents (CPP-POL-2026-043)</h3>${docStatus}
+    <h3>Signed documents</h3>${signedDocsHtml(it) || "<p>None signed yet.</p>"}
+    <p class="meta">Non-clinical peer support only — not medical, psychiatric, or legal advice. In an emergency, call 911. Client information is confidential; share only with a signed release of information or a judge-signed court order, per company practice.</p>
+    <p class="no-print"><button class="btn-small" id="btn-print-summary" type="button">Print this summary</button>
+    <button class="btn-small" id="btn-close-summary" type="button">Close summary</button></p>`;
+  $("btn-print-summary").addEventListener("click", () => window.print());
+  $("btn-close-summary").addEventListener("click", () => { pv.hidden = true; });
+  pv.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+function initIntake() {
+  const f = $("intake-form"); if (!f) return;
+  f.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const rows = loadIntakes();
+    const id = "INT-" + String(rows.length + 1).padStart(4, "0");
+const answers = [];
+    const F = (id, label) => { const el = $("int-" + id); const v = el ? (el.value || "").trim() : ""; if (v) answers.push([label, v]); return v; };
+    const v_name = F("name", "Full legal name");
+    const v_pname = F("pname", "Preferred name — what should we call you");
+    const v_dob = F("dob", "Date of birth");
+    const v_gender = F("gender", "Gender (optional)");
+    const v_pronouns = F("pronouns", "Pronouns (optional)");
+    const v_language = F("language", "Preferred language");
+    const v_interpreter = F("interpreter", "Interpreter needed?");
+    const v_phone = F("phone", "Phone number");
+    const v_textok = F("textok", "May we text this number?");
+    const v_email = F("email", "Email (if any)");
+    const v_besttime = F("besttime", "Best time to reach you");
+    const v_reach = F("reach", "Mailing address, or where we can reach you");
+    const v_messages = F("messages", "Is it safe to leave messages?");
+    const v_living = F("living", "Current living situation");
+    const v_slept = F("slept", "Where did you sleep last night?");
+    const v_howlong = F("howlong", "How long in your current situation?");
+    const v_household = F("household", "Who is in your household?");
+    const v_kids = F("kids", "Children with you — how many, and their ages");
+    const v_pets = F("pets", "Pets or service animal");
+    const v_vehicle = F("vehicle", "Do you live in a vehicle?");
+    const v_ecname = F("ecname", "Emergency contact — name");
+    const v_ecrel = F("ecrel", "Relationship");
+    const v_ecphone = F("ecphone", "Emergency contact — phone");
+    const v_ecok = F("ecok", "May we contact them in an emergency?");
+    const v_source = F("source", "How did you find Centipede?");
+    const v_referredby = F("referredby", "Referred by (person or agency)");
+    const v_prior = F("prior", "Have you worked with Centipede before?");
+    const v_employment = F("employment", "Employment status");
+    const v_income = F("income", "Income sources (SSI, SSDI, GA, VA, work, none, other)");
+    const v_benefits = F("benefits", "Benefits you receive now");
+    const v_applyfor = F("applyfor", "Benefits you want help applying for");
+    const v_payee = F("payee", "Do you have a representative payee?");
+    const v_bankacct = F("bankacct", "Do you have a bank account? (Banking Program)");
+    const v_docid = F("docid", "Photo ID");
+    const v_docbc = F("docbc", "Birth certificate");
+    const v_docssc = F("docssc", "Social Security card (never the number)");
+    const v_docins = F("docins", "Insurance card");
+    const v_insurance = F("insurance", "Insurance coverage");
+    const v_doctor = F("doctor", "Do you have a regular doctor? Where do you get care?");
+    const v_pharmacy = F("pharmacy", "Pharmacy you use");
+    const v_providers = F("providers", "Other case managers or agencies helping you");
+    const v_medsupport = F("medsupport", "Medication support you want (peer help only)");
+    const v_planaround = F("planaround", "Anything we should plan around so you can use our services (mobility, appointments, reminders)");
+    const v_dietary = F("dietary", "Food allergies or dietary needs (for food bags)");
+    const v_safe = F("safe", "Do you feel safe where you are staying?");
+    const v_urgent = F("urgent", "Anything urgent tonight? (shelter, food, medical — in an emergency we call 911)");
+    const v_safetynote = F("safetynote", "Anything about your safety we should know? (optional)");
+    const v_courtcase = F("courtcase", "Do you have a current court case?");
+    const v_courtcounty = F("courtcounty", "Court / county");
+    const v_atty = F("atty", "Attorney of record — name");
+    const v_attyphone = F("attyphone", "Attorney phone");
+    const v_probation = F("probation", "Probation or parole");
+    const v_officer = F("officer", "Probation / parole officer");
+    const v_courtdate = F("courtdate", "Next court date");
+    const v_veteran = F("veteran", "Are you a veteran? (your status is yours to share)");
+    const v_branch = F("branch", "Branch of service");
+    const v_era = F("era", "Era of service");
+    const v_dd214 = F("dd214", "DD-214");
+    const v_vaenrolled = F("vaenrolled", "Enrolled with the VA?");
+    const v_vabenefits = F("vabenefits", "VA benefits");
+    const v_vic = F("vic", "Veteran ID Card held? (never the number)");
+    const v_goal = F("goal", "What is your main goal right now?");
+    const v_checkins = F("checkins", "How often do you want us to check in?");
+    const v_meetplace = F("meetplace", "Best place to meet you");
+    const v_anythingelse = F("anythingelse", "Anything else we should know?");
+    const v_boundaries = F("boundaries", "Anything you do NOT want us to do?");
+    const v_consentphone = F("consentphone", "May we contact you by phone?");
+    const v_consenttext = F("consenttext", "May we contact you by text?");
+    const v_consentcoord = F("consentcoord", "May we coordinate with other agencies helping you? Which ones?");
+    const v_consentmedia = F("consentmedia", "Photo / media consent (optional — never required)");
+    const v_followup = F("followup", "Follow-up appointment set for");
+    const v_nextsteps = F("nextsteps", "Next steps agreed");
+    const v_notes = F("notes", "Intake notes");
+    const needsList = Array.from(document.querySelectorAll(".int-need:checked")).map((x) => x.value);
+    const progList = Array.from(document.querySelectorAll(".int-prog:checked")).map((x) => x.value);
+    if (needsList.length) answers.push(["Needs help with", needsList.join("; ")]);
+    if (progList.length) answers.push(["Programs asking about", progList.join("; ")]);
+    rows.unshift({ id, name: v_name, dob: v_dob, phone: v_phone, email: v_email, reach: v_reach, living: v_living, emergency: [v_ecname, v_ecrel, v_ecphone].filter(Boolean).join(" — "), source: v_source, programs: progList.join("; "), needs: needsList.join("; "), insurance: v_insurance, notes: v_notes, answers, date: new Date().toLocaleDateString("en-US", { timeZone: "America/Los_Angeles" }), by: state.user ? state.user.name : "", status: "In progress", docs: {} });
+    saveIntakes(rows); f.reset(); renderIntakes();
+    $("intake-msg").textContent = "Intake " + id + " opened.";
+  });
+  renderIntakes();
+}
