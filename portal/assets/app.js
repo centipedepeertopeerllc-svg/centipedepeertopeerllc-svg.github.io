@@ -181,6 +181,7 @@ function enterApp() {
      </a>`).join("");
   renderCalendar();
   renderRequests();
+  if (window.CPPBoard) CPPBoard.render(state.user);
   $("logout-btn").addEventListener("click", () => { try { CPPAuth.signOut(); } catch { location.reload(); } });
 }
 
