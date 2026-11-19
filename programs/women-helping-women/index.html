@@ -134,17 +134,23 @@
       <ul id="dv-list" class="note-list"></ul>
     </section>
   <section class="panel">
-    <h2>Client Appointments</h2>
-    <p class="hint">This program's book in the shared company calendar. Program: <strong id="apt-prog"></strong> — locked to this dashboard. Appointments booked here also appear in the Portal calendar, and Portal bookings for this program appear here. Scheduling and record only — the calendar does not notify anyone, and staff assignments are still given by email or text.</p>
-    <form id="apt-form">
-      <label>Client name <input id="apt-client" type="text" required></label>
+    <div class="cal-band">Client Appointments</div>
+    <p class="hint">This program's book in the shared company calendar. Program: <strong id="apt-prog"></strong> \u2014 locked to this dashboard. Appointments booked here also appear in the Portal calendar, and Portal bookings for this program appear here. Any appointment can be changed or deleted at any time with its Edit button. Scheduling and record only \u2014 the calendar does not notify anyone; "Text this appointment" opens your own Messages app, addressed to the company cell (209) 871-3939, with the one appointment written out for you to review and send yourself. Staff assignments are still given by email or text.</p>
+    <p><a class="btn-small" href="sms:?&body=Centipede%20Company%20Portal%20%E2%80%94%20shared%20calendar%3A%20https%3A%2F%2Fcentipedepeertopeerllc-svg.github.io%2Fportal%2F">Share calendar by text</a> <span class="hint">Texts the Portal's web address to a phone; the recipient signs in as usual. No client information travels in the link.</span></p>
+    <form id="apt-form" class="appt-form">
+      <label>Client name <span class="req">*</span> <input id="apt-client" type="text" required></label>
       <label>Staff member <input id="apt-staff" type="text"></label>
-      <label>Date <input id="apt-date" type="date" required></label>
-      <label>Start time <input id="apt-start" type="time"></label>
-      <label>End time <input id="apt-end" type="time"></label>
-      <label>Location <input id="apt-location" type="text"></label>
+      <div class="grid2">
+        <label>Date <span class="req">*</span> <input id="apt-date" type="date" required></label>
+        <label>Start time <input id="apt-start" type="time"></label>
+        <label>End time <input id="apt-end" type="time"></label>
+        <label>Location <input id="apt-location" type="text"></label>
+      </div>
+      <label>What it's for <input id="apt-purpose" type="text"></label>
       <label>Notes <input id="apt-note" type="text"></label>
-      <button type="submit">Add client appointment</button>
+      <button type="submit" id="apt-submit" class="btn-navy">Add client appointment</button>
+      <button type="button" id="apt-cancel" class="btn-small" hidden>Cancel edit</button>
+      <button type="button" id="apt-del" class="btn-small btn-danger" hidden>Delete this appointment</button>
       <span id="apt-msg" class="hint" role="status"></span>
     </form>
     <ul id="apt-list" class="note-list"></ul>
