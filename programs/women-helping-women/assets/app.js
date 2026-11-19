@@ -48,6 +48,35 @@ function buildForms() {
     $("note-msg").textContent = "Note saved as " + n.id + ".";
   });
 }
+/* -------- client appointments — this program's book in the shared calendar --------
+   Same store as the Portal calendar (cpp.portal.cal.v1), so an appointment
+   booked here shows in the Portal and the other way around. Scheduling and
+   record only: nothing here notifies anyone. */
+const AKEY = "cpp.portal.cal.v1";
+const PROG_ALIASES = { "hygiene-outreach": ["Hygiene"], "homeless-shelter": ["Shelter \u2014 Stockton"] };
+function myPrograms() { return [CFG.name].concat(PROG_ALIASES[CFG.slug] || []); }
+function renderAppts() {
+  const items = store.get(AKEY, []).filter((x) => myPrograms().includes(x.program)).sort((x, y) => (x.when || "").localeCompare(y.when || ""));
+  const fmtT = (t) => { if (!t) return ""; const p = t.split(":").map(Number); const ap = p[0] >= 12 ? "PM" : "AM"; return (p[0] % 12 || 12) + ":" + String(p[1] || 0).padStart(2, "0") + " " + ap; };
+  $("apt-list").innerHTML = items.length ? items.map((x) => x.type === "client-appointment"
+    ? `<li class="appt-item"><span class="badge badge-appt">Client Appointment</span> <strong>${esc(x.date || "")}${x.start ? " · " + fmtT(x.start) + (x.end ? "–" + fmtT(x.end) : "") : ""}</strong><br>Client: <strong>${esc(x.client)}</strong> · With: ${esc(x.staff || "")}${x.location ? `<br>Location: ${esc(x.location)}` : ""}<br><span class="hint">${esc(x.note || "")} (entered by ${esc(x.by)})</span> <button type="button" data-adel="${esc(x.id)}">Remove</button></li>`
+    : `<li><strong>${esc(x.when)}</strong><br>Client: ${esc(x.client)} · With: ${esc(x.with || "")}<br><span class="hint">${esc(x.note || "")} (entered by ${esc(x.by)})</span> <button type="button" data-adel="${esc(x.id)}">Remove</button></li>`).join("")
+    : '<li class="hint">No appointments for this program yet.</li>';
+  document.querySelectorAll("[data-adel]").forEach((b) => b.addEventListener("click", () => { store.set(AKEY, store.get(AKEY, []).filter((x) => x.id !== b.dataset.adel)); renderAppts(); }));
+}
+function initAppts() {
+  $("apt-prog").textContent = CFG.name;
+  $("apt-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const date = $("apt-date").value, start = $("apt-start").value, end = $("apt-end").value;
+    const items = store.get(AKEY, []);
+    items.unshift({ id: "CAPT-" + Date.now(), type: "client-appointment", program: CFG.name, client: $("apt-client").value.trim(), staff: $("apt-staff").value.trim(), date: date, start: start, end: end, when: date + "T" + (start || "00:00"), location: $("apt-location").value.trim(), note: $("apt-note").value.trim(), by: state.user.name });
+    store.set(AKEY, items); e.target.reset(); renderAppts();
+    $("apt-msg").textContent = "Client appointment added to the shared calendar — scheduling record only; it does not notify anyone.";
+  });
+  renderAppts();
+}
+
 function enterApp() {
   $("login-screen").hidden = true; $("app").hidden = false;
   $("who").textContent = "Signed in: " + state.user.name + " (" + state.user.role + ")";
@@ -55,7 +84,7 @@ function enterApp() {
   $("prog-head").innerHTML = `<h2>${esc(CFG.name)}</h2><p class="hint">Status: ${esc(CFG.status)} · Lead: ${esc(CFG.lead)}</p>
     <p><a href="${esc(CFG.driveUrl)}" target="_blank" rel="noopener"><strong>Open this program's Google Drive folder</strong></a> · <a href="https://centipedepeertopeerllc-svg.github.io/portal/">Back to the Company Portal (shared calendar &amp; appointments)</a></p>
     ${CFG.guardrail ? `<p class="hint">${esc(CFG.guardrail)}</p>` : ""}`;
-  buildForms(); renderRecords(); renderNotes();
+  buildForms(); renderRecords(); renderNotes(); initAppts();
   if (window.CPPMail) CPPMail.mount($("email-panel"), {});
   initDV();
   $("logout-btn").addEventListener("click", () => { try { CPPAuth.signOut(); } catch { location.reload(); } });

@@ -92,3 +92,7 @@ legend { font-weight: bold; color: var(--navy); padding: 0 0.4rem; }
 .linkedin-link:hover, .linkedin-link:focus-visible { color: var(--gold); }
 .website-link { color: #fff; display: inline-flex; align-items: center; gap: 0.35rem; line-height: 1; font-size: 0.85rem; text-decoration: none; white-space: nowrap; }
 .website-link:hover, .website-link:focus-visible { color: var(--gold); }
+
+/* Client appointments — distinct gold label on the shared calendar (Nov 18, 2026). */
+.badge-appt { background: #dfc166; color: #10243e; border-color: #b8933a; font-weight: 700; }
+.appt-item { border-color: #b8933a !important; background: #fdf6dd !important; }
