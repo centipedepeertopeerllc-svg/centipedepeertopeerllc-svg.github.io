@@ -24,6 +24,7 @@ window.PORTAL_CONFIG = {
     { name: "DAP Notes Dashboard", url: "https://centipedepeertopeerllc-svg.github.io/dap/", note: "Session notes in DAP format and encounter documentation." },
     { name: "Client Dashboard", url: "https://centipedepeertopeerllc-svg.github.io/clients/", note: "Client records, paperwork, and purchase orders." },
     { name: "Peer Support Dashboard", url: "https://centipedepeertopeerllc-svg.github.io/peer-support-desk/", note: "Tom Clark's staff workspace — his clients, his appointments, the documents he needs, and Jarvis. His desk; the program's own dashboard is under Programs." },
+    { name: "Program Activity", url: "https://centipedepeertopeerllc-svg.github.io/portal/program-activity/", note: "Every program in one place — what we have done, what has been updated, and what is coming up, program by program (CPP-POL-2026-058)." },
     { name: "HR Dashboard", url: "https://centipedepeertopeerllc-svg.github.io/hr/", note: "Employee records and human-resources work." },
     { name: "Clients Without Insurance", url: "https://centipedepeertopeerllc-svg.github.io/uninsured/", note: "Clients with no coverage — the coverage work list, kept separate from insurance." },
     { name: "Banking Dashboard", url: "https://centipedepeertopeerllc-svg.github.io/banking/", note: "The company banking program and program cards." },
