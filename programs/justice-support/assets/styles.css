@@ -90,3 +90,5 @@ legend { font-weight: bold; color: var(--navy); padding: 0 0.4rem; }
 /* LinkedIn header link (added Nov 18, 2026) */
 .linkedin-link { color: #fff; display: inline-flex; align-items: center; line-height: 0; }
 .linkedin-link:hover, .linkedin-link:focus-visible { color: var(--gold); }
+.website-link { color: #fff; display: inline-flex; align-items: center; gap: 0.35rem; line-height: 1; font-size: 0.85rem; text-decoration: none; white-space: nowrap; }
+.website-link:hover, .website-link:focus-visible { color: var(--gold); }
