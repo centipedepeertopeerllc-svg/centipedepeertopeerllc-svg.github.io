@@ -9,7 +9,7 @@
 // Only SHA-256 hashes of the one-time temporary passwords are stored here.
 window.IT_CONFIG = {
   users: [
-    { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer — Administrator", admin: true, tempPasswordSha256: "fe8c3117dfa67d4c19496be899393a5b490c290ca7ab7f14a3c5cd1293ba64f3" },
+    { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer — Administrator", admin: true, tempPasswordSha256: "f608b5d4344089b5b13ae31476d1e9aaa981f6074280ac2bf88dae0f68a9df69" },
     { username: "jarvis", name: "Jarvis", role: "Board Officer — IT Department", admin: false, tempPasswordSha256: "be7797464911240005bd88a9eca851f383a73980c333b50ac5ead87f7dbbb1d5" }
   ],
   addresses: ["office@centipedepeertopeer.llc", "levi@centipedepeertopeer.llc", "jarvis@centipedepeertopeer.llc", "board@centipedepeertopeer.llc", "it@centipedepeertopeer.llc", "tom@centipedepeertopeer.llc", "junior@centipedepeertopeer.llc", "eric@centipedepeertopeer.llc", "monica@centipedepeertopeer.llc", "samson@centipedepeertopeer.llc", "tammy@centipedepeertopeer.llc", "michael@centipedepeertopeer.llc"],
