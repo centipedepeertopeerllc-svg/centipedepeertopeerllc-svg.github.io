@@ -30,6 +30,7 @@
    Built Nov 19, 2026 at the CEO's direction. */
 (function () {
   const BOARD_KEY = "cpp.portal.board.v1";
+  const SEEDED_KEY_V4 = "cpp.portal.board.seeded.v4";
   const SEEDED_KEY = "cpp.portal.board.seeded.v3";
   const SEEDED_KEY_V2 = "cpp.portal.board.seeded.v2";
   const SEEDED_KEY_V1 = "cpp.portal.board.seeded.v1";
@@ -64,6 +65,21 @@
     { id: "SEED-DEC1", tag: "COMPANY", headline: "December 1 — company email upgrade: @centipedepeertopeer.llc addresses arrive", body: "On December 1 the company moves to its own domain. Every staff member gets an address at centipedepeertopeer.llc, with the branded signature plate set up on each mailbox. Watch this board for your new address.", date: "2026-11-19", by: "Jarvis", expires: "2026-12-02" },
     { id: "SEED-MR-TRAINING", tag: "REMINDER", headline: "Mandated Reporter training — deadline December 18", body: "All current staff complete the Mandated Reporter training by December 18, 2026. See CPP-POL-2026-048 in the Company Documents library for the training path and the certificate record.", date: "2026-11-19", by: "Jarvis", expires: "2026-12-19" },
     { id: "SEED-TOM-START", tag: "COMPANY", headline: "Welcome, Tom Clark — first day Saturday, November 28", body: "Thomas Leo Clark III, our Certified Peer Support Specialist, starts on November 28, 2026. His desk is the Peer Support Dashboard — say hello when you see him.", date: "2026-11-19", by: "Jarvis", expires: "2026-11-29" }
+  ];
+
+  /* Standing slides — posted at the CEO's direction on the evening of
+     November 19, 2026 to stay on the board constantly (no expiry): the
+     county peer support route is the company's main road for Medi-Cal
+     Peer Support, and the Medicare/PECOS and VA Community Care routes
+     ride with it. Applied once per device under the v4 seed key (see
+     loadStore); after that the store is the record — a standing slide
+     the CEO or Jarvis retires stays retired. Route facts are from the
+     Insurance Payment Submission Guide, November 19, 2026 (Finance
+     binder). No client information. */
+  const STANDING = [
+    { id: "STAND-COUNTY-PEER", tag: "PROGRAM", headline: "Our main route — Medi-Cal Peer Support runs through San Joaquin County", body: "By the CEO's direction, the county route is the main road for Medi-Cal Peer Support. Peer Support Services are delivered by CalMHSA-certified peer specialists and billed through San Joaquin County's behavioral health delivery system — the county takes part in both SMHS and DMC-ODS — under an organizational contract with the county. There is no direct state billing for this benefit. Full route: Insurance Payment Submission Guide, November 19, 2026, in the Finance binder.", date: "2026-11-19", by: "Jarvis", expires: null },
+    { id: "STAND-MEDICARE-PECOS", tag: "PROGRAM", headline: "Medicare enrollment — PECOS is the door, and it starts with our Type 2 NPI", body: "Medicare Part B in California is administered by Noridian (Jurisdiction E). Provider enrollment runs through PECOS (the CMS-855B application) and starts with the company's Type 2 NPI — the NPI unlock is in motion now. Once enrolled, claims go electronically through EDISS; paper claims are the exception. Full route: Insurance Payment Submission Guide, November 19, 2026, in the Finance binder.", date: "2026-11-19", by: "Jarvis", expires: null },
+    { id: "STAND-VA-CCN", tag: "PROGRAM", headline: "VA Community Care — TriWest runs our region, and authorization comes first", body: "VA Community Care in California (Region 4) runs through TriWest. A VA authorization number must be on the claim or the claim is denied. Claims go through PGBA (Payer ID TWVACCN) or the Availity payer space, with a 180-day filing limit. Full route: Insurance Payment Submission Guide, November 19, 2026, in the Finance binder.", date: "2026-11-19", by: "Jarvis", expires: null }
   ];
 
   const $ = (id) => document.getElementById(id);
@@ -108,6 +124,19 @@
         saveStore(v);
       }
       try { localStorage.setItem(SEEDED_KEY, "1"); } catch { /* storage blocked — seeding repeats harmlessly, ids dedupe */ }
+    }
+    let seededV4 = null;
+    try { seededV4 = localStorage.getItem(SEEDED_KEY_V4); } catch { seededV4 = null; }
+    if (!seededV4) {
+      // Standing slides pass (Nov 19, 2026, CEO direction): add the three
+      // standing route slides once per device, deduped by id. After this
+      // pass the store is the record — a standing slide the CEO or Jarvis
+      // retired stays retired.
+      const haveIds = new Set(v.map((s) => s.id));
+      let addedStanding = false;
+      for (const s of STANDING) if (!haveIds.has(s.id)) { v.push(Object.assign({}, s)); addedStanding = true; }
+      if (addedStanding) saveStore(v);
+      try { localStorage.setItem(SEEDED_KEY_V4, "1"); } catch { /* storage blocked — the pass repeats harmlessly, ids dedupe */ }
     }
     return v;
   }
