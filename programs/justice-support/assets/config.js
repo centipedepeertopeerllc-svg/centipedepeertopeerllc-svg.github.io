@@ -1,5 +1,5 @@
 window.PROGRAM_CONFIG = {
-  slug: "justice-support", name: "Justice Support Program", status: "Approved by counsel — November 18, 2026", lead: "Levi Spears (CEO), with counsel Amber Bellante", mode: "justice",
+  slug: "justice-support", name: "Justice Support Program", status: "Active — November 20, 2026", lead: "Levi Spears (CEO), with counsel Amber Bellante", mode: "justice",
   driveUrl: "https://drive.google.com/drive/folders/1zfy4y7aTFPNM3Yr09RlfLzzipcFow7p1",
   guardrail: "Peer support only — not legal representation. Centipede prepares factual letters to defense counsel and helps with logistics and court navigation. Case information is confidential client information.",
   users: [
