@@ -60,6 +60,7 @@ window.PEER_DESK_CONFIG = {
 
   // The documents Tom works from — Portal reading pages.
   documents: [
+    { name: "OUR SHARED NOTEBOOK PAD — the shared pad between the CEO and Tom", url: "https://centipedepeertopeerllc-svg.github.io/peer-support-desk/shared-notebook/", note: "READ AND WRITE HERE. The one shared program-work notepad between the Chief Executive Officer and you: program work goes on the pad. You can read it and add entries yourself. Program-level work only — no client names or client details ever go on the pad." },
     { name: "OFFICER OF THE DAY FOLDER — Briefing for Saturday, November 21, 2026", url: "https://centipedepeertopeerllc-svg.github.io/peer-support-desk/ootd/", note: "READ FIRST. Your Officer of the Day trial day briefing paper: the day is yours to run, your phone line, Jarvis's check-in texts, your duties, and your boundaries." },
     { name: "Peer Support Manual — CPP-MAN-2026-001", url: "https://centipedepeertopeerllc-svg.github.io/portal/manual/", note: "The company's peer support manual — how Centipede does this work." },
     { name: "CPP-POL-2026-045 — Outreach Worker Skills, Training, and Field Gear", url: "https://centipedepeertopeerllc-svg.github.io/portal/documents/policies/cpp-pol-2026-045.html", note: "Skills, training, and field gear standard for outreach and peer support work." },

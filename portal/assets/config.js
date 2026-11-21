@@ -26,6 +26,7 @@ window.PORTAL_CONFIG = {
     { name: "Peer Support Dashboard", url: "https://centipedepeertopeerllc-svg.github.io/peer-support-desk/", note: "Tom Clark's staff workspace — his clients, his appointments, the documents he needs, and Jarvis. His desk; the program's own dashboard is under Programs." },
     { name: "Field Team Dashboard", url: "https://centipedepeertopeerllc-svg.github.io/field-team/", note: "The field team's workspace — today's assignments, field notes, supplies and needs, the program activity quick-log, email, and Jarvis." },
     { name: "Program Activity", url: "https://centipedepeertopeerllc-svg.github.io/portal/program-activity/", note: "Every program in one place — what we have done, what has been updated, and what is coming up, program by program (CPP-POL-2026-058)." },
+    { name: "Our Shared Notebook Pad", url: "https://centipedepeertopeerllc-svg.github.io/portal/shared-notebook/", note: "The one shared program-work notepad between the CEO and Tom Clark — program work goes on the pad; both can read it and add entries (CPP-POL-2026-066, draft)." },
     { name: "HR Dashboard", url: "https://centipedepeertopeerllc-svg.github.io/hr/", note: "Employee records and human-resources work." },
     { name: "Clients Without Insurance", url: "https://centipedepeertopeerllc-svg.github.io/uninsured/", note: "Clients with no coverage — the coverage work list, kept separate from insurance." },
     { name: "Banking Dashboard", url: "https://centipedepeertopeerllc-svg.github.io/banking/", note: "The company banking program and program cards." },
