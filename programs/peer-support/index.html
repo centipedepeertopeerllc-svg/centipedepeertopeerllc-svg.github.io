@@ -103,7 +103,32 @@
       <h2>Email</h2>
       <div id="email-panel"></div>
     </section>
-  </main>
+  <section class="panel" id="housing-law-panel">
+      <h2>Housing Law — California</h2>
+      <div style="border:1px solid #b8933a;background:#fdf6dd;border-radius:10px;padding:12px;">
+        <p style="margin-top:0;"><strong>California Housing Law — the Ellis Act, Fair Housing, and Tenant Protections</strong> &mdash; the housing statutes our work runs into, with the section numbers: the Ellis Act (Government Code &sect;&sect; 7060&ndash;7060.7), housing discrimination under FEHA (Government Code &sect; 12955, including source of income and vouchers at &sect; 12955(p)) and the Unruh Act (Civil Code &sect; 51), just cause and relocation (Civil Code &sect; 1946.2), retaliation (Civil Code &sect; 1942.5), and habitability (Civil Code &sect; 1941.1) &mdash; plus how Centipede applies the law in its housing work and the counsel route. Open to everybody on the Portal. Reference information only &mdash; not legal advice.</p>
+        <p style="margin-bottom:0;"><a href="https://centipedepeertopeerllc-svg.github.io/portal/housing-law/" style="font-size:1.05rem;font-weight:bold;">Open Housing Law &mdash; California &rarr;</a></p>
+      </div>
+    </section>
+
+    <section class="panel" id="law-books-panel">
+      <h2>Law Books / Law Resources</h2>
+      <div style="border:1px solid #b8933a;background:#fdf6dd;border-radius:10px;padding:12px;">
+        <p style="margin-top:0;">California housing law resources for the Peer Support Program &mdash; the statutes peer staff run into every day with the people we serve, with their official texts at the California Legislative Information site:</p>
+        <ul style="margin-bottom:8px;">
+          <li>Housing discrimination, including source of income and vouchers &mdash; Government Code &sect; 12955 and &sect; 12955(p) &mdash; <a href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=GOV&amp;sectionNum=12955">official text</a></li>
+          <li>The Ellis Act (withdrawal of rental housing) &mdash; Government Code &sect;&sect; 7060&ndash;7060.7 &mdash; <a href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=GOV&amp;sectionNum=7060">official text</a></li>
+          <li>Just cause for eviction &mdash; Civil Code &sect; 1946.2 &mdash; <a href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&amp;sectionNum=1946.2">official text</a></li>
+          <li>Notice periods to end a tenancy &mdash; Civil Code &sect; 1946.1 &mdash; <a href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&amp;sectionNum=1946.1">official text</a></li>
+          <li>Retaliation against a tenant &mdash; Civil Code &sect; 1942.5 &mdash; <a href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&amp;sectionNum=1942.5">official text</a></li>
+          <li>Unruh Civil Rights Act &mdash; Civil Code &sect; 51 &mdash; <a href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&amp;sectionNum=51">official text</a></li>
+          <li>Habitability &mdash; a dwelling must be tenantable &mdash; Civil Code &sect; 1941 &mdash; <a href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&amp;sectionNum=1941">official text</a></li>
+        </ul>
+        <p>A companion reference &mdash; laws commonly enforced against people experiencing homelessness &mdash; is being added to this section.</p>
+        <p style="margin-bottom:0;">Reference information only &mdash; not legal advice. Legal questions go to the Chief Executive Officer and to retained counsel, Fluetsch and Fluetsch, Attorney at Law.</p>
+      </div>
+    </section>
+</main>
 
   <footer class="app-footer">
     <span>Centipede Peer to Peer, LLC — a California for-profit limited liability company. The binders remain the official record; this dashboard is the Board's register and change desk.</span>
@@ -140,6 +165,23 @@
     </form>
     <ul id="apt-list" class="note-list"></ul>
   </section>
+  <section class="panel">
+    <div class="cal-band">Appointment Requests</div>
+    <p class="hint">Requests for this program sent from the website's Request an Appointment form arrive in the company inbox (centipedepeertopeer.llc@gmail.com) right away; staff enter them here or in the Portal. Program: <strong id="req-prog"></strong> — locked to this dashboard. This queue does not pull from the form by itself — the automatic form-to-calendar connection arrives with the system's live-mode step. Accepting a request puts it on the shared calendar as a client appointment; the office still confirms the appointment with the person directly. A request is never a confirmed booking on its own.</p>
+    <form id="req-form" class="appt-form">
+      <label>Full name <span class="req">*</span> <input id="req-name" type="text" required></label>
+      <label>Phone <input id="req-phone" type="text"></label>
+      <label>Email <input id="req-email" type="text"></label>
+      <label>What it's for <input id="req-purpose" type="text"></label>
+      <label>Preferred day/time <input id="req-preferred" type="text"></label>
+      <label>Meet <select id="req-meet"><option>In person</option><option>Video call</option><option>Phone</option></select></label>
+      <button type="submit" class="btn-navy">Add request to queue</button>
+      <span id="req-msg" class="hint" role="status"></span>
+    </form>
+    <ul id="req-list" class="note-list"></ul>
+    <p id="req-count" class="hint"></p>
+  </section>
+
   <section class="panel"><h2>Jarvis</h2><div id="jarvis-panel"></div></section>
   <section class="panel"><h2>Company insurance</h2><div id="insurance-card"></div></section>
   <section class="panel"><h2>Email</h2><div id="email-panel"></div></section>
