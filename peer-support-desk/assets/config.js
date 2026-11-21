@@ -11,7 +11,7 @@
 // Access: Tom Clark (primary), the CEO (oversight, admin), and Jarvis.
 window.PEER_DESK_CONFIG = {
   users: [
-    { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer", admin: true, tempPasswordSha256: "ab35e5ad31d4fd4fe4f3853eca29f4794b1fd31701a19a62bbde10cc556a75f4" },
+    { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer", admin: true, tempPasswordSha256: "138e9b00dca0a00f6642db21c4d79799f2c0d47e783ce60c9ecc1c75d66df576" },
     { username: "tom.clark", name: "Thomas Leo Clark III", role: "Certified Peer Support Specialist", admin: false, tempPasswordSha256: "47400cc485f18196b6345108f222f3a733c01bed320524bcf7e82fdc98b1de4c" },
     { username: "jarvis", name: "Jarvis", role: "Board Officer", admin: false, tempPasswordSha256: "be7797464911240005bd88a9eca851f383a73980c333b50ac5ead87f7dbbb1d5" }
   ],
@@ -60,7 +60,6 @@ window.PEER_DESK_CONFIG = {
 
   // The documents Tom works from — Portal reading pages.
   documents: [
-    { name: "OUR SHARED NOTEBOOK PAD — the shared pad between the CEO and Tom", url: "https://centipedepeertopeerllc-svg.github.io/peer-support-desk/shared-notebook/", note: "READ AND WRITE HERE. The one shared program-work notepad between the Chief Executive Officer and you: program work goes on the pad. You can read it and add entries yourself. Program-level work only — no client names or client details ever go on the pad." },
     { name: "OFFICER OF THE DAY FOLDER — Briefing for Saturday, November 21, 2026", url: "https://centipedepeertopeerllc-svg.github.io/peer-support-desk/ootd/", note: "READ FIRST. Your Officer of the Day trial day briefing paper: the day is yours to run, your phone line, Jarvis's check-in texts, your duties, and your boundaries." },
     { name: "Peer Support Manual — CPP-MAN-2026-001", url: "https://centipedepeertopeerllc-svg.github.io/portal/manual/", note: "The company's peer support manual — how Centipede does this work." },
     { name: "CPP-POL-2026-045 — Outreach Worker Skills, Training, and Field Gear", url: "https://centipedepeertopeerllc-svg.github.io/portal/documents/policies/cpp-pol-2026-045.html", note: "Skills, training, and field gear standard for outreach and peer support work." },

@@ -8,8 +8,8 @@
 // stored here; the temporary passwords themselves are never in any file.
 window.LEGAL_CONFIG = {
   users: [
-    { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer", admin: true, tempPasswordSha256: "4193fa8f3a1a7c1e0a8772f8d7edfc5a4f3269a357cd1d7a4a25627886bbe497" },
-    { username: "amber.bellante", name: "Amber Bellante", role: "Counsel — Legal Department / Justice Support Program", admin: false, tempPasswordSha256: "4193fa8f3a1a7c1e0a8772f8d7edfc5a4f3269a357cd1d7a4a25627886bbe497" }
+    { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer", admin: true, tempPasswordSha256: "138e9b00dca0a00f6642db21c4d79799f2c0d47e783ce60c9ecc1c75d66df576" },
+    { username: "amber.bellante", name: "Amber Bellante", role: "Counsel — Legal Department / Justice Support Program", admin: false, tempPasswordSha256: "ab35e5ad31d4fd4fe4f3853eca29f4794b1fd31701a19a62bbde10cc556a75f4" }
   ],
   // Legal Binder (CPP-BND-2026-001) tab index — titles only. The binder
   // itself is the official record; document contents are NOT in this portal.

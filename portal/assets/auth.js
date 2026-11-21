@@ -351,16 +351,16 @@
   }
   function mount(opts) {
     // Nov 20, 2026 (Jarvis, at the CEO's direction): the store key carries
-    // an ".r2" suffix so every device starts from a clean seed. The old
+    // an ".r3" suffix so every device starts from a clean seed. The old
     // device stores held stale password state that a central temporary-
     // password reset could not reach (the seed only applied to devices
     // with no store), which locked the CEO out after his reset. Fresh
     // seed = the current temporary passwords in config.js apply again.
     CTX = {
-      storeKey: opts.storeKey + ".r2",
+      storeKey: opts.storeKey + ".r4",
       sessionKey: opts.sessionKey,
       onSignIn: opts.onSignIn,
-      store: loadStore(opts.storeKey + ".r2", opts.seedUsers),
+      store: loadStore(opts.storeKey + ".r4", opts.seedUsers),
       step: "login",
       pending: null,
       pendingSecret: null
