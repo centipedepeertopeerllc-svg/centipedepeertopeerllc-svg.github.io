@@ -1,9 +1,9 @@
 window.PROGRAM_CONFIG = {
-  slug: "recovery-support", name: "Substance Abuse Recovery Support", status: "In Development", lead: "Levi Spears (CEO)", mode: "generic",
+  slug: "recovery-support", name: "Substance Abuse Recovery Support", status: "Adopted — not yet enrolling", lead: "Levi Spears (CEO)", mode: "generic",
   driveUrl: "https://drive.google.com/drive/folders/1NkrciZ9PG_7mEmVxbbs4VN42U3rOL4TU",
   guardrail: "",
   users: [
-    { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer", admin: true, tempPasswordSha256: "138e9b00dca0a00f6642db21c4d79799f2c0d47e783ce60c9ecc1c75d66df576" },
+    { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer", admin: true, tempPasswordSha256: "ab35e5ad31d4fd4fe4f3853eca29f4794b1fd31701a19a62bbde10cc556a75f4" },
     { username: "tom.clark", name: "Thomas Leo Clark III", role: "Certified Peer Support Specialist", admin: false, tempPasswordSha256: "47400cc485f18196b6345108f222f3a733c01bed320524bcf7e82fdc98b1de4c" },
     { username: "jarvis", name: "Jarvis", role: "Board Officer — Record Keeper", admin: false, tempPasswordSha256: "be7797464911240005bd88a9eca851f383a73980c333b50ac5ead87f7dbbb1d5" },
     { username: "eric.jacobson", name: "Eric Jacobson", role: "Human Resources", admin: false, tempPasswordSha256: "db3e9ec2992db457a2d1e0f6be47b3f2f10f9baefb0ec3e56bde2e28a3aefca" },

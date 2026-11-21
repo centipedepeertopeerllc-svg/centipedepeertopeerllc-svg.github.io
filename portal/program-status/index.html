@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Program Status Board — Centipede Peer to Peer, LLC</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="../assets/styles.css">
+<style>
+  .wrap2{max-width:980px;margin:0 auto;padding:1rem;}
+  table.sb{width:100%;border-collapse:collapse;margin:0 0 1.5rem;}
+  table.sb th,table.sb td{border:1px solid #cbbd8a;padding:.45rem .6rem;text-align:left;vertical-align:top;font-size:.95rem;}
+  table.sb th{background:#10243e;color:#f5efe0;}
+  .st{font-weight:bold;white-space:nowrap;}
+  .src{color:#555;font-size:.85rem;}
+</style>
+</head>
+<body>
+<div class="wrap2">
+  <p><a href="../">&larr; Company Portal</a></p>
+  <h1>Program Status Board</h1>
+  <p><strong>Centipede Peer to Peer, LLC</strong> &middot; Current as of <strong>November 21, 2026</strong> &middot; Controlled by the Chief Executive Officer</p>
+  <p id="sb-note">The company's one program status list. Every Portal program listing and the public programs page are kept to this board.</p>
+  <h2>Programs with their own dashboard</h2>
+  <table class="sb"><thead><tr><th>Program</th><th>Status</th><th>Dashboard</th><th>Source</th></tr></thead><tbody id="sb-dash"></tbody></table>
+  <h2>Service lines — where they live</h2>
+  <p>These named services do not stand alone; each one is delivered inside the dashboard shown. This is the company's written program map (November 21, 2026).</p>
+  <table class="sb"><thead><tr><th>Service line</th><th>Status</th><th>Lives in</th><th>Source</th></tr></thead><tbody id="sb-lines"></tbody></table>
+  <p class="src">Reference information for the Centipede team. Client information never appears on this board.</p>
+</div>
+<script>
+(function(){
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function render(b){
+    document.getElementById("sb-note").textContent = b.note;
+    document.getElementById("sb-dash").innerHTML = b.dashboards.map(function(p){
+      return "<tr><td>"+esc(p.name)+"</td><td class='st'>"+esc(p.status)+"</td><td><a href='"+esc(p.url)+"'>Open dashboard</a></td><td class='src'>"+esc(p.source)+"</td></tr>";
+    }).join("");
+    document.getElementById("sb-lines").innerHTML = b.serviceLines.map(function(p){
+      return "<tr><td>"+esc(p.name)+"</td><td class='st'>"+esc(p.status)+"</td><td><a href='"+esc(p.homeUrl)+"'>"+esc(p.home)+"</a></td><td class='src'>"+esc(p.source)+"</td></tr>";
+    }).join("");
+  }
+  fetch("../assets/program-status.json").then(function(r){return r.json();}).then(render).catch(function(){
+    document.getElementById("sb-note").textContent = "The status list could not be loaded. Tell Jarvis — the board file is portal/assets/program-status.json.";
+  });
+})();
+</script>
+</body>
+</html>

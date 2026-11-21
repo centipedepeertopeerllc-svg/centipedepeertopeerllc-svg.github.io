@@ -1,0 +1,223 @@
+{
+ "board": "Program Status Board",
+ "company": "Centipede Peer to Peer, LLC",
+ "date": "2026-11-21",
+ "controlledBy": "Chief Executive Officer",
+ "note": "The company's one program status list. Every Portal program listing and the public programs page are kept to this board. Statuses as the company record supports them on the date above; conflicts settled in favor of the most recent CEO/board record, with the source noted per program. Active = the program is working and open now (shown as Now Serving on the public page). In Development = being built, not enrolling yet.",
+ "dashboards": [
+  {
+   "name": "Homeless Outreach",
+   "status": "Active",
+   "url": "https://centipedepeertopeerllc-svg.github.io/programs/homeless-outreach/",
+   "source": "Portal program config; public list Nov 5 (Now Serving) agrees."
+  },
+  {
+   "name": "1-on-1 Peer Support",
+   "status": "Active",
+   "url": "https://centipedepeertopeerllc-svg.github.io/programs/peer-support/",
+   "source": "Portal program config; public list Nov 5 (Now Serving) agrees."
+  },
+  {
+   "name": "Referrals & ID Assistance",
+   "status": "Active",
+   "url": "https://centipedepeertopeerllc-svg.github.io/programs/referrals-id/",
+   "source": "Portal program config; public list Nov 5 (Now Serving) agrees."
+  },
+  {
+   "name": "Community Resource Navigation",
+   "status": "Active",
+   "url": "https://centipedepeertopeerllc-svg.github.io/programs/resource-navigation/",
+   "source": "Portal program config; public list Nov 5 (Now Serving) agrees."
+  },
+  {
+   "name": "Justice Support Program",
+   "status": "Active",
+   "url": "https://centipedepeertopeerllc-svg.github.io/programs/justice-support/",
+   "source": "CEO direction Nov 20, 2026 (went Active); program config updated. Public list Nov 5 predates the activation."
+  },
+  {
+   "name": "Mental-Health Outreach & Navigation",
+   "status": "Active",
+   "url": "https://centipedepeertopeerllc-svg.github.io/programs/mental-health-outreach/",
+   "source": "Public list Nov 5 (Now Serving); dashboard created Nov 21, 2026."
+  },
+  {
+   "name": "Crisis Support & Resource Connection",
+   "status": "Active",
+   "url": "https://centipedepeertopeerllc-svg.github.io/programs/crisis-support/",
+   "source": "Public list Nov 5 (Now Serving); dashboard created Nov 21, 2026."
+  },
+  {
+   "name": "Housing Stability Services",
+   "status": "Active",
+   "url": "https://centipedepeertopeerllc-svg.github.io/programs/housing-stability/",
+   "source": "Public list Nov 5 (Now Serving); program manual Oct 1, 2026; dashboard created Nov 21, 2026."
+  },
+  {
+   "name": "Pet Pantry",
+   "status": "Active",
+   "url": "https://centipedepeertopeerllc-svg.github.io/programs/pet-pantry/",
+   "source": "Recurring program work on the record (next: Tue Nov 24, 2026, 9-11 AM); dashboard created Nov 21, 2026. Not on the Nov 5 public list."
+  },
+  {
+   "name": "Substance Abuse Recovery Support",
+   "status": "Adopted — not yet enrolling",
+   "url": "https://centipedepeertopeerllc-svg.github.io/programs/recovery-support/",
+   "source": "Adopted Oct 16, 2026; Portal config wording. Public list Nov 5 carries it In Development, which the page defines as not enrolling yet — same standing."
+  },
+  {
+   "name": "Hygiene Outreach",
+   "status": "In Development",
+   "url": "https://centipedepeertopeerllc-svg.github.io/programs/hygiene-outreach/",
+   "source": "CONFLICT SETTLED Nov 21, 2026: public list Nov 5 said Now Serving; the company's posting screens (Nov 8-21) and the program config carry In Development. Most recent company record governs — In Development."
+  },
+  {
+   "name": "Homeless Shelter (Emergency Shelter & Transitional Housing)",
+   "status": "In Development",
+   "url": "https://centipedepeertopeerllc-svg.github.io/programs/homeless-shelter/",
+   "source": "Portal program config; public list Nov 5 agrees."
+  },
+  {
+   "name": "Super Hero Program",
+   "status": "In Development",
+   "url": "https://centipedepeertopeerllc-svg.github.io/programs/super-hero/",
+   "source": "Portal program config (being built; sign-up deadline Dec 12, 2026). Not on the Nov 5 public list."
+  },
+  {
+   "name": "Women Helping Women",
+   "status": "In Development",
+   "url": "https://centipedepeertopeerllc-svg.github.io/programs/women-helping-women/",
+   "source": "Portal program config; public list Nov 5 agrees."
+  },
+  {
+   "name": "Centipede Day of Hope",
+   "status": "In Development",
+   "url": "https://centipedepeertopeerllc-svg.github.io/programs/day-of-hope/",
+   "source": "Adopted Nov 14, 2026 — standing program being built; Portal program config. Not in the Nov 5 list section (adopted after it; its own page section is on the website)."
+  },
+  {
+   "name": "Centipede Academy",
+   "status": "In Development",
+   "url": "https://centipedepeertopeerllc-svg.github.io/programs/centipede-academy/",
+   "source": "Public list Nov 5; program documents Sep 27, 2026; dashboard created Nov 21, 2026."
+  },
+  {
+   "name": "Relationship Coaching",
+   "status": "In Development",
+   "url": "https://centipedepeertopeerllc-svg.github.io/programs/relationship-coaching/",
+   "source": "Public list Nov 5; own program seal Oct 22, 2026; dashboard created Nov 21, 2026."
+  },
+  {
+   "name": "Transportation Support",
+   "status": "In Development",
+   "url": "https://centipedepeertopeerllc-svg.github.io/programs/transportation-support/",
+   "source": "Public list Nov 5; dashboard created Nov 21, 2026."
+  },
+  {
+   "name": "Veterans Program",
+   "status": "Pending Board Approval",
+   "url": "https://centipedepeertopeerllc-svg.github.io/programs/veterans/",
+   "source": "CONFLICT SETTLED Nov 21, 2026: public list Nov 5 says In Development; the Portal config and the company's posting screens carry Pending Board Approval. Most recent company record governs — Pending Board Approval."
+  }
+ ],
+ "serviceLines": [
+  {
+   "name": "Mental Health Wellness Tools",
+   "status": "Active",
+   "home": "1-on-1 Peer Support",
+   "homeUrl": "https://centipedepeertopeerllc-svg.github.io/programs/peer-support/",
+   "source": "Public list Nov 5 (Now Serving). Wellness tools are peer-support materials — service line of 1-on-1 Peer Support."
+  },
+  {
+   "name": "Peer Recovery Planning & Documentation",
+   "status": "Active",
+   "home": "1-on-1 Peer Support",
+   "homeUrl": "https://centipedepeertopeerllc-svg.github.io/programs/peer-support/",
+   "source": "Public list Nov 5 (Now Serving). Recovery planning and DAP documentation run inside 1-on-1 Peer Support."
+  },
+  {
+   "name": "Life Skills & Personal Development",
+   "status": "Active",
+   "home": "1-on-1 Peer Support",
+   "homeUrl": "https://centipedepeertopeerllc-svg.github.io/programs/peer-support/",
+   "source": "Public list Nov 5 (Now Serving). Delivered inside 1-on-1 Peer Support work."
+  },
+  {
+   "name": "Community Integration",
+   "status": "In Development",
+   "home": "Community Resource Navigation",
+   "homeUrl": "https://centipedepeertopeerllc-svg.github.io/programs/resource-navigation/",
+   "source": "Public list Nov 5. Integration work is resource-navigation work."
+  },
+  {
+   "name": "Community Partnerships & Referral Network",
+   "status": "In Development",
+   "home": "Community Resource Navigation",
+   "homeUrl": "https://centipedepeertopeerllc-svg.github.io/programs/resource-navigation/",
+   "source": "Public list Nov 5. The referral network is maintained by Community Resource Navigation."
+  },
+  {
+   "name": "2026 Community Project: Civic & Voter Navigation",
+   "status": "In Development",
+   "home": "Community Resource Navigation",
+   "homeUrl": "https://centipedepeertopeerllc-svg.github.io/programs/resource-navigation/",
+   "source": "Public list Nov 5. A navigation project — runs inside Community Resource Navigation."
+  },
+  {
+   "name": "Peer Sponsorship Program",
+   "status": "In Development",
+   "home": "Substance Abuse Recovery Support",
+   "homeUrl": "https://centipedepeertopeerllc-svg.github.io/programs/recovery-support/",
+   "source": "Public list Nov 5. Sponsorship is recovery practice — service line of Recovery Support."
+  },
+  {
+   "name": "Structured Recovery Support Program",
+   "status": "In Development",
+   "home": "Substance Abuse Recovery Support",
+   "homeUrl": "https://centipedepeertopeerllc-svg.github.io/programs/recovery-support/",
+   "source": "Public list Nov 5. The structured track of Recovery Support."
+  },
+  {
+   "name": "Recovery-Supportive Activities",
+   "status": "In Development",
+   "home": "Substance Abuse Recovery Support",
+   "homeUrl": "https://centipedepeertopeerllc-svg.github.io/programs/recovery-support/",
+   "source": "Public list Nov 5. Activities arm of Recovery Support."
+  },
+  {
+   "name": "Alumni Servant Leadership",
+   "status": "In Development",
+   "home": "Substance Abuse Recovery Support",
+   "homeUrl": "https://centipedepeertopeerllc-svg.github.io/programs/recovery-support/",
+   "source": "Public list Nov 5. Recovery-program alumni leadership — service line of Recovery Support."
+  },
+  {
+   "name": "Shelter Alumni Volunteer Program",
+   "status": "In Development",
+   "home": "Homeless Shelter (Emergency Shelter & Transitional Housing)",
+   "homeUrl": "https://centipedepeertopeerllc-svg.github.io/programs/homeless-shelter/",
+   "source": "Public list Nov 5. Shelter alumni volunteering — service line of the Shelter program."
+  },
+  {
+   "name": "2026 Community Project: Community-Center Outreach",
+   "status": "In Development",
+   "home": "Homeless Outreach",
+   "homeUrl": "https://centipedepeertopeerllc-svg.github.io/programs/homeless-outreach/",
+   "source": "Public list Nov 5. An outreach project — runs inside Homeless Outreach."
+  },
+  {
+   "name": "5150 Awareness & Response Training",
+   "status": "In Development",
+   "home": "Centipede Academy",
+   "homeUrl": "https://centipedepeertopeerllc-svg.github.io/programs/centipede-academy/",
+   "source": "Public list Nov 5. A training — the Academy is the company's training arm; the material also supports Justice Support field work."
+  },
+  {
+   "name": "Peer Workforce & Leadership Development",
+   "status": "In Development",
+   "home": "Centipede Academy",
+   "homeUrl": "https://centipedepeertopeerllc-svg.github.io/programs/centipede-academy/",
+   "source": "Public list Nov 5. Workforce training and leadership development — Academy service line."
+  }
+ ]
+}
