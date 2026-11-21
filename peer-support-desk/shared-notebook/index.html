@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Shared Notebook Pad — Centipede Peer to Peer, LLC</title>
+<meta name="description" content="Our Shared Notebook Pad — the one shared program-work notepad between the Chief Executive Officer and Tom Clark at Centipede Peer to Peer, LLC. Program-level work only; no client information.">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#10243e">
+<style>
+  :root { --navy:#10243e; --gold:#dfc166; --gold-dark:#b8933a; --ink:#1d2733; --paper:#f7f5ef; --line:#d8d2c0; --green:#1e6b4f; --amber:#8a6d1a; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: Georgia, "Times New Roman", serif; color:var(--ink); background:var(--paper); }
+  .topbar { background:var(--navy); color:#fff; padding:.8rem 1rem; border-bottom:4px solid var(--gold); }
+  .topbar a { color:var(--gold); }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 1rem; }
+  .head { background:#fff; border:1px solid var(--line); border-top:6px solid var(--gold); border-radius:10px; padding:1.4rem 1.6rem; box-shadow:0 4px 18px rgba(0,0,0,.08); margin:1rem 0; }
+  .head h1 { margin:.1rem 0 .4rem; color:var(--navy); font-size:1.7rem; }
+  .head p { line-height:1.5; margin:.35rem 0; }
+  .mode { border-radius:8px; padding:.7rem 1rem; margin:1rem 0; font-size:.98rem; line-height:1.45; }
+  .mode.shared { background:#e7f4ec; border:2px solid var(--green); }
+  .mode.local { background:#fdf3d7; border:2px solid var(--amber); }
+  .entry { background:#fff; border:1px solid var(--line); border-left:6px solid var(--navy); border-radius:8px; padding:1rem 1.2rem; margin:.8rem 0; }
+  .entry h3 { margin:.1rem 0 .3rem; color:var(--navy); font-size:1.08rem; }
+  .entry .meta { font-size:.88rem; color:#55503f; margin-bottom:.4rem; }
+  .entry p { line-height:1.5; margin:.3rem 0; white-space:pre-wrap; }
+  .composer { background:#fff; border:1px solid var(--line); border-top:6px solid var(--navy); border-radius:10px; padding:1.2rem 1.4rem; margin:1.2rem 0; }
+  .composer h2 { margin:.1rem 0 .6rem; color:var(--navy); }
+  .composer label { display:block; margin:.7rem 0 .25rem; font-weight:bold; }
+  .composer select, .composer input[type="text"], .composer textarea { width:100%; padding:.55rem; border:1px solid #b9b29c; border-radius:6px; font:inherit; background:#fffef9; }
+  .btn { display:inline-block; background:var(--navy); color:#fff; border:2px solid var(--gold-dark); border-radius:8px; padding:.55rem 1.1rem; text-decoration:none; cursor:pointer; font-size:1rem; margin-top:.9rem; }
+  .hint { font-size:.9rem; color:#55503f; }
+  .fineprint { font-size:.85rem; color:#55503f; text-align:center; margin:1rem 0 2rem; }
+  .status { margin-left:.7rem; font-size:.95rem; }
+</style>
+</head>
+<body>
+<div class="topbar"><a href="../">&larr; Back to the dashboard</a> &nbsp;·&nbsp; Centipede Peer to Peer, LLC · LIC: 0714781 · Stockton, California</div>
+<div class="wrap">
+
+  <div class="head">
+    <h1>&#128211; Our Shared Notebook Pad</h1>
+    <p><strong>The shared pad between the CEO and Tom.</strong> One notepad for Centipede's program work, shared by Levi Spears, Chief Executive Officer, and Tom Clark, Certified Peer Support Specialist.</p>
+    <p>The standing rule (CEO direction, November 21, 2026): whenever the CEO is working on the programs, everything about that program work goes on this notepad. The notepad is filed in its binder so it can be retrieved when needed; this Portal copy is the working surface, and both the CEO and Tom can read it and add entries here. Jarvis keeps the pad current.</p>
+    <p><strong>Program-level work only.</strong> No client names, no client details, nothing confidential ever goes on this pad — client records live in the client dashboards and the locked client binders, which remain the official record.</p>
+  </div>
+
+  <div id="mode-banner" class="mode local" role="status">Checking how this pad is saving&hellip;</div>
+
+  <div id="entries" aria-live="polite"></div>
+
+  <form id="pad-form" class="composer">
+    <h2>Add to the pad</h2>
+    <label for="pad-name">Your name</label>
+    <select id="pad-name">
+      <option>Levi Spears, CEO</option>
+      <option>Tom Clark</option>
+      <option>Jarvis</option>
+    </select>
+    <label for="pad-title">Heading</label>
+    <input type="text" id="pad-title" maxlength="140" placeholder="What is this note about?" required>
+    <label for="pad-note">Note</label>
+    <textarea id="pad-note" rows="4" maxlength="2000" placeholder="Program work only — no client names or client details." required></textarea>
+    <button type="submit" class="btn">Add entry</button>
+    <span id="pad-msg" class="status" role="status"></span>
+    <p class="hint">Entries are dated automatically. In shared mode an entry saves to the company database and shows on both the CEO's Portal copy and Tom's desk copy. If the page says Local Mode, your entry is kept on this device and Jarvis carries it into the binder notepad — the banner above always tells you which mode you are in.</p>
+  </form>
+
+  <p class="fineprint">Our Shared Notebook Pad — Centipede Peer to Peer, LLC, a California for-profit limited liability company. Opened November 21, 2026, by direction of the Chief Executive Officer. Policy (draft, awaiting CEO approval): CPP-POL-2026-066 — Shared Notebook Pad Policy. The binder copy is the record; this page is the working surface.</p>
+</div>
+
+<script>
+"use strict";
+/* Our Shared Notebook Pad — one shared program-work notepad between the
+   CEO and Tom Clark (CEO direction, Nov 21, 2026; draft policy
+   CPP-POL-2026-066). Same page in the Portal (/portal/shared-notebook/)
+   and on Tom's Peer Support Desk (/peer-support-desk/shared-notebook/).
+   Save path: the company Supabase project (publishable key, same pattern
+   as the Client Dashboard) table "shared_notebook_entries". If that table
+   is not reachable, the pad runs in LOCAL MODE on this device
+   (localStorage "cpp.portal.sharedpad.v1") and SAYS SO in the banner —
+   entries are never silently lost and the mode is never hidden.
+   PROGRAM-LEVEL ONLY: no client information ever goes on this pad. */
+const SB_URL = "https://xaogzcoefeirezhicovs.supabase.co";
+const SB_KEY = "sb_publishable_nek2I10pkRAWf8_-m3X0UA_aQVAH-lR";
+const SB_TABLE = "shared_notebook_entries";
+const LOCAL_KEY = "cpp.portal.sharedpad.v1";
+
+const SEED = [
+  { id: "SEED-2026-11-21-1", date: "2026-11-21", by: "Jarvis, for the CEO", title: "Pad opened today", note: "This pad was opened today at the CEO's direction, on the standing rule: program work goes on the notepad, the notepad lives in a binder, and a copy lives in the Portal where the CEO and Tom can both read it and add to it." },
+  { id: "SEED-2026-11-21-2", date: "2026-11-21", by: "Jarvis, for the CEO", title: "Jessica — San Joaquin County Department of Education", note: "Levi has been talking by phone with Jessica, of the Department of Education, San Joaquin County (first name only on the record — her last name has not been given). A video call is held today, Saturday, November 21, 2026, about Centipede's programs — specifically what the programs need, material-wise and/or in learning sketches (the CEO's words). Follow-up: the program needs that come out of the call get written onto this pad." },
+  { id: "SEED-2026-11-21-3", date: "2026-11-21", by: "Jarvis, for the CEO", title: "Housing law for the housing programs (cross-reference)", note: "The Ellis Act (California Government Code sections 7060 to 7060.7) and California housing discrimination law are being applied to Centipede's housing programs in a separate workstream: a housing-law packet for the housing area and Housing Law sections in the Portal. This pad cross-references that work only; the packet and the Legal Binder filing carry the substance." },
+  { id: "SEED-2026-11-21-4", date: "2026-11-21", by: "Jarvis, for the CEO", title: "Officer of the Day — today", note: "Tom Clark is Officer of the Day today, Saturday, November 21, 2026 (trial day), and has taken the day. Jarvis supervises the day. The CEO is resting and feeling a little better; the Emergency Billboard carries the current company phone arrangements." }
+];
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const pad2 = (n) => String(n).padStart(2, "0");
+const todayISO = () => { const d = new Date(); return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()); };
+const fmtDay = (d) => { if (!d) return ""; try { return new Date(d + "T12:00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" }); } catch { return d; } };
+const state = { mode: "local", entries: [] };
+
+function sbHeaders(extra) {
+  return Object.assign({ apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" }, extra || {});
+}
+function localGet() {
+  try { const raw = localStorage.getItem(LOCAL_KEY); if (raw !== null) { const v = JSON.parse(raw); if (Array.isArray(v)) return v; } } catch { /* fall through */ }
+  const seed = SEED.slice();
+  localSet(seed);
+  return seed;
+}
+function localSet(v) { try { localStorage.setItem(LOCAL_KEY, JSON.stringify(v)); } catch { /* storage blocked — entries still render this session */ } }
+
+function setBanner() {
+  const b = $("mode-banner");
+  if (state.mode === "shared") {
+    b.className = "mode shared";
+    b.innerHTML = "<strong>Shared mode — connected.</strong> Entries on this pad save to the company database and show on both copies of the pad: the CEO's Portal and Tom's Peer Support Desk.";
+  } else {
+    b.className = "mode local";
+    b.innerHTML = "<strong>Local mode on this device.</strong> The shared pad table is not connected yet, so entries you add are kept on this device only, and Jarvis carries them into the binder notepad. The one-step setup is on file with Jarvis (the shared_notebook_entries table for the company database). Nothing you write here is lost — but it does not reach the other copy of the pad until shared mode is connected.";
+  }
+}
+function draw() {
+  const list = state.entries.slice().sort((a, b) => ((b.date || "") + (b.id || "")).localeCompare((a.date || "") + (a.id || "")));
+  $("entries").innerHTML = list.length ? list.map((e) =>
+    `<article class="entry"><h3>${esc(e.title)}</h3><div class="meta">${esc(fmtDay(e.date))} · ${esc(e.by)}</div><p>${esc(e.note)}</p></article>`
+  ).join("") : '<p class="hint">No entries on the pad yet.</p>';
+}
+async function loadShared() {
+  const res = await fetch(SB_URL + "/rest/v1/" + SB_TABLE + "?select=id,entry_date,author,title,note,created_at&order=created_at.asc", { headers: sbHeaders() });
+  if (!res.ok) throw new Error("shared table not reachable: " + res.status);
+  const rows = await res.json();
+  return rows.map((r) => ({ id: String(r.id), date: r.entry_date || (r.created_at || "").slice(0, 10), by: r.author, title: r.title, note: r.note }));
+}
+async function init() {
+  try {
+    state.entries = await loadShared();
+    state.mode = "shared";
+  } catch {
+    state.mode = "local";
+    state.entries = localGet();
+  }
+  setBanner();
+  draw();
+}
+$("pad-form").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const by = $("pad-name").value;
+  const title = $("pad-title").value.trim();
+  const note = $("pad-note").value.trim();
+  if (!title || !note) { $("pad-msg").textContent = "Write a heading and a note first."; return; }
+  const entry = { id: "PAD-" + Date.now(), date: todayISO(), by: by, title: title, note: note };
+  if (state.mode === "shared") {
+    try {
+      const res = await fetch(SB_URL + "/rest/v1/" + SB_TABLE, {
+        method: "POST",
+        headers: sbHeaders({ Prefer: "return=minimal" }),
+        body: JSON.stringify({ entry_date: entry.date, author: entry.by, title: entry.title, note: entry.note })
+      });
+      if (!res.ok) throw new Error("save failed: " + res.status);
+      state.entries = await loadShared();
+      draw();
+      ev.target.reset();
+      $("pad-msg").textContent = "Saved to the shared pad — it shows on both copies now.";
+      return;
+    } catch {
+      state.mode = "local";
+      setBanner();
+      $("pad-msg").textContent = "The shared save did not go through, so this entry was kept on this device instead (local mode). Jarvis will carry it into the binder notepad.";
+    }
+  }
+  const v = localGet();
+  v.push(entry);
+  localSet(v);
+  state.entries = v;
+  draw();
+  ev.target.reset();
+  if (!$("pad-msg").textContent) $("pad-msg").textContent = "Saved on this device (local mode) — Jarvis carries pad entries into the binder notepad.";
+});
+init();
+</script>
+</body>
+</html>

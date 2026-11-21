@@ -9,7 +9,7 @@
 // Only SHA-256 hashes of the one-time temporary passwords are stored here.
 window.PORTAL_CONFIG = {
   users: [
-    { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer", admin: true, tempPasswordSha256: "4193fa8f3a1a7c1e0a8772f8d7edfc5a4f3269a357cd1d7a4a25627886bbe497" },
+    { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer", admin: true, tempPasswordSha256: "ab35e5ad31d4fd4fe4f3853eca29f4794b1fd31701a19a62bbde10cc556a75f4" },
     { username: "tom.clark", name: "Thomas Leo Clark III", role: "Certified Peer Support Specialist", admin: false, tempPasswordSha256: "47400cc485f18196b6345108f222f3a733c01bed320524bcf7e82fdc98b1de4c" },
     { username: "jarvis", name: "Jarvis", role: "Board Officer", admin: false, tempPasswordSha256: "be7797464911240005bd88a9eca851f383a73980c333b50ac5ead87f7dbbb1d5" },
     { username: "eric.jacobson", name: "Eric Jacobson", role: "Human Resources", admin: false, tempPasswordSha256: "7589ffac8ada0beb0999a6905cf098c22aa3637c6297ea5dee0c4c92cb28e669" },
@@ -26,6 +26,7 @@ window.PORTAL_CONFIG = {
     { name: "Peer Support Dashboard", url: "https://centipedepeertopeerllc-svg.github.io/peer-support-desk/", note: "Tom Clark's staff workspace — his clients, his appointments, the documents he needs, and Jarvis. His desk; the program's own dashboard is under Programs." },
     { name: "Field Team Dashboard", url: "https://centipedepeertopeerllc-svg.github.io/field-team/", note: "The field team's workspace — today's assignments, field notes, supplies and needs, the program activity quick-log, email, and Jarvis." },
     { name: "Program Activity", url: "https://centipedepeertopeerllc-svg.github.io/portal/program-activity/", note: "Every program in one place — what we have done, what has been updated, and what is coming up, program by program (CPP-POL-2026-058)." },
+    { name: "Our Shared Notebook Pad", url: "https://centipedepeertopeerllc-svg.github.io/portal/shared-notebook/", note: "The one shared program-work notepad between the CEO and Tom Clark — program work goes on the pad; both can read it and add entries (CPP-POL-2026-066, draft)." },
     { name: "HR Dashboard", url: "https://centipedepeertopeerllc-svg.github.io/hr/", note: "Employee records and human-resources work." },
     { name: "Clients Without Insurance", url: "https://centipedepeertopeerllc-svg.github.io/uninsured/", note: "Clients with no coverage — the coverage work list, kept separate from insurance." },
     { name: "Banking Dashboard", url: "https://centipedepeertopeerllc-svg.github.io/banking/", note: "The company banking program and program cards." },
