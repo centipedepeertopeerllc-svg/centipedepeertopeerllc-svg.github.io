@@ -60,6 +60,7 @@ window.PEER_DESK_CONFIG = {
 
   // The documents Tom works from — Portal reading pages.
   documents: [
+    { name: "OFFICER OF THE DAY FOLDER — Briefing for Saturday, November 21, 2026", url: "https://centipedepeertopeerllc-svg.github.io/peer-support-desk/ootd/", note: "READ FIRST. Your Officer of the Day trial day briefing paper: the day is yours to run, your phone line, Jarvis's check-in texts, your duties, and your boundaries." },
     { name: "Peer Support Manual — CPP-MAN-2026-001", url: "https://centipedepeertopeerllc-svg.github.io/portal/manual/", note: "The company's peer support manual — how Centipede does this work." },
     { name: "CPP-POL-2026-045 — Outreach Worker Skills, Training, and Field Gear", url: "https://centipedepeertopeerllc-svg.github.io/portal/documents/policies/cpp-pol-2026-045.html", note: "Skills, training, and field gear standard for outreach and peer support work." },
     { name: "CPP-POL-2026-047 — Electronic Signatures", url: "https://centipedepeertopeerllc-svg.github.io/portal/documents/policies/cpp-pol-2026-047.html", note: "How electronic signatures work at Centipede — the consent line and the paper alternative." },

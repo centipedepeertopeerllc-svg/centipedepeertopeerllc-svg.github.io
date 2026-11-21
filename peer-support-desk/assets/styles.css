@@ -112,3 +112,13 @@ legend { font-weight: bold; color: var(--navy); padding: 0 0.4rem; }
 .btn-navy:hover { background: var(--navy2); }
 .btn-danger { color: var(--danger); border-color: var(--danger); }
 .req { color: var(--danger); font-weight: bold; }
+
+/* Officer of the Day folder — deliberately impossible to miss (CEO direction, Nov 20, 2026) */
+.ootd-folder { margin: 1rem auto 0; max-width: 1280px; padding: 0 1rem; }
+.ootd-folder a.ootd-card { display: block; text-decoration: none; background: #fdf3d7; border: 6px solid var(--danger); border-radius: 14px; padding: 1.1rem 1.3rem; text-align: center; box-shadow: 0 0 0 4px var(--gold), 0 10px 30px rgba(156,43,43,.35); animation: ootd-pulse 1.6s ease-in-out infinite; }
+@keyframes ootd-pulse { 0%,100% { box-shadow: 0 0 0 4px var(--gold), 0 10px 30px rgba(156,43,43,.35); } 50% { box-shadow: 0 0 0 10px var(--gold), 0 10px 38px rgba(156,43,43,.55); } }
+.ootd-card .ootd-kicker { display: block; font-size: .95rem; font-weight: bold; letter-spacing: .18em; color: var(--danger); text-transform: uppercase; }
+.ootd-card .ootd-title { display: block; font-size: 2rem; font-weight: bold; color: var(--navy); margin: .35rem 0; }
+.ootd-card .ootd-sub { display: block; font-size: 1.05rem; color: var(--ink); }
+.ootd-card .ootd-open { display: inline-block; margin-top: .7rem; background: var(--danger); color: #fff; border-radius: 8px; padding: .55rem 1.2rem; font-size: 1.05rem; font-weight: bold; }
+@media (prefers-reduced-motion: reduce) { .ootd-folder a.ootd-card { animation: none; } }
