@@ -8,7 +8,7 @@
 // stored here; the temporary passwords themselves are never in any file.
 window.LEGAL_CONFIG = {
   users: [
-    { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer", admin: true, tempPasswordSha256: "138e9b00dca0a00f6642db21c4d79799f2c0d47e783ce60c9ecc1c75d66df576" },
+    { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer", admin: true, tempPasswordSha256: "55ec255a70690484a84769bb7264cafb72e48d7d17467a02beebab7d83d33e45" },
     { username: "amber.bellante", name: "Amber Bellante", role: "Counsel — Legal Department / Justice Support Program", admin: false, tempPasswordSha256: "ab35e5ad31d4fd4fe4f3853eca29f4794b1fd31701a19a62bbde10cc556a75f4" }
   ],
   // Legal Binder (CPP-BND-2026-001) tab index — titles only. The binder
