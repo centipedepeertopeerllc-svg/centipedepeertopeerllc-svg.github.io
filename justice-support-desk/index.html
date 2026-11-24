@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Justice Support Center — Case Tracker — Centipede Peer to Peer, LLC</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#0e3b26">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Centipede">
+</head>
+<body>
+
+<!-- ============ LOGIN GATE (nothing is shown before login) ============ -->
+<section id="login-screen">
+  <div class="login-card">
+    <div class="brand-row">
+      <img class="login-logo brand-logo" alt="Centipede Peer to Peer, LLC logo">
+      <img class="login-seal brand-seal" alt="Justice Support Program seal — Criminal Justice Support">
+    </div>
+    <h1>Justice Support Center</h1>
+    <p class="org">Centipede Peer to Peer, LLC<br>LIC: 0714781 · Stockton, California</p>
+    <p class="gate-note">The Justice Support Center case tracker — matters, court dates, tasks, and contacts for the Legal Department. Access: the Chief Executive Officer (administrator) and Amber Bellante only. Nothing is shown until you sign in with your username, password, and authenticator code.</p>
+    <form id="login-form">
+      <div id="auth-step-login">
+        <label for="login-username">Username</label>
+        <input type="text" id="login-username" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" autocomplete="current-password" required>
+        <button type="submit" class="btn-primary">Sign in</button>
+      </div>
+      <div id="auth-step-change" hidden>
+        <p class="auth-step-title">Set your own password</p>
+        <p class="hint">You signed in with a temporary password. Choose your own password before continuing. Password rule: at least 10 characters, must contain at least one letter, and cannot be only numbers.</p>
+        <label for="change-password">New password</label>
+        <input type="password" id="change-password" autocomplete="new-password">
+        <label for="change-password2">Type it again</label>
+        <input type="password" id="change-password2" autocomplete="new-password">
+        <button type="submit" class="btn-primary">Set password</button>
+        <p><button type="button" class="btn-small auth-restart">Start over</button></p>
+      </div>
+      <div id="auth-step-enroll" hidden>
+        <p class="auth-step-title">Set up your authenticator app</p>
+        <p class="hint">Open your authenticator app (Google Authenticator, Microsoft Authenticator, Authy, or similar), add a new account, and type in this setup key:</p>
+        <code class="auth-key" id="enroll-key"></code>
+        <p class="auth-uri" id="enroll-uri"></p>
+        <p class="hint">Then enter the 6-digit code the app shows for Centipede to confirm.</p>
+        <label for="enroll-code">6-digit code</label>
+        <input type="text" id="enroll-code" inputmode="numeric" autocomplete="one-time-code" maxlength="7">
+        <button type="submit" class="btn-primary">Confirm and continue</button>
+        <p><button type="button" class="btn-small auth-restart">Start over</button></p>
+      </div>
+      <div id="auth-step-totp" hidden>
+        <p class="auth-step-title">Authenticator code</p>
+        <p class="hint">Enter the current 6-digit code from your authenticator app.</p>
+        <label for="totp-code">6-digit code</label>
+        <input type="text" id="totp-code" inputmode="numeric" autocomplete="one-time-code" maxlength="7">
+        <button type="submit" class="btn-primary">Verify</button>
+        <p><button type="button" class="btn-small auth-restart">Start over</button></p>
+      </div>
+      <p id="login-error" class="error" role="alert"></p>
+    </form>
+    <p class="fineprint">No passwords or credentials are ever written in this tracker — they live in secure storage only. Client information in this tracker is confidential Legal Department material: never share it outside the Legal Department. In an emergency, call 911.</p>
+  </div>
+</section>
+
+<!-- ============ APP (populated by app.js only after login) ============ -->
+<div id="app" hidden>
+  <header class="app-header">
+    <img class="header-logo brand-logo" alt="Centipede Peer to Peer, LLC logo">
+    <div class="header-titles">
+      <strong>Justice Support Center — Case Tracker</strong>
+      <span>Legal Department · Centipede Peer to Peer, LLC · LIC: 0714781 · 717 E. Longview Ave., Stockton, CA 95207</span>
+    </div>
+    <img class="header-seal brand-seal" alt="Justice Support Program seal — Criminal Justice Support">
+    <div class="header-user">
+      <span id="who"></span>
+      <button id="logout-btn" class="btn-small" type="button">Sign out</button>
+    </div>
+  </header>
+
+  <div id="mode-banner" class="banner warn" role="status">Local Mode: this tracker keeps its records in this device's browser storage. The locked client binders and the Legal Binder (CPP-BND-2026-001) remain the official record. Use Admin &amp; Data to download a backup copy of the tracker data.</div>
+
+  <main class="wrap">
+    <nav class="tabs no-print" id="tabs">
+      <button type="button" data-tab="overview" class="active">Overview</button>
+      <button type="button" data-tab="matters">Matters</button>
+      <button type="button" data-tab="calendar">Court Calendar</button>
+      <button type="button" data-tab="tasks">Tasks</button>
+      <button type="button" data-tab="contacts">Contacts</button>
+      <button type="button" data-tab="admin" id="tab-admin" hidden>Admin &amp; Data</button>
+    </nav>
+
+    <section id="view-overview"></section>
+    <section id="view-matters" hidden></section>
+    <section id="view-calendar" hidden></section>
+    <section id="view-tasks" hidden></section>
+    <section id="view-contacts" hidden></section>
+    <section id="view-admin" hidden></section>
+  </main>
+
+  <footer class="app-footer">
+    <div class="footer-seals">
+      <img class="brand-logo" alt="Centipede Peer to Peer, LLC logo">
+      <img class="seal brand-seal" alt="Justice Support Program seal — Criminal Justice Support">
+    </div>
+    <span>Centipede Peer to Peer, LLC — a California for-profit limited liability company. Peer support is non-clinical support, not treatment, and this tracker holds no legal advice. The locked client binders and the Legal Binder remain the official record.</span>
+    <span>Access: the Chief Executive Officer (administrator) and Amber Bellante — Legal Department only. Confidential: do not share tracker information outside the Legal Department.</span>
+  </footer>
+</div>
+
+<script src="assets/config.js"></script>
+<script src="assets/auth.js"></script>
+<script src="assets/branding.js"></script>
+<script>document.querySelectorAll(".brand-logo").forEach(function (i) { i.src = window.JS_LOGO; }); document.querySelectorAll(".brand-seal").forEach(function (i) { i.src = window.JS_SEAL; });</script>
+<script src="assets/app.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(function () { /* a failed registration must never break the page */ });
+  });
+}
+</script>
+</body>
+</html>
