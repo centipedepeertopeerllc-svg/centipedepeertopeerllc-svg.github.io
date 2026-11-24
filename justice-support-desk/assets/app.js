@@ -26,7 +26,7 @@ const fmtDate = (s) => { if (!s) return "—"; const p = s.split("-"); if (p.len
 const daysUntil = (s) => { if (!s) return null; const a = new Date(todayStr() + "T00:00:00"); const b = new Date(s + "T00:00:00"); return Math.round((b - a) / 86400000); };
 const isOpen = (m) => m.stage !== "Resolved / Closed";
 
-const dbGet = () => { try { const d = JSON.parse(localStorage.getItem(DB_KEY)); if (d && Array.isArray(d.matters) && Array.isArray(d.tasks) && Array.isArray(d.contacts)) return d; } catch { /* fall through */ } return { matters: [], tasks: [], contacts: [] }; };
+const dbGet = () => { try { const d = JSON.parse(localStorage.getItem(DB_KEY)); if (d && Array.isArray(d.matters) && Array.isArray(d.tasks) && Array.isArray(d.contacts)) { if (!Array.isArray(d.applications)) d.applications = []; return d; } } catch { /* fall through */ } return { matters: [], tasks: [], contacts: [], applications: [] }; };
 const dbSet = (d) => localStorage.setItem(DB_KEY, JSON.stringify(d));
 
 const state = { user: null, tab: "overview", matterId: null, editingMatter: null, editingContact: null, matterSearch: "", matterStage: "" };
@@ -131,6 +131,7 @@ function matterDetail(m, db) {
     + (state.user && state.user.admin ? '<button type="button" class="btn-small btn-danger" id="md-delete">Delete this matter</button> ' : "")
     + '<button type="button" class="btn-small" id="md-close">Close</button></p>'
     + "<h3>Documents</h3>";
+  h += signNowSection("Documents for this matter are signed through SignNow — the company's one signing route for every application and signature. When a document is fully signed, the signed copy and its audit trail file into this matter's record automatically.");
   if (!m.docs || !m.docs.length) h += '<p class="hint">No document links yet. Link to the document\u2019s home (Portal page or file) — the paper and binder copies stay the official record.</p>';
   else h += '<ul class="item-list">' + m.docs.map((d, i) => '<li><a href="' + esc(d.url) + '" target="_blank" rel="noopener">' + esc(d.label || d.url) + "</a>" + (state.user && state.user.admin ? ' <button type="button" class="btn-small btn-danger" data-doc-del="' + i + '">Remove</button>' : "") + "</li>").join("") + "</ul>";
   h += '<form id="doc-form" class="no-print"><div class="grid2"><label>Document name<input type="text" id="df-label"></label><label>Link (URL)<input type="url" id="df-url" placeholder="https://"></label></div><p><button type="submit" class="btn-small">Add document link</button></p></form>'
@@ -187,6 +188,121 @@ function wireMatterForms() {
     const db = dbGet(); db.tasks.push({ id: uid(), matterId: state.matterId, title, due: $("mt-due").value, done: false }); dbSet(db); renderMatters();
   });
   wireTaskToggles($("view-matters"));
+}
+
+/* ---------------- SignNow — the company's one signing route ----------------
+   SignNow is the signing route for EVERY application and signature at
+   Centipede — Justice Support, Employment, and Volunteer applications
+   alike (Levi's direction, Nov 24, 2026). There is no typed-name
+   signature block in the converted flow: the applicant signs the
+   application document itself through SignNow. This page is static,
+   so this section is the designed signing ENTRY POINT: in the live
+   flow the Portal asks the secure backend (which alone holds the
+   SignNow key — never in page code), the signer signs in an embedded
+   SignNow session, and the signed copy plus its audit trail file
+   into the person's record automatically. Design: Legal Department
+   SignNow–Portal integration design note, Nov 24, 2026. */
+function signNowSection(blurb) {
+  return '<div class="panel" style="border:2px solid #0e3b26;">'
+    + "<h3>Sign with SignNow</h3>"
+    + '<p class="hint">' + esc(blurb) + "</p>"
+    + '<p class="hint">How signing works here: this is the signing entry point. The document opens in a SignNow signing session arranged through the Portal\u2019s secure backend — no SignNow account is needed by the signer, and no key or credential is ever held in this page. When signing is complete, the signed copy and its audit trail file into the person\u2019s record automatically.</p>'
+    + '<p><button type="button" class="btn-navy" data-signnow-open>Sign with SignNow</button> <span class="save-status" data-signnow-msg></span></p>'
+    + "</div>";
+}
+function wireSignNow(root) {
+  if (!root) return;
+  root.querySelectorAll("[data-signnow-open]").forEach((b) => b.addEventListener("click", () => {
+    const msg = b.parentElement.querySelector("[data-signnow-msg]");
+    if (msg) msg.textContent = "Signing entry point: in the live Portal flow, this opens the SignNow signing session for the document. Signed copies file into the record automatically.";
+  }));
+}
+
+/* ---------------- Justice Support Program Application ---------------- */
+const HELP_OPTIONS = ["Court reminders", "Rides to court", "Document help", "ID help", "Housing referrals", "Peer support check-ins", "Other"];
+function renderApplication() {
+  const db = dbGet();
+  let h = '<section class="panel"><h2>Justice Support Program Application</h2>'
+    + '<p class="hint">The Justice Support Program is <strong>Active</strong> (approved November 20, 2026). A person completes this application to enter the program; staff may complete it on the person\u2019s behalf at the person\u2019s direction. Applications are kept in this tracker on this device (Local Mode); the signed application files into the person\u2019s client record.</p>'
+    + '<p class="hint"><strong>Please read first:</strong> Centipede Peer to Peer, LLC is a California for-profit limited liability company. The Justice Support Program is non-clinical peer support from people with lived experience. It is <strong>not legal advice</strong>: Centipede is not a law firm, program staff are not attorneys, and staff never give legal advice or representation. In an emergency, call 911.</p>'
+    + '<form id="app-form"><div class="grid2">'
+    + '<label>Full legal name <span class="req">*</span><input type="text" id="af-name" required></label>'
+    + '<label>Date of birth <span class="req">*</span><input type="date" id="af-dob" required></label>'
+    + '<label>Phone <span class="req">*</span><input type="tel" id="af-phone" required></label>'
+    + '<label>Email (optional)<input type="email" id="af-email"></label>'
+    + '<label>Mailing address — or write \u201cno fixed address\u201d<input type="text" id="af-address" placeholder="Street, city, ZIP — or: no fixed address"></label>'
+    + '<label>Case number(s)<input type="text" id="af-case"></label>'
+    + '<label>Court / jurisdiction<input type="text" id="af-court" placeholder="e.g. San Joaquin County Superior Court"></label>'
+    + '<label>Next court date<input type="date" id="af-nextdate"></label>'
+    + '<label>Probation / parole status<input type="text" id="af-probation" placeholder="e.g. On probation; on parole; not on supervision"></label>'
+    + '<label>Probation / parole officer name (optional)<input type="text" id="af-officer"></label>'
+    + '<label>How did you hear about us?<input type="text" id="af-heard"></label>'
+    + "</div>"
+    + '<fieldset style="border:1px solid #ccc;border-radius:8px;padding:10px 12px;"><legend>What do you need help with?</legend>'
+    + HELP_OPTIONS.map((o, i) => '<label class="check" style="display:block;"><input type="checkbox" id="af-help-' + i + '"> ' + esc(o) + "</label>").join("")
+    + '<label>Other — tell us in your words<input type="text" id="af-help-other"></label></fieldset>'
+    + '<h3>Consent</h3>'
+    + '<p class="hint">By submitting this application, I ask Centipede Peer to Peer, LLC to enroll me in the Justice Support Program and to contact me about my court dates and the help I asked for. I understand the program is non-clinical peer support, not legal advice, and that Centipede is a for-profit company. I understand my information is confidential and is shared outside the company only with my signed release or a judge-signed court order. <strong>This application is signed through SignNow</strong> — the company\u2019s signing service — in the signing step below; there is no typed signature block, because the SignNow signature on the application document itself is my signature.</p>'
+    + '<label class="check" style="display:block;"><input type="checkbox" id="af-consent" required> I have read the consent above, I understand it, and the information I gave is true as I know it. <span class="req">*</span></label>'
+    + '<p><button type="submit" class="btn-navy">Submit application</button> <span class="save-status" id="af-msg"></span></p></form>'
+    + signNowSection("The submitted application is signed through SignNow — the signature step for this application, and for every Centipede application. The signed copy files into the applicant\u2019s client record.")
+    + "</section>";
+  h += '<section class="panel"><h2>Applications received (this device)</h2>';
+  if (!db.applications.length) h += '<p class="empty-note">No applications yet. The list starts empty on purpose — submitted applications show here.</p>';
+  else h += '<table class="data"><thead><tr><th>Applicant</th><th>Submitted</th><th>Case number</th><th>Next court date</th><th>Needs</th><th>Signing</th></tr></thead><tbody>'
+    + db.applications.slice().reverse().map((a) => "<tr><td><strong>" + esc(a.name) + "</strong></td><td>" + fmtDate(a.submitted) + "</td><td>" + esc(a.caseNumber || "—") + "</td><td>" + (a.nextDate ? fmtDate(a.nextDate) : "—") + "</td><td>" + esc((a.help || []).join(", ") || "—") + "</td><td>Signs through SignNow; signed copy files to the client record</td></tr>").join("")
+    + "</tbody></table>";
+  h += "</section>";
+  $("view-application").innerHTML = h;
+  wireSignNow($("view-application"));
+  $("app-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = $("af-name").value.trim();
+    if (!name || !$("af-consent").checked) { $("af-msg").textContent = "Name and consent are required."; return; }
+    const help = HELP_OPTIONS.filter((o, i) => $("af-help-" + i).checked);
+    const other = $("af-help-other").value.trim(); if (other) help.push("Other: " + other);
+    const db2 = dbGet();
+    db2.applications.push({ id: uid(), submitted: todayStr(), name, dob: $("af-dob").value, phone: $("af-phone").value.trim(), email: $("af-email").value.trim(), address: $("af-address").value.trim(), caseNumber: $("af-case").value.trim(), court: $("af-court").value.trim(), nextDate: $("af-nextdate").value, probation: $("af-probation").value.trim(), officer: $("af-officer").value.trim(), help, heard: $("af-heard").value.trim(), consent: true, signedVia: "SignNow" });
+    dbSet(db2); renderApplication();
+    const msg = $("af-msg"); if (msg) msg.textContent = "Application saved. Complete the SignNow signing step so the signed copy files into the client record.";
+  });
+}
+
+/* ---------------- Policies (DRAFTS — read-only) ---------------- */
+const POLICY_PROGRAM = [
+"COMPANY POLICY CPP-POL-2026-___ — JUSTICE SUPPORT PROGRAM POLICY",
+"Status: DRAFT — not issued. This draft takes effect only when it is approved by the Chief Executive Officer, assigned its CPP-POL number, posted in the Portal library, and emailed to all staff. Drafted November 24, 2026.",
+"1. PURPOSE. This policy governs the Justice Support Program of Centipede Peer to Peer, LLC: what the program is, who it serves, what its staff do and do not do, how program documents are signed, how member information is protected, and where program records are kept.",
+"2. PROGRAM STATUS. The Justice Support Program is Active. It was approved on November 20, 2026. The program is run by the company's Legal Department, and its working tool is the Justice Support Center Case Tracker in the company Portal.",
+"3. WHO THE PROGRAM SERVES. The program serves people in Stockton and San Joaquin County who are involved in the criminal justice system — people with a court case, people on probation or parole, and people working to clear up court obligations — who ask Centipede for peer support. A person enters the program by completing the Justice Support Program Application, in person, by phone with staff help, or through the Portal. Staff may complete the application on a person's behalf at the person's direction.",
+"4. SCOPE — NON-CLINICAL PEER SUPPORT. The program provides non-clinical peer support from people with lived experience. Program staff support, encourage, coach, mentor, navigate, and connect members to resources. Services include: court date reminders and help keeping track of court obligations; rides to court, where available; help understanding and organizing court and program documents; help obtaining identification; referrals to housing and other community resources; and peer support check-ins.",
+"5. WHAT THE PROGRAM IS NOT — NO LEGAL ADVICE. Centipede Peer to Peer, LLC is not a law firm. Program staff are not attorneys, do not act as attorneys, and never give legal advice, legal opinions, or legal representation. Staff do not tell a member what plea to enter, what a court will decide, or how a case will come out. A member who needs legal advice is referred to an attorney or to the public defender. Program support is also non-clinical: staff do not diagnose, do not provide treatment, therapy, or counseling in the clinical sense, and the program is not a medical or mental-health provider.",
+"6. ELECTRONIC SIGNATURES — SIGNNOW. SignNow is the company's one signing route for every application and signature. Program documents that require a signature — including the program application — are signed through SignNow under CPP-POL-2026-047 (Electronic Signatures). The applicant signs the document itself through SignNow; there is no typed-name signature block in the signing flow. Signed copies file into the member's client record. No program document is signed through any other service unless the Chief Executive Officer directs it in writing.",
+"7. CONFIDENTIALITY. Member information is confidential. It is shared outside the company only (a) with the member's signed Release of Information (ROI), or (b) under a judge-signed court order. A subpoena alone is not sufficient. Program staff do not discuss a member's case, court status, or personal information with family members, employers, or any outside party except as this section allows.",
+"8. RECORDS. The locked client binders and the Legal Binder (CPP-BND-2026-001) are the official record of the Justice Support Program. The Justice Support Center Case Tracker is a working tool; its records live in the signed-in device's browser storage (Local Mode) and are backed up under the Admin & Data function. Signed program documents file into the member's client binder. Legal documents and program legal actions file into the Legal Binder the same session they are made.",
+"9. COMPANY STATEMENT. Centipede Peer to Peer, LLC is a California for-profit limited liability company. The Justice Support Program is a peer support program. Nothing in this policy, and nothing program staff say or write, is legal, medical, or psychiatric advice. In an emergency, call 911.",
+"Legal — Counsel: Fluetsch and Fluetsch, Attorney at Law. Centipede Peer to Peer, LLC is fully dealt with counsel."
+];
+const POLICY_MEMBERS = [
+"COMPANY POLICY CPP-POL-2026-___ — JUSTICE SUPPORT MEMBERS POLICY",
+"Status: DRAFT — not issued. This draft takes effect only when it is approved by the Chief Executive Officer, assigned its CPP-POL number, posted in the Portal library, and emailed to all staff. Drafted November 24, 2026.",
+"1. PURPOSE. This policy states what a member of the Justice Support Program can expect from Centipede Peer to Peer, LLC, what the program asks of its members, and how membership begins and ends. It is written in plain language on purpose, so every member can read it and hold us to it.",
+"2. WHO IS A MEMBER. A member is a person who has completed the Justice Support Program Application and been enrolled. Membership is free of any promise of outcome: the program offers support, reminders, rides where available, document and ID help, referrals, and check-ins. The program does not promise any court result.",
+"3. MEMBER RIGHTS. Every member has the right to: (a) be treated with respect and without judgment, whatever their case or history; (b) peer support that is non-clinical — support, encouragement, coaching, mentoring, navigation, and connection to resources from people with lived experience; (c) clear information about what the program can and cannot do, including that staff are not attorneys and never give legal advice; (d) privacy under section 6; (e) ask questions, raise a concern, or make a complaint to the Legal Department or the Board without losing services for having spoken up; (f) leave the program at any time, for any reason, by telling any program staff member.",
+"4. WHAT MEMBERS CAN EXPECT. Members can expect: court date reminders for the dates they give us; help keeping their court and program papers organized; help obtaining identification; referrals to housing and community resources, with a warm handoff where we can make one; peer support check-ins at the rhythm agreed with their assigned staff; and honest answers — including 'we cannot do that' — when a request is outside the program's scope.",
+"5. MEMBER RESPONSIBILITIES AND CONDUCT. Members are asked to: give true information as they know it, and update us when court dates, phone numbers, or addresses change; treat staff, other members, and partners with respect; come to scheduled meetings and rides on time, or let us know ahead when they cannot; never ask staff to break the law, falsify a document, or speak for them in court; and keep their own court obligations — the program reminds and supports, but the member's case remains the member's responsibility. Violence, threats, or harassment toward staff or other members is not tolerated.",
+"6. PRIVACY. A member's information is confidential. It is shared outside the company only with the member's signed Release of Information (ROI) or under a judge-signed court order; a subpoena alone is not sufficient. Members may see their own program record by asking the Legal Department. Program documents the member signs are signed through SignNow, the company's signing service, and the signed copies are kept in the member's client record.",
+"7. LEAVING THE PROGRAM. A member may leave at any time by telling any staff member; no reason is required and no penalty follows. When a member leaves, staff close the member's matter in the tracker, note the closing in the client record, and stop reminders and check-ins.",
+"8. REMOVAL FROM THE PROGRAM. The program may end a membership when a member: engages in violence, threats, or harassment toward staff or other members; asks staff to break the law or falsify records and repeats the request after being told no; or cannot be reached after repeated documented attempts over 60 days and has no upcoming court date on file. Removal is decided by the Legal Department, is recorded in the member's client record with the reason, and is told to the member directly (in person, by phone, or by mail to the last address given) unless the member cannot be reached. A removed member may ask the Board to review the decision.",
+"9. COMPANY STATEMENT. Centipede Peer to Peer, LLC is a California for-profit limited liability company. The Justice Support Program is non-clinical peer support, not legal advice, not treatment, and not a medical or mental-health service. In an emergency, call 911.",
+"Legal — Counsel: Fluetsch and Fluetsch, Attorney at Law. Centipede Peer to Peer, LLC is fully dealt with counsel."
+];
+function renderPolicies() {
+  const para = (arr) => arr.map((p, i) => i === 0 ? "<h3>" + esc(p) + "</h3>" : '<p class="hint" style="color:inherit;">' + esc(p) + "</p>").join("");
+  $("view-policies").innerHTML = '<section class="panel"><h2>Program Policies — DRAFTS</h2>'
+    + '<p class="hint"><strong>These are DRAFT policies — not issued.</strong> They are shown here read-only for review. Each takes effect only when the Chief Executive Officer approves it, it is assigned its CPP-POL number, posted in the Portal library, and emailed to all staff.</p></section>'
+    + '<section class="panel">' + para(POLICY_PROGRAM) + "</section>"
+    + '<section class="panel">' + para(POLICY_MEMBERS) + "</section>";
 }
 
 /* ---------------- Court Calendar ---------------- */
@@ -277,7 +393,8 @@ function renderAdmin() {
     + '<table class="data"><tbody>'
     + "<tr><th>Matters</th><td>" + db.matters.length + " total · " + db.matters.filter(isOpen).length + " open</td></tr>"
     + "<tr><th>Tasks</th><td>" + db.tasks.length + " total · " + db.tasks.filter((t) => !t.done).length + " open</td></tr>"
-    + "<tr><th>Contacts</th><td>" + db.contacts.length + "</td></tr></tbody></table>"
+    + "<tr><th>Contacts</th><td>" + db.contacts.length + "</td></tr>"
+    + "<tr><th>Applications</th><td>" + (db.applications ? db.applications.length : 0) + " received in this tracker</td></tr></tbody></table>"
     + "<h3>Backup — download the tracker data</h3>"
     + '<p class="hint">The tracker\u2019s records live in this device\u2019s browser storage (Local Mode). Download a JSON copy regularly and keep it with the Legal Department records. The locked binders remain the official record.</p>'
     + '<p><button type="button" class="btn-navy" id="ad-export">Download backup (JSON)</button></p>'
@@ -293,7 +410,7 @@ function renderAdmin() {
   $("ad-import").addEventListener("change", (e) => {
     const file = e.target.files[0]; if (!file) return;
     file.text().then((text) => {
-      try { const d = JSON.parse(text); if (!Array.isArray(d.matters) || !Array.isArray(d.tasks) || !Array.isArray(d.contacts)) throw new Error("shape"); dbSet(d); $("ad-msg").textContent = "Backup restored."; renderAdmin(); }
+      try { const d = JSON.parse(text); if (!Array.isArray(d.matters) || !Array.isArray(d.tasks) || !Array.isArray(d.contacts)) throw new Error("shape"); if (!Array.isArray(d.applications)) d.applications = []; dbSet(d); $("ad-msg").textContent = "Backup restored."; renderAdmin(); }
       catch { $("ad-msg").textContent = "That file is not a tracker backup — nothing was changed."; }
     });
   });
@@ -308,12 +425,14 @@ function wireView(root) {
 function showTab(tab) {
   state.tab = tab;
   document.querySelectorAll("#tabs button").forEach((b) => b.classList.toggle("active", b.getAttribute("data-tab") === tab));
-  ["overview", "matters", "calendar", "tasks", "contacts", "admin"].forEach((t) => { $("view-" + t).hidden = t !== tab; });
+  ["overview", "application", "matters", "calendar", "tasks", "contacts", "policies", "admin"].forEach((t) => { $("view-" + t).hidden = t !== tab; });
   if (tab === "overview") renderOverview();
+  if (tab === "application") renderApplication();
   if (tab === "matters") renderMatters();
   if (tab === "calendar") renderCalendar();
   if (tab === "tasks") renderTasks();
   if (tab === "contacts") renderContacts();
+  if (tab === "policies") renderPolicies();
   if (tab === "admin") renderAdmin();
 }
 function enterApp() {
