@@ -4,10 +4,11 @@
 // Company Portal, in the Legal Department area. Centipede is NOT a law
 // firm — this tracker supports people through the criminal justice
 // process; it does not hold legal advice and it is not a law practice
-// system. Access: the Chief Executive Officer (administrator) and
-// Amber Bellante (Legal Department / Justice Support Program) ONLY —
-// the same users as the Legal Department Portal (assets/config.js at
-// /legal/). Sign-in is the same as every dashboard: username + password
+// system. Access: the Chief Executive Officer (administrator),
+// Amber Bellante (Legal Department / Justice Support Program), and
+// Tom Clark (added November 24, 2026 at the CEO's direction — he will
+// be working with people in the Justice Support Center; working access,
+// not an administrator). Sign-in is the same as every dashboard: username + password
 // + authenticator 2FA (assets/auth.js).
 // Only the SHA-256 hash of each person's one-time TEMPORARY password is
 // stored here; the temporary passwords themselves are never in any file.
@@ -17,7 +18,8 @@ window.JUSTICE_DESK_CONFIG = {
   users: [
     { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer", admin: true, tempPasswordSha256: "8753c9cd72388ce70eb4a35fe04364adc3bf37e72b9daf9eeafbb80c13cb5037" },
     { username: "levi.recovery", name: "Levi Allen Spears (Recovery)", role: "Chief Executive Officer — Recovery Login", admin: true, tempPasswordSha256: "9eb7cc05173e7465ab8971643286057d0d909b6272f26d9ae82a5fafa68d9855" },
-    { username: "amber.bellante", name: "Amber Bellante", role: "Counsel — Legal Department / Justice Support Program", admin: false, tempPasswordSha256: "ab35e5ad31d4fd4fe4f3853eca29f4794b1fd31701a19a62bbde10cc556a75f4" }
+    { username: "amber.bellante", name: "Amber Bellante", role: "Counsel — Legal Department / Justice Support Program", admin: false, tempPasswordSha256: "ab35e5ad31d4fd4fe4f3853eca29f4794b1fd31701a19a62bbde10cc556a75f4" },
+    { username: "tom.clark", name: "Thomas Leo Clark III", role: "Certified Peer Support Specialist — Justice Support Center", admin: false, tempPasswordSha256: "47400cc485f18196b6345108f222f3a733c01bed320524bcf7e82fdc98b1de4c" }
   ],
 
   // Stages of a matter in the criminal justice process, in plain
