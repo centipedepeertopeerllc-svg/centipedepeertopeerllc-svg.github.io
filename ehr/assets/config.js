@@ -1,9 +1,10 @@
 // Centipede Peer to Peer, LLC — Centipede EHR configuration.
 // Built November 24, 2026 at the direction of the Chief Executive
 // Officer: Centipede's own internal peer-support record system,
-// modeled on the feature set of SimplePractice (clients, calendar,
-// session notes, support plans, documents, billing & insurance,
-// reminders) and reshaped for a NON-CLINICAL peer-support company.
+// modeled on the feature set of a full practice-management system
+// (clients, calendar, session notes, support plans, documents,
+// billing & insurance, reminders) and reshaped for a NON-CLINICAL
+// peer-support company.
 // Centipede staff support, coach, mentor, and navigate — they do not
 // diagnose and they do not provide clinical services. Sign-in is the
 // same as every Portal dashboard: username + password + authenticator
@@ -34,21 +35,41 @@ window.EHR_CONFIG = {
     "Other"
   ],
 
-  // Profession / role options for staff profiles, mirroring the
-  // list SimplePractice offers at profile setup (Levi's direction,
-  // Nov 24, 2026). A data field only — each person selects the
-  // profession that matches their own credential or role.
+  // Profession / specialty options for staff profiles — the
+  // "Specialty" list used at profile setup in standard practice
+  // systems (Levi's direction, Nov 24, 2026). A data field only —
+  // each person selects the specialty that matches their own
+  // credential or role.
   professions: [
-    "Social Worker",
-    "Psychologist",
-    "Counselor",
-    "Therapist",
-    "Psychiatrist",
-    "Nurse Practitioner",
-    "Marriage & Family Therapist",
-    "Case Manager",
-    "Peer Support Specialist",
-    "Other"
+    "Other",
+    "Acupuncture",
+    "Lactation consulting",
+    "Massage therapy",
+    "Counseling",
+    "Marriage and family therapy",
+    "Psychology",
+    "Social work",
+    "Psychiatry",
+    "Psychiatric-Mental Health Nursing",
+    "Behavioral health therapy",
+    "Dietetics or nutrition counseling",
+    "Chiropractic",
+    "Applied behavior analysis",
+    "Occupational therapy",
+    "Physical therapy",
+    "Speech-language pathology",
+    "Substance use counseling"
+  ],
+
+  // Team role patterns for staff profiles and Admin, mirroring the
+  // three standard practice roles — full access, biller, scheduler —
+  // restated in Centipede's non-clinical terms. The permission list
+  // under each role is shown on the Staff Profiles tab so the whole
+  // team can see who can do what.
+  teamRoles: [
+    { name: "Full Access", summary: "Entire practice access — client care, billing, and templates.", permissions: ["Schedule appointments", "Edit appointments", "Create client profiles", "Delete client profiles", "Search for clients", "View files uploaded by clients", "Create session notes", "View documents completed by clients", "Share documents with clients", "Manage appointment requests", "Edit clients' billing info", "Edit service fees", "Create billing documents", "Add client payments", "Add insurance payments", "Track claim status", "View payment reports", "Refund payments", "Edit notes and forms templates"] },
+    { name: "Billing", summary: "Billing-focused — billing records and payments, limited client care.", permissions: ["Edit appointments", "Search for clients", "Edit clients' billing info", "Edit service fees", "Create billing documents", "Add client payments", "Add insurance payments", "Track claim status", "View payment reports", "Refund payments", "View financial summaries and reports"] },
+    { name: "Scheduling", summary: "Scheduling-focused — calendar, client profiles, and appointment requests, limited billing.", permissions: ["Schedule appointments", "Edit appointments", "Create client profiles", "Search for clients", "Manage appointment requests", "Share documents with clients", "Edit clients' billing info", "Edit service fees", "Create billing documents", "Add client payments"] }
   ],
 
   clientStatuses: ["Active", "Waitlist", "Paused", "Closed"],
@@ -80,7 +101,30 @@ window.EHR_CONFIG = {
     "IHSS Enrollment",
     "Shelter Stay Agreement",
     "ID Assistance Request",
+    "Consent for Telehealth Consultation",
+    "Credit Card Authorization",
+    "Consent to Record Audio",
+    "Notice of Privacy Practices",
+    "Practice Policies",
+    "Standard Intake Questionnaire",
+    "Third Party Financial Responsibility Form",
+    "Good Faith Estimate",
     "Signed Form — Other"
+  ],
+
+  // Standard consent / shareable documents checklist — the set of
+  // standard forms a complete client file carries. The Documents
+  // tab checks a client's records against this list.
+  consentChecklist: [
+    "Consent for Telehealth Consultation",
+    "Credit Card Authorization",
+    "Consent to Record Audio",
+    "Notice of Privacy Practices",
+    "Practice Policies",
+    "Release of Information (ROI)",
+    "Standard Intake Questionnaire",
+    "Third Party Financial Responsibility Form",
+    "Good Faith Estimate"
   ],
 
   documentStatuses: ["On File", "Pending Signature", "Signed", "Expired"],
@@ -95,12 +139,72 @@ window.EHR_CONFIG = {
     { code: "OTHER", label: "Other — see note" }
   ],
 
+  // Services catalog, structured the way standard practice systems
+  // structure theirs: code, description, rate, default duration
+  // (minutes), active flag, and whether the service can be picked
+  // when scheduling. Centipede's peer-support codes are the
+  // defaults. The standard CPT entries are carried as additional
+  // selectable entries for TRACKING ONLY — this system does not
+  // submit claims, and no entry here changes that.
+  serviceCatalog: [
+    { code: "H0038", description: "Peer Support Services (per 15 min)", rate: "", duration: 15, active: true, schedulable: true, peer: true },
+    { code: "T1016", description: "Care Coordination (per 15 min)", rate: "", duration: 15, active: true, schedulable: true, peer: true },
+    { code: "T1017", description: "Support Navigation (per 15 min)", rate: "", duration: 15, active: true, schedulable: true, peer: true },
+    { code: "90834", description: "Psychotherapy, 45 min", rate: "", duration: 50, active: true, schedulable: true },
+    { code: "90791", description: "Psychiatric Diagnostic Evaluation", rate: "", duration: 50, active: true, schedulable: true },
+    { code: "90792", description: "Psychiatric Diagnostic Evaluation with Medical", rate: "", duration: 50, active: true, schedulable: true },
+    { code: "90837", description: "Psychotherapy, 60 min", rate: "", duration: 60, active: true, schedulable: true },
+    { code: "90847", description: "Family psychotherapy, conjoint psychotherapy with the patient present", rate: "", duration: 50, active: true, schedulable: true },
+    { code: "90853", description: "Group Therapy", rate: "", duration: 50, active: true, schedulable: true },
+    { code: "90887", description: "Collateral Visit", rate: "", duration: 50, active: true, schedulable: true },
+    { code: "97110", description: "Therapeutic exercises", rate: "", duration: 50, active: true, schedulable: true },
+    { code: "97124", description: "Therapeutic procedure; massage", rate: "", duration: 50, active: true, schedulable: true },
+    { code: "97530", description: "Therapeutic activities, direct (one-on-one) patient contact", rate: "", duration: 50, active: true, schedulable: true },
+    { code: "99204", description: "Level 4 new patient office visit", rate: "", duration: 50, active: true, schedulable: true },
+    { code: "99205", description: "Level 5 new patient office visit", rate: "", duration: 50, active: true, schedulable: true },
+    { code: "99213", description: "Level 3 office visit", rate: "", duration: 50, active: true, schedulable: true },
+    { code: "99214", description: "Level 4 office visit", rate: "", duration: 50, active: true, schedulable: true },
+    { code: "99344", description: "New Patient E/M Home Visit — 60 minutes face-to-face", rate: "", duration: 50, active: true, schedulable: true },
+    { code: "+90833", description: "Psychotherapy Add-on, 30 min", rate: "", duration: 50, active: true, schedulable: false },
+    { code: "+90836", description: "Psychotherapy Add-on, 45 min", rate: "", duration: 50, active: true, schedulable: false },
+    { code: "+90838", description: "Psychotherapy Add-on, 60 min", rate: "", duration: 50, active: true, schedulable: false }
+  ],
+
+  billDocKinds: ["Invoice", "Statement", "Superbill"],
+  billDocStatuses: ["Draft", "Sent", "Unpaid", "Partially Paid", "Paid", "Void"],
+
+  // Calendar locations, following the standard pattern: the video
+  // office and physical places, plus Unassigned.
+  locations: ["Video Office", "Office", "Client Home", "Community Site", "Unassigned"],
+
+  cancellationPolicies: [
+    "Require a phone call to cancel",
+    "At least 24 hours before the appointment",
+    "At least 48 hours before the appointment",
+    "At least 72 hours before the appointment"
+  ],
+
+  // Appointment reminder rules, modeled on the standard pattern:
+  // an email reminder 48 hours before, a text reminder 24 hours
+  // before, a voice reminder 24 hours before, and an extra reminder
+  // 10 minutes before video appointments. In Local Mode these rules
+  // are recorded and displayed for the team's reference — this
+  // browser-based system does not send reminders by itself.
+  reminderRuleDefaults: { emailHours: 48, textHours: 24, voiceHours: 24, videoMinutes: 10, emailOn: true, textOn: true, voiceOn: true, videoOn: true },
+  reminderHourOptions: [24, 36, 48, 72],
+
+  languages: [
+    "No answer", "English", "Spanish", "Arabic", "Armenian", "Bengali", "Cambodian (Khmer)", "Chinese (Cantonese)", "Chinese (Mandarin)", "Farsi (Persian)", "French", "German", "Greek", "Haitian Creole", "Hebrew", "Hindi", "Hmong", "Italian", "Japanese", "Korean", "Laotian", "Polish", "Portuguese", "Punjabi", "Russian", "Samoan", "Tagalog", "Thai", "Ukrainian", "Urdu", "Vietnamese", "American Sign Language (ASL)", "Other"
+  ],
+
+  planReviewOptions: [7, 30, 60, 90, 120, 180, 365],
+
 
   // Work-area outlines (Levi's direction, Nov 24, 2026): clicking a
   // profession / behavioral-health area opens its outline — what
   // that role works on, the kinds of services or support in that
   // area, and what gets documented in the EHR. Written factually,
-  // the way SimplePractice presents its areas. Centipede's own
+  // the way practice systems present their areas. Centipede's own
   // services are non-clinical peer support; outlines for licensed
   // professions describe those professions generally, for reference.
   workAreas: [
