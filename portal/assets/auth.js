@@ -11,7 +11,10 @@
    - On first use of a device, the seed becomes the runtime user store
      in that browser's local storage (store key passed to mount(),
      e.g. "cpp.auth.client.v1"): { username, name, role, admin,
-     passwordSha256, mustChangePassword: true, totpSecret: null }.
+     passwordSha256, mustChangePassword: true, totpSecret: null,
+     pendingTotpSecret: null }. pendingTotpSecret holds the enrollment
+     setup key once shown, so a page reload cannot rotate it before the
+     person confirms a code (fix added Nov 24, 2026 — see beginEnroll).
      Any seed user missing from an existing store is merged in.
    - Sign-in flow: username + password -> if mustChangePassword, the
      person must set their own password (rule: at least 10 characters,
@@ -184,7 +187,10 @@
     const clean = String(code || "").replace(/\s/g, "");
     if (!/^\d{6}$/.test(clean)) return false;
     const now = Math.floor(Date.now() / 1000 / 30);
-    for (const d of [-1, 0, 1]) {
+    // Window widened Nov 24, 2026: two steps either side (was one), so a
+    // device whose clock drifts a minute or two does not lock its user
+    // out of the authenticator step.
+    for (const d of [-2, -1, 0, 1, 2]) {
       if ((await totpCode(secretB32, now + d)) === clean) return true;
     }
     return false;
@@ -221,6 +227,7 @@
     delete r.tempPasswordSha256;
     r.mustChangePassword = true;
     r.totpSecret = null;
+    r.pendingTotpSecret = null;
     return r;
   }
   function saveStore(storeKey, store) {
@@ -248,7 +255,7 @@
   function publicUser(u) {
     const out = {};
     for (const k of Object.keys(u)) {
-      if (k === "passwordSha256" || k === "tempPasswordSha256" || k === "totpSecret") continue;
+      if (k === "passwordSha256" || k === "tempPasswordSha256" || k === "totpSecret" || k === "pendingTotpSecret") continue;
       out[k] = u[k];
     }
     return out;
@@ -288,7 +295,19 @@
     showStep("totp");
   }
   function beginEnroll(user) {
-    CTX.pendingSecret = newTotpSecret();
+    // Nov 24, 2026 fix (Jarvis, at the CEO's direction): the enrollment
+    // setup key is kept on the user record (pendingTotpSecret) and saved
+    // with the store, so reloading the page or pressing "Start over"
+    // can no longer rotate the key and silently invalidate the
+    // authenticator entry the person just added — the failure that
+    // locked the CEO out on Nov 24, 2026. The same key is shown at
+    // every attempt until enrollment completes; only a completed
+    // enrollment or an administrator's 2FA reset clears it.
+    if (!user.pendingTotpSecret) {
+      user.pendingTotpSecret = newTotpSecret();
+      saveStore(CTX.storeKey, CTX.store);
+    }
+    CTX.pendingSecret = user.pendingTotpSecret;
     const keyEl = $("enroll-key");
     if (keyEl) keyEl.textContent = CTX.pendingSecret.replace(/(.{4})/g, "$1 ").trim();
     const uriEl = $("enroll-uri");
@@ -334,6 +353,7 @@
           return;
         }
         user.totpSecret = CTX.pendingSecret;
+        user.pendingTotpSecret = null;
         CTX.pendingSecret = null;
         saveStore(CTX.storeKey, CTX.store);
         finishLogin(user);
@@ -351,11 +371,15 @@
   }
   function mount(opts) {
     // Nov 20, 2026 (Jarvis, at the CEO's direction): the store key carries
-    // an ".r3" suffix so every device starts from a clean seed. The old
-    // device stores held stale password state that a central temporary-
-    // password reset could not reach (the seed only applied to devices
-    // with no store), which locked the CEO out after his reset. Fresh
-    // seed = the current temporary passwords in config.js apply again.
+    // a revision suffix (".r7" as of the Nov 24, 2026 reset #3) so every
+    // device starts from a clean seed. The old device stores held stale
+    // password state that a central temporary-password reset could not
+    // reach (the seed only applied to devices with no store), which
+    // locked the CEO out after his reset. Fresh seed = the current
+    // temporary passwords in config.js apply again.
+    // Nov 24, 2026: the enrollment-key persistence fix in beginEnroll()
+    // deliberately does NOT bump this suffix — existing device stores,
+    // and the own passwords people already set on them, carry over.
     CTX = {
       storeKey: opts.storeKey + ".r7",
       sessionKey: opts.sessionKey,
@@ -443,6 +467,7 @@
     const user = CTX && CTX.store.users.find((u) => u.username === username);
     if (!user) return;
     user.totpSecret = null;
+    user.pendingTotpSecret = null;
     saveStore(CTX.storeKey, CTX.store);
     const msg = $("auth-admin-msg");
     if (msg) msg.innerHTML = "<p class=\"auth-temp-once\">2FA reset for <strong>" + esc(user.name) + "</strong> (" + esc(user.username) + "). They will set up their authenticator app again at their next sign-in.</p>";
