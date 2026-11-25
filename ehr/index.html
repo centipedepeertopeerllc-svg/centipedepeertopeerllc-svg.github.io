@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Centipede EHR — Centipede Peer to Peer, LLC</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#0e3b26">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Centipede">
+</head>
+<body>
+
+<!-- ============ LOGIN GATE (nothing is shown before login) ============ -->
+<section id="login-screen">
+  <div class="login-card">
+    <div class="brand-row">
+      <img class="login-logo brand-logo" alt="Centipede Peer to Peer, LLC logo">
+      <img class="login-seal brand-seal" alt="Peer Support Program seal">
+    </div>
+    <h1>Centipede EHR</h1>
+    <p class="org">Centipede Peer to Peer, LLC<br>LIC: 0714781 · Stockton, California</p>
+    <p class="gate-note">Centipede's internal peer-support record system — clients, appointments, session notes, support plans, documents, billing &amp; insurance tracking, and reminders. This is a non-clinical peer-support record system: Centipede staff support, coach, mentor, and navigate. Access is for authorized Centipede staff only. Nothing is shown until you sign in with your username, password, and authenticator code.</p>
+    <form id="login-form">
+      <div id="auth-step-login">
+        <label for="login-username">Username</label>
+        <input type="text" id="login-username" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" autocomplete="current-password" required>
+        <button type="submit" class="btn-primary">Sign in</button>
+      </div>
+      <div id="auth-step-change" hidden>
+        <p class="auth-step-title">Set your own password</p>
+        <p class="hint">You signed in with a temporary password. Choose your own password before continuing. Password rule: at least 10 characters, must contain at least one letter, and cannot be only numbers.</p>
+        <label for="change-password">New password</label>
+        <input type="password" id="change-password" autocomplete="new-password">
+        <label for="change-password2">Type it again</label>
+        <input type="password" id="change-password2" autocomplete="new-password">
+        <button type="submit" class="btn-primary">Set password</button>
+        <p><button type="button" class="btn-small auth-restart">Start over</button></p>
+      </div>
+      <div id="auth-step-enroll" hidden>
+        <p class="auth-step-title">Set up your authenticator app</p>
+        <p class="hint">Open your authenticator app (Google Authenticator, Microsoft Authenticator, Authy, or similar), add a new account, and type in this setup key:</p>
+        <code class="auth-key" id="enroll-key"></code>
+        <p class="auth-uri" id="enroll-uri"></p>
+        <p class="hint">Then enter the 6-digit code the app shows for Centipede to confirm.</p>
+        <label for="enroll-code">6-digit code</label>
+        <input type="text" id="enroll-code" inputmode="numeric" autocomplete="one-time-code" maxlength="7">
+        <button type="submit" class="btn-primary">Confirm and continue</button>
+        <p><button type="button" class="btn-small auth-restart">Start over</button></p>
+      </div>
+      <div id="auth-step-totp" hidden>
+        <p class="auth-step-title">Authenticator code</p>
+        <p class="hint">Enter the current 6-digit code from your authenticator app.</p>
+        <label for="totp-code">6-digit code</label>
+        <input type="text" id="totp-code" inputmode="numeric" autocomplete="one-time-code" maxlength="7">
+        <button type="submit" class="btn-primary">Verify</button>
+        <p><button type="button" class="btn-small auth-restart">Start over</button></p>
+      </div>
+      <p id="login-error" class="error" role="alert"></p>
+    </form>
+    <p class="fineprint">Client information in this system is confidential: never share it outside authorized Centipede staff. In an emergency, call 911.</p>
+  </div>
+</section>
+
+<!-- ============ APP (populated by app.js only after login) ============ -->
+<div id="app" hidden>
+  <header class="app-header">
+    <img class="header-logo brand-logo" alt="Centipede Peer to Peer, LLC logo">
+    <div class="header-titles">
+      <strong>Centipede EHR</strong>
+      <span>Centipede Peer to Peer, LLC · LIC: 0714781 · 717 E. Longview Ave., Stockton, CA 95207</span>
+    </div>
+    <img class="header-seal brand-seal" alt="Peer Support Program seal">
+    <div class="header-user">
+      <span id="who"></span>
+      <button id="logout-btn" class="btn-small" type="button">Sign out</button>
+    </div>
+  </header>
+
+  <div id="mode-banner" class="banner warn" role="status">New system being set up: Centipede EHR is Centipede's internal, non-clinical peer-support record system. Records are kept in this device's browser storage (Local Mode). The locked client binders remain the official record. Use Admin &amp; Data to download a backup copy of the data.</div>
+
+  <main class="wrap">
+    <nav class="tabs no-print" id="tabs">
+      <button type="button" data-tab="overview" class="active">Overview</button>
+      <button type="button" data-tab="clients">Clients</button>
+      <button type="button" data-tab="calendar">Calendar</button>
+      <button type="button" data-tab="notes">Session Notes</button>
+      <button type="button" data-tab="plans">Support Plans</button>
+      <button type="button" data-tab="documents">Documents</button>
+      <button type="button" data-tab="billing">Billing &amp; Insurance</button>
+      <button type="button" data-tab="reminders">Reminders</button>
+      <button type="button" data-tab="admin" id="tab-admin" hidden>Admin &amp; Data</button>
+    </nav>
+
+    <section id="view-overview"></section>
+    <section id="view-clients" hidden></section>
+    <section id="view-calendar" hidden></section>
+    <section id="view-notes" hidden></section>
+    <section id="view-plans" hidden></section>
+    <section id="view-documents" hidden></section>
+    <section id="view-billing" hidden></section>
+    <section id="view-reminders" hidden></section>
+    <section id="view-admin" hidden></section>
+  </main>
+
+  <footer class="app-footer">
+    <div class="footer-seals">
+      <img class="brand-logo" alt="Centipede Peer to Peer, LLC logo">
+      <img class="seal brand-seal" alt="Peer Support Program seal">
+    </div>
+    <span>Centipede Peer to Peer, LLC — a California for-profit limited liability company. Centipede EHR is an internal, non-clinical peer-support record system: staff support, coach, mentor, and navigate; nothing in this system is medical advice or a clinical record. The locked client binders remain the official record.</span>
+    <span>Confidential: authorized Centipede staff only. Do not share information from this system outside authorized staff.</span>
+  </footer>
+</div>
+
+<script src="assets/config.js"></script>
+<script src="assets/auth.js"></script>
+<script src="assets/branding.js"></script>
+<script>document.querySelectorAll(".brand-logo").forEach(function (i) { i.src = window.JS_LOGO; }); document.querySelectorAll(".brand-seal").forEach(function (i) { i.src = window.JS_SEAL; });</script>
+<script src="assets/app.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(function () { /* a failed registration must never break the page */ });
+  });
+}
+</script>
+</body>
+</html>
