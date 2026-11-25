@@ -103,7 +103,7 @@ window.CentipedePDF = (function () {
     const lines = [];
     const push = (text, opts) => lines.push(Object.assign({ text }, opts || {}));
     push("Centipede Peer to Peer, LLC", { bold: true, size: 15, color: "navy" });
-    push("Cell: (209) 871-3939 | Office: (209) 625-9863 or (209) 426-0964", { size: 8.5 });
+    push("Cell: (209) 871-3939", { size: 8.5 });
     push("Email: centipedepeertopeer.llc@gmail.com | Board: board.centipede.stockton@gmail.com", { size: 8.5 });
     push("Web: centipedepeertopeerllc-svg.github.io | LIC: 0714781", { size: 8.5 });
     push("717 E. Longview Ave., Stockton, CA 95207 | CalMHSA Driven", { size: 8.5 });

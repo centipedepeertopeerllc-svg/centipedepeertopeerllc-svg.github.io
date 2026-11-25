@@ -11,7 +11,7 @@
       '<span class="hint">Tom \u2014 welcome to your desk. You start on November 28, 2026, and this is your workspace: your clients, your appointments, the documents you need, and Jarvis. Your morning brief comes from Jarvis at 8:30 AM, Monday through Saturday, and it opens by asking how you are doing \u2014 you can answer it. You can reply to any of Jarvis\'s emails at jarvis.centipedepeertopeer.llc@gmail.com, and Jarvis answers. Questions about your assignments go to Jarvis or to Eric Jacobson (Human Resources). This panel is not a live chat: leave a request below and Jarvis reads it on his rounds and answers by email or here.</span></p>' +
       '<p><span class="hint">Email:</span> jarvis.centipedepeertopeer.llc@gmail.com<br>' +
       '<span class="hint">Board:</span> board.centipedepeertopeer.llc@gmail.com<br>' +
-      '<span class="hint">Office:</span> (209) 625-9863 or (209) 426-0964 · <span class="hint">Cell:</span> (209) 871-3939</p>' +
+      '<span class="hint">Cell:</span> (209) 871-3939</p>' +
       '<p><span class="hint">Company Facebook Page:</span> <a href="https://www.facebook.com/profile.php?id=100064765000378" target="_blank" rel="noopener">Centipede Peer To Peer.LLC on Facebook</a> <span class="hint">— the company\'s public page: daily posts, program news, and events. It opens in Facebook.</span></p>' +
       '<label>Request for Jarvis<br><textarea id="jarvis-note" rows="3" style="width:100%;" placeholder="Write it the way you would say it — Jarvis will pick it up from here."></textarea></label>' +
       '<p><button type="button" id="jarvis-send">Send to Jarvis</button> <span id="jarvis-msg" class="hint" role="status"></span></p>' +

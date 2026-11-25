@@ -60,7 +60,7 @@
   function plateHTML(key) {
     const p = PLATES[key];
     if (!p) return "";
-    const contact = [p.phone, "Office: (209) 625-9863 or (209) 426-0964"].filter(Boolean).join(" &nbsp;|&nbsp; ");
+    const contact = [p.phone].filter(Boolean).join(" &nbsp;|&nbsp; ");
     const mrCell = p.mr ? `<td width="10" style="width:10px;font-size:0;line-height:0;">&nbsp;</td>
           <td align="center" valign="top" style="padding:0;">
             <img src="${sealSrc("mandated-reporter.png")}" width="106" height="106" alt="Mandated Reporter seal" style="display:block;width:106px;height:106px;"/>
@@ -115,7 +115,7 @@
     <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
       <td width="34" valign="middle"><img src="${sealSrc("company.png")}" width="30" height="30" alt="Centipede Peer to Peer, LLC company seal" style="display:block;width:30px;height:30px;"/></td>
       <td valign="middle" style="font-size:11px;color:#f0ead6;line-height:1.55;">717 E. Longview Ave., Stockton, CA 95207 &nbsp;|&nbsp; LIC: 0714781<br/>
-      Cell: (209) 871-3939 &nbsp;|&nbsp; Office: (209) 625-9863 or (209) 426-0964<br/>
+      Cell: (209) 871-3939<br/>
       Email: centipedepeertopeer.llc@gmail.com &nbsp;|&nbsp; Board: board.centipedepeertopeer.llc@gmail.com<br/>
       Web: www.centipedepeertopeer.llc<br/>
       <span style="color:#dfc166;font-weight:bold;">Family Run Company</span> <span style="color:#ffffff;">— Peer Support &amp; Homeless Outreach, Stockton, California</span></td>
