@@ -28,9 +28,9 @@ const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 
 const todayStr = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
 const fmtDate = (s) => { if (!s) return "—"; const p = String(s).split("-"); if (p.length !== 3) return s; return ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][Number(p[1]) - 1] + " " + Number(p[2]) + ", " + p[0]; };
 const daysUntil = (s) => { if (!s) return null; const a = new Date(todayStr() + "T00:00:00"); const b = new Date(s + "T00:00:00"); return Math.round((b - a) / 86400000); };
-const EMPTY = () => ({ clients: [], appointments: [], notes: [], plans: [], documents: [], services: [], reminders: [] });
+const EMPTY = () => ({ clients: [], appointments: [], notes: [], plans: [], documents: [], services: [], reminders: [], staff: [] });
 
-const dbGet = () => { try { const d = JSON.parse(localStorage.getItem(DB_KEY)); if (d && Array.isArray(d.clients) && Array.isArray(d.appointments) && Array.isArray(d.notes) && Array.isArray(d.plans) && Array.isArray(d.documents) && Array.isArray(d.services) && Array.isArray(d.reminders)) return d; } catch { /* fall through */ } return EMPTY(); };
+const dbGet = () => { try { const d = JSON.parse(localStorage.getItem(DB_KEY)); if (d && Array.isArray(d.clients) && Array.isArray(d.appointments) && Array.isArray(d.notes) && Array.isArray(d.plans) && Array.isArray(d.documents) && Array.isArray(d.services) && Array.isArray(d.reminders)) { if (!Array.isArray(d.staff)) d.staff = []; return d; } } catch { /* fall through */ } return EMPTY(); };
 const dbSet = (d) => localStorage.setItem(DB_KEY, JSON.stringify(d));
 
 const state = { user: null, tab: "overview", clientId: null, editing: {}, search: "", calView: "upcoming" };
@@ -525,7 +525,7 @@ function wireView(root) {
   root.querySelectorAll("[data-open-client]").forEach((el) => el.addEventListener("click", () => { state.clientId = el.getAttribute("data-open-client"); state.editing = {}; showTab("clients"); }));
   root.querySelectorAll("[data-goto]").forEach((el) => el.addEventListener("click", () => showTab(el.getAttribute("data-goto"))));
 }
-const TABS = ["overview", "clients", "calendar", "notes", "plans", "documents", "billing", "reminders", "admin"];
+const TABS = ["overview", "clients", "calendar", "notes", "plans", "documents", "billing", "reminders", "staff", "areas", "admin"];
 function showTab(tab) {
   state.tab = tab;
   if (tab !== "clients") state.clientId = null;
@@ -539,6 +539,8 @@ function showTab(tab) {
   if (tab === "documents") renderDocuments();
   if (tab === "billing") renderBilling();
   if (tab === "reminders") renderReminders();
+  if (tab === "staff") renderStaff();
+  if (tab === "areas") renderAreas();
   if (tab === "admin") renderAdmin();
 }
 function enterApp() {
@@ -552,3 +554,86 @@ document.querySelectorAll("#tabs button").forEach((b) => b.addEventListener("cli
 $("logout-btn").addEventListener("click", () => { try { CPPAuth.signOut(); } catch { location.reload(); } });
 CPPAuth.mount({ seedUsers: CFG.users, storeKey: "cpp.auth.ehr.v1", sessionKey: "ehr.user", onSignIn: (u) => { state.user = u; enterApp(); } });
 const restored = CPPAuth.restoreSession(); if (restored) { state.user = restored; enterApp(); }
+
+/* ---------------- Staff / Provider Profiles ---------------- */
+function staffForm(s) {
+  s = s || {};
+  const progs = Array.isArray(s.programs) ? s.programs : [];
+  let checks = "";
+  CFG.programs.forEach((p) => { checks += '<label style="display:inline-block;margin:0.15rem 0.7rem 0.15rem 0;font-weight:normal;"><input type="checkbox" class="sf-prog" value="' + esc(p) + '"' + (progs.includes(p) ? " checked" : "") + "> " + esc(p) + "</label>"; });
+  return '<form id="staff-form" class="panel"><h2>' + (s.id ? "Edit staff profile" : "Add a staff profile") + '</h2>'
+    + '<p class="hint">Profile setup asks each person\'s profession, the same way SimplePractice does. Select the profession that matches your own credential or role.</p>'
+    + '<div class="grid2"><div><label>Full name <span class="req">*</span></label><input type="text" id="sf-name" value="' + esc(s.name || "") + '" required></div>'
+    + '<div><label>Profession / role <span class="req">*</span></label><select id="sf-profession">' + opts(CFG.professions, s.profession || "Peer Support Specialist") + '</select></div>'
+    + '<div><label>Credential / license type</label><input type="text" id="sf-credtype" value="' + esc(s.credentialType || "") + '" placeholder="e.g. Certified Peer Support Specialist"></div>'
+    + '<div><label>Credential / license number</label><input type="text" id="sf-crednum" value="' + esc(s.credentialNumber || "") + '"></div>'
+    + '<div><label>Phone</label><input type="tel" id="sf-phone" value="' + esc(s.phone || "") + '"></div>'
+    + '<div><label>Email</label><input type="email" id="sf-email" value="' + esc(s.email || "") + '"></div>'
+    + '<div><label>Status</label><select id="sf-status"><option value="Active"' + (s.status === "Active" || !s.status ? " selected" : "") + '>Active</option><option value="Inactive"' + (s.status === "Inactive" ? " selected" : "") + '>Inactive</option></select></div></div>'
+    + '<fieldset><legend>Programs</legend>' + checks + '</fieldset>'
+    + '<label>Notes</label><textarea id="sf-notes" rows="2">' + esc(s.notes || "") + '</textarea>'
+    + '<button type="submit" class="btn-navy">' + (s.id ? "Save changes" : "Add profile") + '</button> '
+    + '<button type="button" class="btn-small" id="sf-cancel">Cancel</button></form>';
+}
+function renderStaff() {
+  const db = dbGet();
+  const root = $("view-staff");
+  if (state.editing.staff) {
+    const s = state.editing.staff === "new" ? null : db.staff.find((x) => x.id === state.editing.staff);
+    root.innerHTML = staffForm(s);
+    $("sf-cancel").addEventListener("click", () => { state.editing.staff = null; renderStaff(); });
+    $("staff-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const d = dbGet();
+      const progs = Array.from(root.querySelectorAll(".sf-prog:checked")).map((x) => x.value);
+      const rec = { name: $("sf-name").value.trim(), profession: $("sf-profession").value, credentialType: $("sf-credtype").value.trim(), credentialNumber: $("sf-crednum").value.trim(), phone: $("sf-phone").value.trim(), email: $("sf-email").value.trim(), status: $("sf-status").value, programs: progs, notes: $("sf-notes").value };
+      if (!rec.name) return;
+      if (s) Object.assign(d.staff.find((x) => x.id === s.id), rec);
+      else { rec.id = uid(); d.staff.push(rec); }
+      dbSet(d); state.editing.staff = null; renderStaff();
+    });
+    return;
+  }
+  const list = db.staff.slice().sort((a, b) => a.name < b.name ? -1 : 1);
+  let h = '<section class="panel"><div class="toolbar"><span class="hint">Staff / provider profiles — profession, credential, and programs for each team member.</span><button type="button" class="btn-navy" id="staff-add">Add a staff profile</button></div>';
+  if (!list.length) h += '<p class="empty-note">No staff profiles yet. Add the first profile.</p>';
+  else {
+    h += '<table class="data"><tr><th>Name</th><th>Profession / role</th><th>Credential</th><th>Programs</th><th>Status</th><th></th></tr>';
+    list.forEach((s) => { h += "<tr><td><strong>" + esc(s.name) + "</strong></td><td>" + esc(s.profession || "—") + "</td><td>" + esc([s.credentialType, s.credentialNumber].filter(Boolean).join(" ") || "—") + "</td><td>" + esc((s.programs || []).join(", ") || "—") + "</td><td>" + esc(s.status || "—") + '</td><td><button type="button" class="btn-small" data-edit-staff="' + s.id + '">Edit</button></td></tr>'; });
+    h += "</table>";
+  }
+  h += "</section>";
+  root.innerHTML = h;
+  $("staff-add").addEventListener("click", () => { state.editing.staff = "new"; renderStaff(); });
+  root.querySelectorAll("[data-edit-staff]").forEach((b) => b.addEventListener("click", () => { state.editing.staff = b.getAttribute("data-edit-staff"); renderStaff(); }));
+  root.querySelectorAll("[data-open-area]").forEach((b) => b.addEventListener("click", () => { state.area = b.getAttribute("data-open-area"); showTab("areas"); }));
+}
+
+/* ---------------- Work Areas (clickable outlines) ---------------- */
+function renderAreas() {
+  const root = $("view-areas");
+  const areas = CFG.workAreas || [];
+  if (state.area) {
+    const ar = areas.find((x) => x.name === state.area);
+    if (ar) {
+      let h = '<section class="panel"><button type="button" class="btn-small" id="area-back">← All work areas</button>'
+        + "<h2>" + esc(ar.name) + "</h2><p>" + esc(ar.summary) + "</p>"
+        + "<h3>What this role works on</h3><ul>";
+      ar.worksOn.forEach((w) => { h += "<li>" + esc(w) + "</li>"; });
+      h += "</ul><h3>Services / support in this area</h3><ul>";
+      ar.services.forEach((w) => { h += "<li>" + esc(w) + "</li>"; });
+      h += "</ul><h3>What gets documented in the EHR</h3><ul>";
+      ar.documents.forEach((w) => { h += "<li>" + esc(w) + "</li>"; });
+      h += '</ul><p class="hint">Centipede\'s own services are non-clinical peer support. Outlines for licensed professions describe those professions generally, for reference.</p></section>';
+      root.innerHTML = h;
+      $("area-back").addEventListener("click", () => { state.area = null; renderAreas(); });
+      return;
+    }
+    state.area = null;
+  }
+  let h = '<section class="panel"><h2>Work areas</h2><p class="hint">Click a profession or behavioral-health area to see its outline — what that role works on, the services or support in that area, and what gets documented in the EHR.</p><ul class="item-list">';
+  areas.forEach((ar) => { h += '<li class="clickable" data-area="' + esc(ar.name) + '"><strong>' + esc(ar.name) + "</strong> — " + esc(ar.summary) + "</li>"; });
+  h += "</ul></section>";
+  root.innerHTML = h;
+  root.querySelectorAll("[data-area]").forEach((el) => el.addEventListener("click", () => { state.area = el.getAttribute("data-area"); renderAreas(); }));
+}
