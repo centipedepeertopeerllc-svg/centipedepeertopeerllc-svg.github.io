@@ -12,7 +12,7 @@ window.JARVIS_DASH_CONFIG = {
   // characters, at least one letter, never only numbers) and enroll an
   // authenticator app — the same gate as every company dashboard.
   users: [
-    { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer", admin: true, tempPasswordSha256: "8753c9cd72388ce70eb4a35fe04364adc3bf37e72b9daf9eeafbb80c13cb5037" }
+    { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer", admin: true, tempPasswordSha256: "47f0ddd06a6272a1fbc6a9f2749c16fce972bf5f777806f148473d4def5f7c31" }
     { username: "levi.recovery", name: "Levi Allen Spears (Recovery)", role: "Chief Executive Officer — Recovery Login", admin: true, tempPasswordSha256: "9eb7cc05173e7465ab8971643286057d0d909b6272f26d9ae82a5fafa68d9855" },
   ]
 };
