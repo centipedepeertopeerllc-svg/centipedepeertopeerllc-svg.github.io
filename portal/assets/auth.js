@@ -357,10 +357,10 @@
     // with no store), which locked the CEO out after his reset. Fresh
     // seed = the current temporary passwords in config.js apply again.
     CTX = {
-      storeKey: opts.storeKey + ".r6",
+      storeKey: opts.storeKey + ".r7",
       sessionKey: opts.sessionKey,
       onSignIn: opts.onSignIn,
-      store: loadStore(opts.storeKey + ".r6", opts.seedUsers),
+      store: loadStore(opts.storeKey + ".r7", opts.seedUsers),
       step: "login",
       pending: null,
       pendingSecret: null
