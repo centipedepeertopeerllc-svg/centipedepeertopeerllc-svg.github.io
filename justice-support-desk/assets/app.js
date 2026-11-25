@@ -305,6 +305,25 @@ function renderPolicies() {
     + '<section class="panel">' + para(POLICY_MEMBERS) + "</section>";
 }
 
+/* ---------------- Program Documents (DRAFTS — linked pages) ----------------
+   The six Justice Support program documents, drafted Nov 24, 2026.
+   Every one is a DRAFT pending the Chief Executive Officer's approval —
+   none is issued or in effect. They open as their own pages under
+   documents/ and are linked from here only. */
+const PROGRAM_DOCUMENTS = [
+  ["documents/member-agreement.html", "Justice Support Member Agreement", "The program agreement — what the program is and is not, what Centipede does, what the member agrees to, confidentiality, and how participation ends. Signed through SignNow."],
+  ["documents/intake-form.html", "Justice Support Intake Form", "Program intake — contact and safe-contact information, case basics, attorney and probation information, and the member's support needs."],
+  ["documents/what-to-expect-at-each-stage.html", "What to Expect at Each Stage", "The member guide — plain language for every case stage, from Awaiting Filing to Resolved-Closed: what happens, what the member does, what Centipede does, what to bring."],
+  ["documents/court-date-reminder-consent.html", "Court Date Reminder & Communication Consent", "The member chooses how Centipede reminds them of court dates and who else may be contacted about dates and scheduling only. Signed through SignNow."],
+  ["documents/member-rights-and-responsibilities.html", "Member Rights & Responsibilities", "One page, plain language — the member's rights in the program and the responsibilities that come with membership."],
+  ["documents/case-closure-summary.html", "Case Closure Summary", "Completed by staff when a case reaches Resolved-Closed — outcome, support provided, referrals, documents returned, and the member's SignNow sign-off."]
+];
+function renderDocuments() {
+  $("view-documents").innerHTML = '<section class="panel"><h2>Program Documents — DRAFTS</h2>'
+    + '<p class="hint"><strong>These are DRAFT documents — pending the Chief Executive Officer\u2019s approval; none is issued or in effect.</strong> They are kept here for review and use in preparing member paperwork. Each takes effect only when the Chief Executive Officer approves it. Documents that are signed are signed through SignNow.</p>'
+    + '<ul class="item-list">' + PROGRAM_DOCUMENTS.map((d) => '<li><a href="' + d[0] + '"><strong>' + esc(d[1]) + " (DRAFT)</strong></a><br><span class=\"meta\">" + esc(d[2]) + "</span></li>").join("") + "</ul></section>";
+}
+
 /* ---------------- Court Calendar ---------------- */
 function renderCalendar() {
   const db = dbGet();
@@ -425,7 +444,7 @@ function wireView(root) {
 function showTab(tab) {
   state.tab = tab;
   document.querySelectorAll("#tabs button").forEach((b) => b.classList.toggle("active", b.getAttribute("data-tab") === tab));
-  ["overview", "application", "matters", "calendar", "tasks", "contacts", "policies", "admin"].forEach((t) => { $("view-" + t).hidden = t !== tab; });
+  ["overview", "application", "matters", "calendar", "tasks", "contacts", "policies", "documents", "admin"].forEach((t) => { $("view-" + t).hidden = t !== tab; });
   if (tab === "overview") renderOverview();
   if (tab === "application") renderApplication();
   if (tab === "matters") renderMatters();
@@ -433,6 +452,7 @@ function showTab(tab) {
   if (tab === "tasks") renderTasks();
   if (tab === "contacts") renderContacts();
   if (tab === "policies") renderPolicies();
+  if (tab === "documents") renderDocuments();
   if (tab === "admin") renderAdmin();
 }
 function enterApp() {
