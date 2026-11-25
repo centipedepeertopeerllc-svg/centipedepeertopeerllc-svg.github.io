@@ -42,6 +42,7 @@ legend { font-weight: bold; color: var(--green); padding: 0 0.4rem; }
 .login-card label { text-align: left; }
 .login-logo { width: 92px; height: 92px; object-fit: contain; }
 .login-seal { width: 104px; height: 104px; object-fit: contain; border-radius: 50%; }
+.login-ehr-seal { width: 104px; height: 104px; object-fit: contain; border-radius: 50%; }
 .brand-row { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 0.4rem; }
 .org { color: var(--gold-dark); font-weight: bold; }
 .gate-note, .fineprint { font-size: 0.88rem; color: #55503f; }
@@ -50,6 +51,7 @@ legend { font-weight: bold; color: var(--green); padding: 0 0.4rem; }
 .app-header { display: flex; align-items: center; gap: 0.9rem; background: var(--green); color: #fff; padding: 0.6rem 1rem; border-bottom: 4px solid var(--gold); flex-wrap: wrap; }
 .header-logo { width: 52px; height: 52px; object-fit: contain; background: #fff; border-radius: 8px; padding: 3px; }
 .header-seal { width: 52px; height: 52px; object-fit: contain; border-radius: 50%; }
+.header-ehr-seal { width: 52px; height: 52px; object-fit: contain; border-radius: 50%; }
 .header-titles { display: flex; flex-direction: column; flex: 1; min-width: 220px; }
 .header-titles span { font-size: 0.82rem; color: var(--gold); }
 .header-user { display: flex; gap: 0.6rem; align-items: center; font-size: 0.9rem; }

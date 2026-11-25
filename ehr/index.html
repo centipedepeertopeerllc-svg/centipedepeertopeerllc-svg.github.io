@@ -19,6 +19,7 @@
     <div class="brand-row">
       <img class="login-logo brand-logo" alt="Centipede Peer to Peer, LLC logo">
       <img class="login-seal brand-seal" alt="Peer Support Program seal">
+      <img class="login-ehr-seal brand-ehr-seal" alt="Centipede EHR seal">
     </div>
     <h1>Centipede EHR</h1>
     <p class="org">Centipede Peer to Peer, LLC<br>LIC: 0714781 · Stockton, California</p>
@@ -75,6 +76,7 @@
       <span>Centipede Peer to Peer, LLC · LIC: 0714781 · 717 E. Longview Ave., Stockton, CA 95207</span>
     </div>
     <img class="header-seal brand-seal" alt="Peer Support Program seal">
+    <img class="header-ehr-seal brand-ehr-seal" alt="Centipede EHR seal">
     <div class="header-user">
       <span id="who"></span>
       <button id="logout-btn" class="btn-small" type="button">Sign out</button>
@@ -115,6 +117,7 @@
     <div class="footer-seals">
       <img class="brand-logo" alt="Centipede Peer to Peer, LLC logo">
       <img class="seal brand-seal" alt="Peer Support Program seal">
+      <img class="seal brand-ehr-seal" alt="Centipede EHR seal">
     </div>
     <span>Centipede Peer to Peer, LLC — a California for-profit limited liability company. Centipede EHR is an internal, non-clinical peer-support record system: staff support, coach, mentor, and navigate; nothing in this system is medical advice or a clinical record. The locked client binders remain the official record.</span>
     <span>Confidential: authorized Centipede staff only. Do not share information from this system outside authorized staff.</span>
@@ -124,7 +127,7 @@
 <script src="assets/config.js"></script>
 <script src="assets/auth.js"></script>
 <script src="assets/branding.js"></script>
-<script>document.querySelectorAll(".brand-logo").forEach(function (i) { i.src = window.JS_LOGO; }); document.querySelectorAll(".brand-seal").forEach(function (i) { i.src = window.JS_SEAL; });</script>
+<script>document.querySelectorAll(".brand-logo").forEach(function (i) { i.src = window.JS_LOGO; }); document.querySelectorAll(".brand-seal").forEach(function (i) { i.src = window.JS_SEAL; }); document.querySelectorAll(".brand-ehr-seal").forEach(function (i) { i.src = window.JS_EHR_SEAL; });</script>
 <script src="assets/app.js"></script>
 <script>
 if ('serviceWorker' in navigator) {
