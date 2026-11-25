@@ -84,6 +84,104 @@
   <div id="mode-banner" class="banner warn" role="status">Local Mode: this tracker keeps its records in this device's browser storage. The locked client binders and the Legal Binder (CPP-BND-2026-001) remain the official record. Use Admin &amp; Data to download a backup copy of the tracker data.</div>
 
   <main class="wrap">
+    <!-- EMERGENCY BILLBOARD — Centipede brand frame; shown only while an
+         emergency notice is live in the shared feed
+         (../assets/emergency-billboard.json). When no notice is live, the
+         section stays hidden and nothing renders. -->
+    <style>
+      /* Emergency Billboard — Centipede brand frame: dark green band, gold
+         accents and rule, company name in the frame. Shown only while an
+         emergency notice is live (../assets/emergency-board.js). */
+      .eb-panel{grid-column:1/-1;background:linear-gradient(160deg,#173d33,#0d2921);border:2px solid #b8933a;border-top:6px solid #dfc166;border-radius:14px;color:#fff;padding:1rem 1.2rem 1.1rem;margin:1.2rem 0;box-shadow:0 12px 32px rgba(23,61,51,.18)}
+      .eb-head{border-bottom:2px solid #dfc166;padding-bottom:.45rem;margin-bottom:.8rem}
+      .eb-brand{display:block;color:#dfc166;font-weight:800;font-size:.8rem;letter-spacing:.16em;text-transform:uppercase}
+      .eb-headrow{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+      .eb-headrow h2{color:#fff;font-size:1.3rem;margin:.1rem 0 0;letter-spacing:.02em}
+      .eb-sub{color:#dfc166;font-size:.85rem}
+      .eb-stage{position:relative;min-height:9.5rem}
+      .eb-slide{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .6s ease;padding:.2rem .1rem}
+      .eb-slide.active{opacity:1;pointer-events:auto;position:relative}
+      .eb-tag{display:inline-block;background:#dfc166;color:#173d33;font-weight:700;font-size:.72rem;letter-spacing:.08em;border-radius:10px;padding:.12rem .55rem;margin-bottom:.45rem;text-transform:uppercase}
+      .eb-tag.tag-emergency{background:#b03030;color:#fff}
+      .eb-headline{font-size:1.28rem;line-height:1.3;margin:0 0 .4rem;color:#fff}
+      .eb-body{font-size:1rem;line-height:1.45;margin:0 0 .5rem;color:#eef2ec;max-width:62rem}
+      .eb-meta{font-size:.85rem;color:#dfc166;margin:0}
+      .eb-controls{display:flex;align-items:center;gap:.7rem;margin-top:.7rem;flex-wrap:wrap}
+      .eb-btn{background:#fff;color:#173d33;border:1px solid #b8933a;border-radius:8px;padding:.35rem .8rem;font-size:.9rem;cursor:pointer}
+      .eb-dots{display:inline-flex;gap:.35rem;align-items:center}
+      .eb-dot{width:.72rem;height:.72rem;border-radius:50%;border:1px solid #dfc166;background:transparent;padding:0;cursor:pointer}
+      .eb-dot.active{background:#dfc166}
+      .eb-count{color:#cfd8cd;font-size:.85rem}
+    </style>
+    <section class="panel eb-panel" id="emergency-billboard" data-feed="../assets/emergency-billboard.json" hidden>
+      <div class="eb-head">
+        <span class="eb-brand">Centipede Peer to Peer, LLC</span>
+        <div class="eb-headrow">
+          <h2>Emergency Billboard</h2>
+          <span class="eb-sub">Family Run Company · LIC: 0714781</span>
+        </div>
+      </div>
+      <div class="eb-stage" aria-live="polite"></div>
+      <div class="eb-controls">
+        <button type="button" class="eb-btn eb-prev" aria-label="Previous notice">&larr; Prev</button>
+        <span class="eb-dots"></span>
+        <button type="button" class="eb-btn eb-next" aria-label="Next notice">Next &rarr;</button>
+        <span class="eb-count"></span>
+      </div>
+    </section>
+    <script src="../assets/emergency-board.js" data-feed="../assets/emergency-billboard.json"></script>
+
+    <!-- GENERAL BILLBOARD / COMPANY BOARD — Centipede brand frame; general
+       company items only (announcements, study and compilation work,
+       program news), rotating as a slideshow while an item is live in
+       assets/general-billboard.json. Controlled by the Chief Executive
+       Officer; nothing posts except at the CEO's direction. Separate
+       from the Emergency Billboard, which carries emergencies only and
+       takes visual precedence. When no item is live, the section stays
+       hidden and nothing renders. -->
+    <style>
+      /* General Billboard / Company Board — Centipede brand frame: dark
+         green band, gold accents and rule, company name in the frame. Shown
+         only while a general item is live (../assets/general-board.js). */
+      .gb-panel{grid-column:1/-1;background:linear-gradient(160deg,#173d33,#0d2921);border:2px solid #b8933a;border-top:6px solid #dfc166;border-radius:14px;color:#fff;padding:1rem 1.2rem 1.1rem;margin:1.2rem 0;box-shadow:0 12px 32px rgba(23,61,51,.18)}
+          .gb-head{border-bottom:2px solid #dfc166;padding-bottom:.45rem;margin-bottom:.8rem}
+          .gb-brand{display:block;color:#dfc166;font-weight:800;font-size:.8rem;letter-spacing:.16em;text-transform:uppercase}
+          .gb-headrow{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+          .gb-headrow h2{color:#fff;font-size:1.3rem;margin:.1rem 0 0;letter-spacing:.02em}
+          .gb-sub{color:#dfc166;font-size:.85rem}
+          .gb-stage{position:relative;min-height:9.5rem}
+          .gb-slide{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .6s ease;padding:.2rem .1rem}
+          .gb-slide.active{opacity:1;pointer-events:auto;position:relative}
+          .gb-tag{display:inline-block;background:#dfc166;color:#173d33;font-weight:700;font-size:.72rem;letter-spacing:.08em;border-radius:10px;padding:.12rem .55rem;margin-bottom:.45rem;text-transform:uppercase}
+          .gb-headline{font-size:1.28rem;line-height:1.3;margin:0 0 .4rem;color:#fff}
+          .gb-body{font-size:1rem;line-height:1.45;margin:0 0 .5rem;color:#eef2ec;max-width:62rem}
+          .gb-link{margin:0 0 .5rem}
+          .gb-link a{color:#dfc166;font-weight:700}
+          .gb-meta{font-size:.85rem;color:#dfc166;margin:0}
+          .gb-controls{display:flex;align-items:center;gap:.7rem;margin-top:.7rem;flex-wrap:wrap}
+          .gb-btn{background:#fff;color:#173d33;border:1px solid #b8933a;border-radius:8px;padding:.35rem .8rem;font-size:.9rem;cursor:pointer}
+          .gb-dots{display:inline-flex;gap:.35rem;align-items:center}
+          .gb-dot{width:.72rem;height:.72rem;border-radius:50%;border:1px solid #dfc166;background:transparent;padding:0;cursor:pointer}
+          .gb-dot.active{background:#dfc166}
+          .gb-count{color:#cfd8cd;font-size:.85rem}
+    </style>
+    <section class="panel gb-panel" id="general-billboard" data-feed="../assets/general-billboard.json" hidden>
+      <div class="gb-head">
+        <span class="gb-brand">Centipede Peer to Peer, LLC</span>
+        <div class="gb-headrow">
+          <h2>Company Billboard</h2>
+          <span class="gb-sub">Family Run Company · LIC: 0714781</span>
+        </div>
+      </div>
+      <div class="gb-stage" aria-live="polite"></div>
+      <div class="gb-controls">
+        <button type="button" class="gb-btn gb-prev" aria-label="Previous item">&larr; Prev</button>
+        <span class="gb-dots"></span>
+        <button type="button" class="gb-btn gb-next" aria-label="Next item">Next &rarr;</button>
+        <span class="gb-count"></span>
+      </div>
+    </section>
+    <script src="../assets/general-board.js" data-feed="../assets/general-billboard.json"></script>
     <nav class="tabs no-print" id="tabs">
       <button type="button" data-tab="overview" class="active">Overview</button>
       <button type="button" data-tab="application">Program Application</button>
