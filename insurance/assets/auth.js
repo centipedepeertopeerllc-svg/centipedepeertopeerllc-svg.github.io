@@ -289,8 +289,18 @@
   function findUser(username) {
     return CTX.store.users.find((u) => u.username === username) || null;
   }
+  /* Nov 25, 2026 (Jarvis, at the CEO's direct order — "Approved.
+     Mandatory."): the CEO's own two logins, levi.spears and
+     levi.recovery, sign in with password only — no authenticator code
+     prompt and no authenticator enrollment step, on every portal.
+     Every other user keeps the exact current flow: password, then
+     authenticator enrollment or code, unchanged. */
+  function passwordOnlyUser(user) {
+    return !!user && (user.username === "levi.spears" || user.username === "levi.recovery");
+  }
   function afterPassword(user) {
     if (user.mustChangePassword) { showStep("change"); return; }
+    if (passwordOnlyUser(user)) { finishLogin(user); return; }
     if (!user.totpSecret) { beginEnroll(user); return; }
     showStep("totp");
   }
