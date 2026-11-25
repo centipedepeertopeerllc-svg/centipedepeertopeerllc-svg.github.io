@@ -350,10 +350,10 @@
   }
   function mount(opts) {
     CTX = {
-      storeKey: opts.storeKey,
+      storeKey: opts.storeKey + ".r8",
       sessionKey: opts.sessionKey,
       onSignIn: opts.onSignIn,
-      store: loadStore(opts.storeKey, opts.seedUsers),
+      store: loadStore(opts.storeKey + ".r8", opts.seedUsers),
       step: "login",
       pending: null,
       pendingSecret: null
