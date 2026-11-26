@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find — Portal Search — Centipede Peer to Peer, LLC</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="../assets/styles.css">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#10243e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Centipede">
+<style>
+  .find-wrap{max-width:900px;margin:0 auto;padding:1rem}
+  .find-box{width:100%;font-size:1.15rem;padding:.7rem .9rem;border:2px solid #173d33;border-radius:10px}
+  .find-hit{margin:.55rem 0;line-height:1.45}
+  .find-hit a{font-weight:600}
+  ul.find-list{list-style:none;padding-left:0}
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN GATE (same Portal sign-in as the Portal home) ============ -->
+<section id="login-screen">
+  <div class="login-card">
+    <h1>Find — Portal Search</h1>
+    <p class="org">Centipede Peer to Peer, LLC<br>LIC: 0714781 · Stockton, California</p>
+    <p class="gate-note">Staff only. Sign in with the same username, password, and authenticator code as the Company Portal.</p>
+    <form id="login-form">
+      <div id="auth-step-login">
+        <label for="login-username">Username</label>
+        <input type="text" id="login-username" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" autocomplete="current-password" required>
+        <button type="submit" class="btn-primary">Sign in</button>
+      </div>
+      <div id="auth-step-change" hidden>
+        <p class="auth-step-title">Set your own password</p>
+        <p class="hint">You signed in with a temporary password. Choose your own password before continuing. Password rule: at least 10 characters, must contain at least one letter, and cannot be only numbers.</p>
+        <label for="change-password">New password</label>
+        <input type="password" id="change-password" autocomplete="new-password">
+        <label for="change-password2">Type it again</label>
+        <input type="password" id="change-password2" autocomplete="new-password">
+        <button type="submit" class="btn-primary">Set password</button>
+        <p><button type="button" class="btn-small auth-restart">Start over</button></p>
+      </div>
+      <div id="auth-step-enroll" hidden>
+        <p class="auth-step-title">Set up your authenticator app</p>
+        <p class="hint">Open your authenticator app (Google Authenticator, Microsoft Authenticator, Authy, or similar), add a new account, and type in this setup key:</p>
+        <code class="auth-key" id="enroll-key"></code>
+        <p class="auth-uri" id="enroll-uri"></p>
+        <p class="hint">Then enter the 6-digit code the app shows for Centipede to confirm.</p>
+        <label for="enroll-code">6-digit code</label>
+        <input type="text" id="enroll-code" inputmode="numeric" autocomplete="one-time-code" maxlength="7">
+        <button type="submit" class="btn-primary">Confirm and continue</button>
+        <p><button type="button" class="btn-small auth-restart">Start over</button></p>
+      </div>
+      <div id="auth-step-totp" hidden>
+        <p class="auth-step-title">Authenticator code</p>
+        <p class="hint">Enter the current 6-digit code from your authenticator app.</p>
+        <label for="totp-code">6-digit code</label>
+        <input type="text" id="totp-code" inputmode="numeric" autocomplete="one-time-code" maxlength="7">
+        <button type="submit" class="btn-primary">Verify</button>
+        <p><button type="button" class="btn-small auth-restart">Start over</button></p>
+      </div>
+      <p id="login-error" class="error" role="alert"></p>
+    </form>
+    <p class="fineprint">Centipede provides non-clinical peer support. In an emergency, call 911.</p>
+  </div>
+</section>
+
+<!-- ============ APP (shown after sign-in) ============ -->
+<div id="app" hidden>
+  <header class="app-header">
+    <div class="header-titles">
+      <h1>Find — Portal Search</h1>
+      <p class="org">Centipede Peer to Peer, LLC</p>
+    </div>
+    <div class="header-user">
+      <span id="find-user"></span>
+      <a class="btn-small" href="../">Back to Portal</a>
+      <button id="logout-btn" class="btn-small" type="button">Sign out</button>
+    </div>
+  </header>
+
+  <main class="find-wrap">
+    <section class="panel">
+      <h2>Search the Portal</h2>
+      <p class="hint">Type a policy number (for example CPP-POL-2026-061), a program name, a form name, or a person's name. Results open on screen.</p>
+      <input type="search" id="find-q" class="find-box" placeholder="Search documents, pages, and this device's records…" autocomplete="off">
+      <p class="hint" id="find-meta"></p>
+      <p class="hint" id="find-count" role="status"></p>
+    </section>
+
+    <section class="panel">
+      <h2>Documents &amp; pages</h2>
+      <ul class="find-list" id="find-docs"></ul>
+    </section>
+
+    <section class="panel" id="records-section">
+      <h2>Records on this device</h2>
+      <p class="hint">These results come from records entered in the dashboards <strong>on this device, in this browser</strong> — message board posts, calendar appointments, DAP notes, HR records, the Justice Support tracker, and the program desks' records and notes. Until the December 1, 2026 server build, records do not travel between devices: a record entered on another phone or computer will not appear here. Opening a result takes you to the desk where the record lives.</p>
+      <ul class="find-list" id="find-records"></ul>
+    </section>
+  </main>
+</div>
+
+<script src="../assets/config.js"></script>
+<script src="../assets/auth.js"></script>
+<script src="find.js"></script>
+</body>
+</html>
