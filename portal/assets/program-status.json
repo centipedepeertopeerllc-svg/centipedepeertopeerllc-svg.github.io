@@ -1,7 +1,7 @@
 {
  "board": "Program Status Board",
  "company": "Centipede Peer to Peer, LLC",
- "date": "2026-11-21",
+ "date": "2026-11-26",
  "controlledBy": "Chief Executive Officer",
  "note": "The company's one program status list. Every Portal program listing and the public programs page are kept to this board. Statuses as the company record supports them on the date above; conflicts settled in favor of the most recent CEO/board record, with the source noted per program. Active = the program is working and open now (shown as Now Serving on the public page). In Development = being built, not enrolling yet.",
  "dashboards": [
@@ -54,6 +54,12 @@
    "source": "Public list Nov 5 (Now Serving); program manual Oct 1, 2026; dashboard created Nov 21, 2026."
   },
   {
+   "name": "Housing Development",
+   "status": "Active",
+   "url": "https://centipedepeertopeerllc-svg.github.io/programs/housing-development/",
+   "source": "CEO direction Nov 25, 2026 - built Active Nov 26, 2026; the company is placing people in low-income housing now. Dashboard created Nov 26, 2026."
+  },
+  {
    "name": "Pet Pantry",
    "status": "Active",
    "url": "https://centipedepeertopeerllc-svg.github.io/programs/pet-pantry/",
@@ -61,13 +67,13 @@
   },
   {
    "name": "Substance Abuse Recovery Support",
-   "status": "Adopted — not yet enrolling",
+   "status": "Active",
    "url": "https://centipedepeertopeerllc-svg.github.io/programs/recovery-support/",
    "source": "Adopted Oct 16, 2026; Portal config wording. Public list Nov 5 carries it In Development, which the page defines as not enrolling yet — same standing."
   },
   {
    "name": "Hygiene Outreach",
-   "status": "In Development",
+   "status": "Active",
    "url": "https://centipedepeertopeerllc-svg.github.io/programs/hygiene-outreach/",
    "source": "CONFLICT SETTLED Nov 21, 2026: public list Nov 5 said Now Serving; the company's posting screens (Nov 8-21) and the program config carry In Development. Most recent company record governs — In Development."
   },
@@ -85,7 +91,7 @@
   },
   {
    "name": "Women Helping Women",
-   "status": "In Development",
+   "status": "Active",
    "url": "https://centipedepeertopeerllc-svg.github.io/programs/women-helping-women/",
    "source": "Portal program config; public list Nov 5 agrees."
   },
