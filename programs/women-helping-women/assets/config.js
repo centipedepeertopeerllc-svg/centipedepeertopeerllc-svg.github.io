@@ -11,6 +11,6 @@ window.PROGRAM_CONFIG = {
     { username: "junior.spears", name: "Levi Spears (Junior)", role: "Field Team Member", admin: false, tempPasswordSha256: "b2e67df9a35a2ea1c7d7b4ee47a1e2ce8c1b7f0ecee6a3e04d6b48d7fda2c31c" },
     { username: "monica.frishkorn", name: "Monica Frishkorn-Wellner", role: "Board Director", admin: false, tempPasswordSha256: "c32137c4d6594accb0cd8ce13f50472d8621f839cfcc5defb98c794d615966f3" },
     { username: "jeremy.hughes", name: "Jeremy Hughes", role: "Board Member", admin: false, tempPasswordSha256: "cde74b40b31a6d2da4fa5e54dccfdc2ddeaa6b4d0c3fcfc1ba5fa8f7d6e1b3f3a" },
-    { username: "amanda.spears", name: "Amanda Spears", role: "Women Helping Women — Program Lead", admin: false, tempPasswordSha256: "75fe803604c231d9ae625fc491fe25c20f99c5f4c942f26d62b9c086ce5b067b" }
+    { username: "amanda.spears", name: "Amanda Spears", role: "Women Helping Women — Program Lead", admin: false, tempPasswordSha256: "b9a4cfaec20f28febf92cbaf45e520548c98d8fe841dd67807e24f3f72a9cc36" }
   ]
 };
