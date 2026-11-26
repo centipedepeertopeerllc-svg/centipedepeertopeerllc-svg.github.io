@@ -162,11 +162,11 @@ function enterApp() {
   $("who").textContent = "Signed in: " + state.user.name + " (" + state.user.role + ")";
   $("mode-banner").textContent = CFG.name + " — " + CFG.status + ". Program lead: " + CFG.lead + ". The binders stay the official record.";
   $("prog-head").innerHTML = `<h2>${esc(CFG.name)}</h2><p class="hint">Status: ${esc(CFG.status)} · Lead: ${esc(CFG.lead)}</p>
-    <p><a href="${esc(CFG.driveUrl)}" target="_blank" rel="noopener"><strong>Open this program's Google Drive folder</strong></a> · <a href="https://centipedepeertopeerllc-svg.github.io/portal/">Back to the Company Portal (shared calendar &amp; appointments)</a></p>
+    <p><a href="${esc(CFG.driveUrl)}" target="_blank" rel="noopener"><strong>Open this program's Google Drive folder</strong> (this link is being restored in the Dec 1 Drive rebuild)</a> · <a href="https://centipedepeertopeerllc-svg.github.io/portal/">Back to the Company Portal (shared calendar &amp; appointments)</a></p>
     ${CFG.guardrail ? `<p class="hint">${esc(CFG.guardrail)}</p>` : ""}`;
   buildForms(); renderRecords(); renderNotes(); initAppts(); initReqs();
   if (window.CPPMail) CPPMail.mount($("email-panel"), {});
-  initDV();
+  initDV(); initEvents(); initNotesToLevi(); initPlans();
   $("logout-btn").addEventListener("click", () => { try { CPPAuth.signOut(); } catch { location.reload(); } });
 }
 (function boot() {
@@ -193,3 +193,85 @@ function initDV() {
   });
   renderDV();
 }
+
+/* WHW BUILD 2026-11-26: events & announcements, notes to Levi, her recovery plan */
+const EVKEY = "cpp.prog.women-helping-women.events.v1";
+function renderEvents() {
+  const items = store.get(EVKEY, []);
+  $("ev-list").innerHTML = items.length ? items.map((x) =>
+    `<li><strong>${esc(x.title)}</strong>${x.date ? ` <span class="hint">${esc(x.date)}</span>` : ""}${x.details ? `<br>${esc(x.details)}` : ""}<br><span class="hint">EV-${esc(x.id)} · posted by ${esc(x.by)}</span></li>`).join("")
+    : '<li class="hint">No events or announcements posted yet.</li>';
+}
+function initEvents() {
+  $("ev-date").value = new Date().toISOString().slice(0, 10);
+  $("ev-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const items = store.get(EVKEY, []);
+    const n = items.length + 1;
+    items.unshift({ id: String(n).padStart(4, "0"), date: $("ev-date").value, title: $("ev-title").value.trim(), details: $("ev-details").value.trim(), by: state.user.name });
+    store.set(EVKEY, items); e.target.reset(); $("ev-date").value = new Date().toISOString().slice(0, 10); renderEvents();
+    $("ev-msg").textContent = "Posted to Events & Announcements.";
+  });
+  renderEvents();
+}
+
+const NLKEY = "cpp.prog.women-helping-women.notes-to-levi.v1";
+function renderNotesToLevi() {
+  const items = store.get(NLKEY, []);
+  $("nl-list").innerHTML = items.length ? items.map((x) =>
+    `<li>${esc(x.text)}<br><span class="hint">${esc(x.when)} · from ${esc(x.by)}</span></li>`).join("")
+    : '<li class="hint">No notes to Levi yet.</li>';
+}
+function initNotesToLevi() {
+  $("nl-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const items = store.get(NLKEY, []);
+    items.unshift({ text: $("nl-text").value.trim(), when: new Date().toLocaleString(), by: state.user.name });
+    store.set(NLKEY, items); e.target.reset(); renderNotesToLevi();
+    $("nl-msg").textContent = "Note saved for Levi.";
+  });
+  renderNotesToLevi();
+}
+
+const RPLKEY = "cpp.prog.women-helping-women.recoveryplans.v1";
+function renderPlans() {
+  const items = store.get(RPLKEY, []);
+  $("rp-list").innerHTML = items.length ? items.map((x) =>
+    `<li data-rpview="${esc(x.id)}"><strong>${esc(x.member)}</strong> <span class="hint">Plan date: ${esc(x.date || "—")}${x.review ? ` · Review: ${esc(x.review)}` : ""}</span><br><span class="hint">RP-${esc(x.id)} · written with ${esc(x.by)} — tap to view / print her copy</span></li>`).join("")
+    : '<li class="hint">No recovery plans yet. Her plan starts above, in her words.</li>';
+  document.querySelectorAll("[data-rpview]").forEach((li) => li.addEventListener("click", () => viewPlan(li.dataset.rpview)));
+}
+function planRow(label, val) { return val ? `<h3>${label}</h3><blockquote>${esc(val)}</blockquote>` : ""; }
+function viewPlan(id) {
+  const x = store.get(RPLKEY, []).find((p) => p.id === id);
+  if (!x) return;
+  $("rp-view").innerHTML = `<h3>Her Recovery Plan — ${esc(x.member)}</h3>
+    <p class="meta">Plan date: ${esc(x.date || "—")}${x.review ? ` · Review date: ${esc(x.review)}` : ""} · RP-${esc(x.id)} · written with ${esc(x.by)}. Her plan, in her words — peer support, not treatment.</p>
+    ${planRow("What recovery means to her", x.meaning)}
+    ${planRow("Her goals — the next few weeks", x.goalsShort)}
+    ${planRow("Her goals — the longer road", x.goalsLong)}
+    ${planRow("Her supports", x.supports)}
+    ${planRow("Meetings & program connections she is using", x.meetings)}
+    ${planRow("Daily / weekly wellness steps she chooses", x.steps)}
+    ${planRow("Warning signs she names for herself", x.signs)}
+    ${planRow("What helps when things get hard", x.coping)}
+    ${planRow("Who to call — her safe contacts", x.calls)}
+    <h3>Program numbers</h3><blockquote>Centipede cell (209) 871-3939 · PREVAIL 24/7 crisis line (209) 465-4878 · San Joaquin County Access Line 1-888-468-9370 · 988 Suicide &amp; Crisis Lifeline (call or text 988) · Danger right now: 911</blockquote>
+    ${planRow("Housing & health basics she is working on", x.basics)}
+    ${planRow("Milestones she wants to mark", x.milestones)}
+    ${planRow("Notes", x.notes)}
+    <p><button type="button" class="btn-small" onclick="window.print()">Print her copy</button></p>`;
+}
+function initPlans() {
+  $("rp-date").value = new Date().toISOString().slice(0, 10);
+  $("rp-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const items = store.get(RPLKEY, []);
+    const n = items.length + 1;
+    items.unshift({ id: String(n).padStart(4, "0"), member: $("rp-member").value.trim(), date: $("rp-date").value, review: $("rp-review").value, meaning: $("rp-meaning").value.trim(), goalsShort: $("rp-goals-short").value.trim(), goalsLong: $("rp-goals-long").value.trim(), supports: $("rp-supports").value.trim(), meetings: $("rp-meetings").value.trim(), steps: $("rp-steps").value.trim(), signs: $("rp-signs").value.trim(), coping: $("rp-coping").value.trim(), calls: $("rp-calls").value.trim(), basics: $("rp-basics").value.trim(), milestones: $("rp-milestones").value.trim(), notes: $("rp-notes").value.trim(), by: state.user.name });
+    store.set(RPLKEY, items); e.target.reset(); $("rp-date").value = new Date().toISOString().slice(0, 10); renderPlans();
+    $("rp-msg").textContent = "Her recovery plan is saved.";
+  });
+  renderPlans();
+}
+/* END WHW BUILD 2026-11-26 */

@@ -1,7 +1,7 @@
 window.PROGRAM_CONFIG = {
-  slug: "women-helping-women", name: "Women Helping Women", status: "Active", lead: "Amanda Spears (invited — pending her decision)", mode: "generic",
+  slug: "women-helping-women", name: "Women Helping Women", status: "Active", lead: "Amanda Spears — Program Lead", mode: "generic",
   driveUrl: "https://drive.google.com/drive/folders/14rc4_JKVfaCNeceR8d02rkW9FqB6s_hF",
-  guardrail: "",
+  guardrail: "Peer support only — Women Helping Women is non-clinical peer support: we listen, believe, encourage, and connect women to resources and to each other. We never investigate, never counsel or diagnose, never contact an alleged abuser, and never write down a safe address or a place a woman is hiding. A woman's information is shared only on her signed release or a judge-signed court order. If anyone is in danger right now, call 911.",
   users: [
     { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer", admin: true, tempPasswordSha256: "cec71dcf978ab90a120f201c26110313914f995172c3c5e0c66a0d23897341c2" },
     { username: "levi.recovery", name: "Levi Allen Spears (Recovery)", role: "Chief Executive Officer — Recovery Login", admin: true, tempPasswordSha256: "9eb7cc05173e7465ab8971643286057d0d909b6272f26d9ae82a5fafa68d9855" },
