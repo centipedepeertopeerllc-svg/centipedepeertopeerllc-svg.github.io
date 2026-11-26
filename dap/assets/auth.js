@@ -348,6 +348,40 @@
       setError("Something went wrong signing in. Reload the page and try again.");
     }
   }
+
+  /* ---------------- show-password eye toggle ----------------
+     Nov 26, 2026 (Jarvis, at the CEO's direction): an eye button beside
+     every password box in the sign-in form. Clicking it toggles THAT
+     box between type=password (hidden) and type=text (visible) so the
+     person can check what they themselves just typed; clicking again
+     re-hides it. It only ever reveals the current contents of the box
+     it sits beside — it never reads or displays any stored password
+     or hash. The button is type=button (never submits the form), is
+     keyboard-focusable, and its accessible label flips between
+     "Show password" and "Hide password". */
+  function addPasswordToggles(form) {
+    if (!form) return;
+    form.querySelectorAll('input[type="password"]').forEach((input) => {
+      if (input.dataset.eyeToggle) return;
+      input.dataset.eyeToggle = "1";
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn-small auth-eye-toggle";
+      btn.setAttribute("aria-label", "Show password");
+      btn.setAttribute("aria-pressed", "false");
+      btn.title = "Show password";
+      btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+      btn.addEventListener("click", () => {
+        const show = input.type === "password";
+        input.type = show ? "text" : "password";
+        btn.setAttribute("aria-label", show ? "Hide password" : "Show password");
+        btn.setAttribute("aria-pressed", show ? "true" : "false");
+        btn.title = show ? "Hide password" : "Show password";
+        input.focus();
+      });
+      if (input.parentNode) input.parentNode.insertBefore(btn, input.nextSibling);
+    });
+  }
   function mount(opts) {
     CTX = {
       storeKey: opts.storeKey + ".r9",
@@ -360,6 +394,7 @@
     };
     const form = $("login-form");
     if (form) form.addEventListener("submit", onSubmit);
+    addPasswordToggles(form);
     document.querySelectorAll(".auth-restart").forEach((b) => b.addEventListener("click", () => location.reload()));
     showStep("login");
   }
