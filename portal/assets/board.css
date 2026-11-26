@@ -29,7 +29,11 @@
 }
 .board-sub { color: var(--gold); font-size: 0.85rem; }
 
-.board-stage { position: relative; min-height: 9.5rem; }
+/* Enlarged Nov 26, 2026 at the CEO's direction: the stage is now a
+   full page — a large, page-proportioned reading area (the active
+   slide is presented as a sheet of paper, at least 34rem tall and
+   growing to fit the whole post) instead of the original 9.5rem box. */
+.board-stage { position: relative; min-height: 36rem; }
 .board-slide {
   position: absolute;
   inset: 0;
@@ -38,7 +42,22 @@
   transition: opacity 0.6s ease;
   padding: 0.2rem 0.1rem;
 }
-.board-slide.active { opacity: 1; pointer-events: auto; position: relative; }
+.board-slide.active {
+  opacity: 1;
+  pointer-events: auto;
+  position: relative;
+  background: #fffdf7;
+  color: var(--ink);
+  border-radius: 6px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+  max-width: 54rem;
+  min-height: 34rem;
+  margin: 0 auto;
+  padding: 2.1rem 2.3rem;
+}
+.board-slide.active .board-headline { color: var(--navy); font-size: 1.45rem; }
+.board-slide.active .board-body { color: var(--ink); font-size: 1.06rem; line-height: 1.6; }
+.board-slide.active .board-meta { color: var(--gold-dark); }
 .board-tag {
   display: inline-block;
   background: var(--gold);
@@ -56,7 +75,7 @@
 .board-tag.tag-jarvis { background: #f2c14e; }
 .board-tag.tag-reminder { background: #f0a35e; }
 .board-headline { font-size: 1.28rem; line-height: 1.3; margin: 0 0 0.4rem; color: #fff; }
-.board-body { font-size: 1rem; line-height: 1.45; margin: 0 0 0.5rem; color: #eef1f4; max-width: 62rem; }
+.board-body { font-size: 1rem; line-height: 1.45; margin: 0 0 0.5rem; color: #eef1f4; max-width: 62rem; white-space: pre-wrap; overflow-wrap: break-word; }
 .board-meta { font-size: 0.85rem; color: var(--gold); margin: 0; }
 
 .board-controls {
@@ -101,6 +120,7 @@
   font-size: 0.98rem;
   margin-top: 0.2rem;
 }
+#board-composer textarea { line-height: 1.55; min-height: 22rem; }
 #board-manage { margin-top: 0.8rem; }
 #board-manage h4 { color: var(--navy); margin: 0.4rem 0; font-size: 0.95rem; }
 #board-manage ul { list-style: none; padding: 0; margin: 0; }

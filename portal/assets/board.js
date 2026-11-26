@@ -27,7 +27,13 @@
      (delete) any posted slide. Everyone signed in can read the board.
    - NO client information of any kind ever goes on this board — it is
      program- and company-level news only. No external libraries, no CDN.
-   Built Nov 19, 2026 at the CEO's direction. */
+   Built Nov 19, 2026 at the CEO's direction.
+   Enlarged Nov 26, 2026 at the CEO's direction: the reading area is now
+   a full page (see board.css), the composer fits a whole letter page
+   (10,000 characters), activity slides carry up to 3,500 characters
+   instead of 240, and the rotation now allows reading time in
+   proportion to a slide's length, so a full-page post can be read
+   start to finish before the board moves on. */
 (function () {
   const BOARD_KEY = "cpp.portal.board.v1";
   const SEEDED_KEY_V4 = "cpp.portal.board.seeded.v4";
@@ -155,7 +161,7 @@
         id: "AUTO-ACT-" + e.id,
         tag: "PROGRAM",
         headline: (PROG_NAMES[e.program] || e.program || "Program") + " — " + (KIND_LABEL[e.kind] || "Update"),
-        body: truncate(e.text, 240),
+        body: truncate(e.text, 3500),
         date: e.date || "",
         by: e.by || "Program Activity",
         expires: null,
@@ -248,14 +254,23 @@
   }
   function goTo(i) { ui.idx = i; draw(); }
   function step(dir) { if (ui.slides.length > 1) { ui.idx = nextIndex(ui.idx, ui.slides.length, dir); draw(); } }
-  function stopTimer() { if (ui.timer !== null) { clearInterval(ui.timer); ui.timer = null; } }
+  function stopTimer() { if (ui.timer !== null) { clearTimeout(ui.timer); clearInterval(ui.timer); ui.timer = null; } }
+  /* Reading time: a short slide keeps the plain 8-second rotation; a
+     longer slide stays up in proportion to its length (about 20 ms of
+     reading time per character past the first 240), capped at 120
+     seconds, so a full-page post can be read before the board moves on. */
+  function rotateDelay() {
+    const s = ui.slides[ui.idx];
+    const n = s && s.body ? String(s.body).length : 0;
+    return Math.min(120000, ROTATE_MS + Math.max(0, n - 240) * 20);
+  }
   function startTimer() {
     stopTimer();
     if (ui.slides.length < 2) return;
     let reduced = false;
     try { reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch { reduced = false; }
     if (reduced) return;
-    ui.timer = setInterval(() => { if (!ui.paused) step(1); }, ROTATE_MS);
+    ui.timer = setTimeout(() => { if (!ui.paused) step(1); startTimer(); }, rotateDelay());
   }
   function restart() { startTimer(); }
   function setPaused(p) { ui.paused = p; const count = $("board-count"); if (count && ui.slides.length) count.textContent = "Slide " + (ui.idx + 1) + " of " + ui.slides.length + (ui.paused ? " · paused" : ""); }

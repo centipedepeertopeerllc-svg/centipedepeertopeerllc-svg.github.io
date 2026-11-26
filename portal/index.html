@@ -207,11 +207,11 @@
       </div>
       <div id="board-composer" hidden>
         <h3>Post to the board</h3>
-        <p class="hint">Shown only to the CEO and Jarvis. A post goes up under your name for everyone in the Portal. Company and program news only — never client information.</p>
+        <p class="hint">Shown only to the CEO and Jarvis. A post goes up under your name for everyone in the Portal. Company and program news only — never client information. The message box fits a full page — up to 10,000 characters, five full paragraphs and more — and the board shows the whole post, start to finish.</p>
         <form id="board-form">
           <label>Tag <select id="board-tag"></select></label>
           <label>Headline <input id="board-headline" type="text" maxlength="140" required></label>
-          <label>Message <textarea id="board-body" rows="3" maxlength="600" required></textarea></label>
+          <label>Message <textarea id="board-body" rows="20" maxlength="10000" required></textarea></label>
           <button type="submit" class="btn-navy">Post to the board</button>
           <span id="board-msg" class="hint" role="status"></span>
         </form>
