@@ -171,7 +171,7 @@ function enterApp() {
     $("admin-note").innerHTML = "<strong>Administrator — all dashboards.</strong> You are the administrator of every Centipede dashboard. User access controls live inside each dashboard under \"Admin — user access\" when you sign in there with this same sign-in.";
   }
   $("tiles").innerHTML = CFG.tiles.filter((t) => !t.adminOnly || state.user.admin).map((t) =>
-    `<a class="tile" href="${esc(t.url)}" style="display:block;padding:18px;border:1px solid #ccc;border-radius:10px;text-decoration:none;margin:0 0 12px 0;">
+    `<a class="tile" href="${esc(t.url)}"${t.external ? ' target="_blank" rel="noopener"' : ''} style="display:block;padding:18px;border:1px solid #ccc;border-radius:10px;text-decoration:none;margin:0 0 12px 0;">
        <strong style="font-size:1.15rem;">${esc(t.name)}</strong><br><span class="hint">${esc(t.note)}</span>
      </a>`).join("");
   $("program-list").innerHTML = CFG.programs.map((p) =>
