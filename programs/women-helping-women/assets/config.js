@@ -1,5 +1,5 @@
 window.PROGRAM_CONFIG = {
-  slug: "women-helping-women", name: "Women Helping Women", status: "In Development", lead: "Amanda Spears (invited — pending her decision)", mode: "generic",
+  slug: "women-helping-women", name: "Women Helping Women", status: "Active", lead: "Amanda Spears (invited — pending her decision)", mode: "generic",
   driveUrl: "https://drive.google.com/drive/folders/14rc4_JKVfaCNeceR8d02rkW9FqB6s_hF",
   guardrail: "",
   users: [

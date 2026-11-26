@@ -1,5 +1,5 @@
 window.PROGRAM_CONFIG = {
-  slug: "recovery-support", name: "Substance Abuse Recovery Support", status: "Adopted — not yet enrolling", lead: "Levi Spears (CEO)", mode: "generic",
+  slug: "recovery-support", name: "Substance Abuse Recovery Support", status: "Active", lead: "Levi Spears (CEO)", mode: "generic",
   driveUrl: "https://drive.google.com/drive/folders/1NkrciZ9PG_7mEmVxbbs4VN42U3rOL4TU",
   guardrail: "",
   users: [

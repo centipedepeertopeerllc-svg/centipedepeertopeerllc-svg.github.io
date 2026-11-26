@@ -1,5 +1,5 @@
 window.PROGRAM_CONFIG = {
-  slug: "hygiene-outreach", name: "Hygiene Outreach", status: "In Development", lead: "Levi Spears (CEO)", mode: "generic",
+  slug: "hygiene-outreach", name: "Hygiene Outreach", status: "Active", lead: "Levi Spears (CEO)", mode: "generic",
   driveUrl: "https://drive.google.com/drive/folders/1VF3jT1WmMJQQYuy2wz6LHDBBLIBPDU5R",
   guardrail: "",
   users: [
