@@ -442,6 +442,7 @@
     }
     addPasswordToggles(form);
     document.querySelectorAll(".auth-restart").forEach((b) => b.addEventListener("click", () => location.reload()));
+    setupPasskeyLogin();
     showStep("login");
   }
   function restoreSession() {
@@ -458,6 +459,7 @@
   /* ---------------- admin: user access panel ---------------- */
   function renderAdminUi(user) {
     if (!user || !user.admin) return;
+    renderPasskeyUi(user);
     const headerUser = document.querySelector(".header-user");
     if (!headerUser || document.getElementById("auth-admin-btn")) return;
     const btn = document.createElement("button");
@@ -517,6 +519,286 @@
     const msg = $("auth-admin-msg");
     if (msg) msg.innerHTML = "<p class=\"auth-temp-once\">2FA reset for <strong>" + esc(user.name) + "</strong> (" + esc(user.username) + "). They will set up their authenticator app again at their next sign-in.</p>";
     renderAdminList();
+  }
+
+
+  /* ---------------- Levi-only Face ID (passkey) sign-in ----------------
+     Nov 26, 2026 (Jarvis, at the CEO's direct order): extra protection
+     for the portals beyond the password, for the CEO's phone. ONLY the
+     user levi.spears gets this — no other user sees the enrollment
+     offer or the Face ID button, and nobody else's sign-in changes.
+
+     How it works in this local-mode architecture (static pages, no
+     server):
+     - Enrollment (offered only when levi.spears is signed in): the
+       browser runs WebAuthn with a PLATFORM authenticator (Face ID on
+       his iPhone) and user verification required. The authenticator's
+       private key never leaves the phone's secure hardware / iCloud
+       Keychain. What this code stores is only the credential ID and
+       the PUBLIC key, in a localStorage record under the key
+       "cpp.passkey.levi.v1".
+     - That record key is deliberately NOT the per-dashboard user
+       store: localStorage is shared by every page on this origin
+       (centipedepeertopeerllc-svg.github.io), so ONE enrollment on a
+       device covers EVERY dashboard on that device in that browser.
+       It is still per device and per browser — a new phone, a new
+       browser, or cleared site data needs a fresh enrollment, done by
+       Levi himself while signed in with his password. The Dec 1, 2026
+       server-side sign-in build is what will make this fleet-wide.
+     - Sign-in: the login step shows "Sign in with Face ID" when a
+       passkey record exists on this device. The assertion is verified
+       in full on the device with WebCrypto: challenge match, origin
+       match, rpId hash match, user-presence AND user-verification
+       flags set, signature checked against the stored public key,
+       and the signature counter must not go backwards. On success it
+       is treated exactly like his password sign-in (passwordOnlyUser
+       flow — no authenticator code for the CEO).
+     - Fallbacks are untouched: password sign-in works exactly as
+       before, levi.recovery is unchanged, and removing Face ID from
+       this device (button in the Face ID panel) never locks him out.
+     - HONEST LIMIT: with no server, the stored public key lives in
+       the same browser storage as the local password hashes. Someone
+       with unlocked access to the device AND its browser data could
+       tamper with that record — the same trust level as the existing
+       local-mode password store, not a higher one. The private key
+       itself, however, is real hardware-backed WebAuthn: a copied
+       record alone cannot sign in from another device, because the
+       signature can only be produced by the enrolled authenticator
+       after Face ID. Do not describe this as server-grade passkey
+       verification; it is the strongest sound check this static
+       architecture supports. */
+  const PASSKEY_USER = "levi.spears";
+  const PASSKEY_STORE_KEY = "cpp.passkey.levi.v1";
+  function passkeySupported() {
+    return !!(window.PublicKeyCredential && navigator.credentials && navigator.credentials.create && navigator.credentials.get && window.crypto && crypto.subtle);
+  }
+  function bufToB64url(buf) {
+    const bytes = new Uint8Array(buf);
+    let s = "";
+    for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+    return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+  function b64urlToBuf(str) {
+    const b64 = String(str).replace(/-/g, "+").replace(/_/g, "/") + "===".slice((String(str).length + 3) % 4);
+    const bin = atob(b64);
+    const out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out.buffer;
+  }
+  function loadPasskey() {
+    try {
+      const raw = localStorage.getItem(PASSKEY_STORE_KEY);
+      if (!raw) return null;
+      const p = JSON.parse(raw);
+      if (p && p.username === PASSKEY_USER && p.credId && p.jwk) return p;
+    } catch { /* unreadable record — treat as not enrolled */ }
+    return null;
+  }
+  function savePasskey(rec) {
+    try { localStorage.setItem(PASSKEY_STORE_KEY, JSON.stringify(rec)); } catch { /* storage blocked — enrollment simply does not persist */ }
+  }
+  function clearPasskey() {
+    try { localStorage.removeItem(PASSKEY_STORE_KEY); } catch { /* nothing to clear */ }
+  }
+  /* Minimal CBOR reader — just enough to read the attestation object
+     and the COSE public key out of authenticator data at enrollment. */
+  function cborDecode(bytes) {
+    let pos = 0;
+    function readLen(ai) {
+      if (ai < 24) return ai;
+      if (ai === 24) return bytes[pos++];
+      if (ai === 25) { const v = (bytes[pos] << 8) | bytes[pos + 1]; pos += 2; return v; }
+      if (ai === 26) { const v = ((bytes[pos] << 24) | (bytes[pos + 1] << 16) | (bytes[pos + 2] << 8) | bytes[pos + 3]) >>> 0; pos += 4; return v; }
+      if (ai === 27) { let v = 0; for (let i = 0; i < 8; i++) v = v * 256 + bytes[pos++]; return v; }
+      throw new Error("cbor length");
+    }
+    function item() {
+      const b = bytes[pos++];
+      const mt = b >> 5;
+      const ai = b & 31;
+      if (mt === 0) return readLen(ai);
+      if (mt === 1) return -1 - readLen(ai);
+      if (mt === 2) { const n = readLen(ai); const v = bytes.slice(pos, pos + n); pos += n; return v; }
+      if (mt === 3) { const n = readLen(ai); const v = new TextDecoder().decode(bytes.slice(pos, pos + n)); pos += n; return v; }
+      if (mt === 4) { const n = readLen(ai); const a = []; for (let i = 0; i < n; i++) a.push(item()); return a; }
+      if (mt === 5) { const n = readLen(ai); const m = new Map(); for (let i = 0; i < n; i++) { const k = item(); m.set(k, item()); } return m; }
+      if (mt === 7) { if (ai === 20) return false; if (ai === 21) return true; if (ai === 22) return null; }
+      throw new Error("cbor type");
+    }
+    return item();
+  }
+  function coseKeyFromAuthData(authData) {
+    // authData layout: rpIdHash(32) flags(1) signCount(4) aaguid(16)
+    // credIdLen(2) credId(n) then the COSE public key (CBOR map).
+    const credIdLen = (authData[53] << 8) | authData[54];
+    const cose = cborDecode(authData.slice(55 + credIdLen));
+    const kty = cose.get(1);
+    const alg = cose.get(3);
+    if (kty === 2) {
+      return { alg, jwk: { kty: "EC", crv: "P-256", x: bufToB64url(cose.get(-2)), y: bufToB64url(cose.get(-3)), ext: true } };
+    }
+    if (kty === 3) {
+      return { alg, jwk: { kty: "RSA", n: bufToB64url(cose.get(-1)), e: bufToB64url(cose.get(-2)), ext: true } };
+    }
+    throw new Error("unsupported authenticator key type");
+  }
+  function derToRawSig(der) {
+    // WebCrypto wants the raw r||s form; authenticators return DER.
+    let pos = 0;
+    if (der[pos++] !== 0x30) throw new Error("signature form");
+    let len = der[pos++];
+    if (len & 0x80) { const nb = len & 0x7f; len = 0; for (let i = 0; i < nb; i++) len = len * 256 + der[pos++]; }
+    function readInt() {
+      if (der[pos++] !== 0x02) throw new Error("signature form");
+      const l = der[pos++];
+      let v = der.slice(pos, pos + l);
+      pos += l;
+      while (v.length > 32) v = v.slice(1);
+      const out = new Uint8Array(32);
+      out.set(v, 32 - v.length);
+      return out;
+    }
+    const raw = new Uint8Array(64);
+    raw.set(readInt(), 0);
+    raw.set(readInt(), 32);
+    return raw;
+  }
+  async function enrollPasskey() {
+    const msg = $("auth-passkey-msg");
+    try {
+      const challenge = crypto.getRandomValues(new Uint8Array(32));
+      const cred = await navigator.credentials.create({
+        publicKey: {
+          challenge,
+          rp: { id: location.hostname, name: "Centipede Peer to Peer, LLC" },
+          user: { id: new TextEncoder().encode(PASSKEY_USER), name: PASSKEY_USER, displayName: "Levi Spears" },
+          pubKeyCredParams: [{ type: "public-key", alg: -7 }, { type: "public-key", alg: -257 }],
+          authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required", residentKey: "preferred" },
+          attestation: "none",
+          timeout: 60000
+        }
+      });
+      if (!cred) throw new Error("no credential returned");
+      const attObj = cborDecode(new Uint8Array(cred.response.attestationObject));
+      const key = coseKeyFromAuthData(new Uint8Array(attObj.get("authData")));
+      savePasskey({ username: PASSKEY_USER, credId: bufToB64url(cred.rawId), alg: key.alg, jwk: key.jwk, signCount: 0, enrolledAt: new Date().toISOString() });
+      if (msg) msg.innerHTML = "<p class=\"auth-temp-once\">Face ID is set up on this device. On this device, in this browser, every Centipede dashboard will now offer <strong>Sign in with Face ID</strong> for levi.spears. Your password still works exactly as before.</p>";
+      refreshPasskeyPanel();
+    } catch (err) {
+      if (msg) msg.innerHTML = "<p class=\"auth-temp-once\">Face ID setup did not finish" + (err && err.name === "NotAllowedError" ? " — it was cancelled or timed out" : "") + ". Nothing was changed; your password sign-in is untouched. You can try setup again whenever you are ready.</p>";
+    }
+  }
+  async function passkeySignIn() {
+    const rec = loadPasskey();
+    if (!rec) return;
+    const unameEl = $("login-username");
+    const typed = unameEl ? unameEl.value.trim().toLowerCase() : "";
+    if (typed && typed !== PASSKEY_USER) {
+      setError("Face ID on this device is set up for levi.spears only. Clear the username box, or type levi.spears, to use it — or sign in with a password as usual.");
+      return;
+    }
+    try {
+      const challenge = crypto.getRandomValues(new Uint8Array(32));
+      const assertion = await navigator.credentials.get({
+        publicKey: {
+          challenge,
+          rpId: location.hostname,
+          timeout: 60000,
+          userVerification: "required",
+          allowCredentials: [{ type: "public-key", id: b64urlToBuf(rec.credId) }]
+        }
+      });
+      if (!assertion) return;
+      const resp = assertion.response;
+      const clientData = JSON.parse(new TextDecoder().decode(resp.clientDataJSON));
+      if (clientData.type !== "webauthn.get") throw new Error("client type");
+      if (clientData.challenge !== bufToB64url(challenge)) throw new Error("challenge mismatch");
+      if (clientData.origin !== location.origin) throw new Error("origin mismatch");
+      const authData = new Uint8Array(resp.authenticatorData);
+      const rpHash = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(location.hostname)));
+      let rpOk = authData.length >= 37;
+      for (let i = 0; rpOk && i < 32; i++) rpOk = authData[i] === rpHash[i];
+      if (!rpOk) throw new Error("rpId hash mismatch");
+      const flags = authData[32];
+      if (!(flags & 0x01)) throw new Error("user presence flag missing");
+      if (!(flags & 0x04)) throw new Error("user verification flag missing");
+      const signCount = ((authData[33] << 24) | (authData[34] << 16) | (authData[35] << 8) | authData[36]) >>> 0;
+      if (rec.signCount && signCount && signCount <= rec.signCount) throw new Error("signature counter went backwards");
+      const clientHash = new Uint8Array(await crypto.subtle.digest("SHA-256", resp.clientDataJSON));
+      const signed = new Uint8Array(authData.length + clientHash.length);
+      signed.set(authData, 0);
+      signed.set(clientHash, authData.length);
+      const isRsa = rec.alg === -257;
+      const key = await crypto.subtle.importKey("jwk", rec.jwk, isRsa ? { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" } : { name: "ECDSA", namedCurve: "P-256" }, false, ["verify"]);
+      let sig = new Uint8Array(resp.signature);
+      if (!isRsa) sig = derToRawSig(sig);
+      const ok = await crypto.subtle.verify(isRsa ? { name: "RSASSA-PKCS1-v1_5" } : { name: "ECDSA", hash: "SHA-256" }, key, sig, signed);
+      if (!ok) throw new Error("signature did not verify");
+      if (signCount) { rec.signCount = signCount; savePasskey(rec); }
+      const user = findUser(PASSKEY_USER);
+      if (!user) { setError("That account is not in this dashboard's sign-in list on this device. Sign in with your password instead."); return; }
+      if (unameEl && !typed) unameEl.value = PASSKEY_USER;
+      CTX.pending = user;
+      afterPassword(user);
+    } catch (err) {
+      if (err && err.name === "NotAllowedError") { setError("Face ID was cancelled or timed out. Nothing was changed — your password still works below."); return; }
+      setError("Face ID sign-in could not be verified on this device. Nothing was changed — your password still works below.");
+    }
+  }
+  function setupPasskeyLogin() {
+    if (!passkeySupported() || !loadPasskey()) return;
+    const step = $("auth-step-login");
+    if (!step || document.getElementById("auth-passkey-btn")) return;
+    const wrap = document.createElement("div");
+    wrap.className = "auth-passkey-row";
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.id = "auth-passkey-btn";
+    btn.className = "btn-small";
+    btn.textContent = "Sign in with Face ID";
+    btn.addEventListener("click", () => passkeySignIn());
+    wrap.appendChild(btn);
+    const hint = document.createElement("p");
+    hint.className = "hint";
+    hint.textContent = "For levi.spears, on this device only. Your password still works.";
+    wrap.appendChild(hint);
+    step.appendChild(wrap);
+  }
+  function renderPasskeyUi(user) {
+    if (!user || user.username !== PASSKEY_USER || !passkeySupported()) return;
+    if (document.getElementById("auth-passkey-panel")) { refreshPasskeyPanel(); return; }
+    const header = document.querySelector(".app-header");
+    if (!header || !header.parentNode) return;
+    const panel = document.createElement("section");
+    panel.id = "auth-passkey-panel";
+    panel.className = "panel";
+    panel.innerHTML = "<h2>Face ID sign-in — this device</h2>"
+      + "<p class=\"hint\">Extra protection beyond your password, for your phone. Setting Face ID up here, on this device in this browser, turns on the <strong>Sign in with Face ID</strong> button on every Centipede dashboard on this device — one setup covers them all. The private key never leaves your phone. Your password, and levi.recovery, keep working exactly as before, and removing Face ID here never locks you out.</p>"
+      + "<div id=\"auth-passkey-msg\"></div>"
+      + "<div id=\"auth-passkey-actions\"></div>";
+    header.parentNode.insertBefore(panel, header.nextSibling);
+    refreshPasskeyPanel();
+  }
+  function refreshPasskeyPanel() {
+    const actions = $("auth-passkey-actions");
+    if (!actions) return;
+    actions.innerHTML = "";
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn-small";
+    if (loadPasskey()) {
+      btn.textContent = "Remove Face ID from this device";
+      btn.addEventListener("click", () => {
+        clearPasskey();
+        const msg = $("auth-passkey-msg");
+        if (msg) msg.innerHTML = "<p class=\"auth-temp-once\">Face ID was removed from this device. Your password sign-in is unchanged.</p>";
+        refreshPasskeyPanel();
+      });
+    } else {
+      btn.textContent = "Set up Face ID sign-in on this device";
+      btn.addEventListener("click", () => enrollPasskey());
+    }
+    actions.appendChild(btn);
   }
 
   window.CPPAuth = {
