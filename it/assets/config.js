@@ -40,7 +40,7 @@ window.IT_CONFIG = {
     { address: "tom.centipedepeertopeer.llc@gmail.com", holder: "Tom Clark", role: "Peer Support Administrator", status: "Live — Temporary password reset Nov 26, 2026 — re-issued to CEO; starts Nov 28" },
     { address: "eric.hr.centipedepeertopeer.llc@gmail.com", holder: "Eric Jacobson", role: "Human Resources", status: "Live" },
     { address: "junior.centipedepeertopeer.llc@gmail.com", holder: "Levi Spears (Junior)", role: "Field Team Member", status: "Live" },
-    { address: "Portal account — amanda.spears", holder: "Amanda Spears", role: "Women Helping Women — Program Lead", status: "Reset directed Nov 26, 2026" },
+    { address: "Portal account — amanda.spears", holder: "Amanda Spears", role: "Women Helping Women — Program Lead", status: "Temporary password reset Nov 26, 2026 — re-issued to CEO" },
     { address: "office@centipedepeertopeer.llc", holder: "Centipede Peer to Peer, LLC (the office itself)", role: "Main office mailbox — all office mail copies to levi@", status: "Planned — December 1, 2026" },
     { address: "levi@centipedepeertopeer.llc", holder: "Levi Allen Spears", role: "Chief Executive Officer", status: "Planned — December 1, 2026" },
     { address: "jarvis@centipedepeertopeer.llc", holder: "Jarvis", role: "Board Officer — IT", status: "Planned — December 1, 2026" },
