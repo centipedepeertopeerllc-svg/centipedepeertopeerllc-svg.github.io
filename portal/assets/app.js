@@ -182,6 +182,7 @@ function enterApp() {
   renderCalendar();
   renderRequests();
   if (window.CPPBoard) CPPBoard.render(state.user);
+  if (window.CPPITBulletin) CPPITBulletin.render(state.user);
   $("logout-btn").addEventListener("click", () => { try { CPPAuth.signOut(); } catch { location.reload(); } });
 }
 

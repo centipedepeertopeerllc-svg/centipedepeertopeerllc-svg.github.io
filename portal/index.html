@@ -218,6 +218,23 @@
         <div id="board-manage"></div>
       </div>
     </section>
+    <section class="panel board-panel" id="it-bulletin-panel" hidden>
+      <div class="board-head">
+        <h2>IT Bulletin</h2>
+        <span class="board-sub">Centipede Peer to Peer, LLC · IT — for Levi and Jarvis</span>
+      </div>
+      <p class="hint">The latest from the IT Dashboard — systems status, security, and open items — right here, without opening the dashboard. Shown only to Levi and Jarvis, the same access as the IT Dashboard itself.</p>
+      <ul id="it-feed-list" class="note-list"></ul>
+      <p class="hint" id="it-feed-note"></p>
+      <div id="it-feed-composer" hidden>
+        <form id="it-feed-form">
+          <label>New IT bulletin <input id="it-feed-text" type="text" maxlength="300" required></label>
+          <button type="submit" class="btn-navy">Post to the IT Bulletin</button>
+          <span id="it-feed-msg" class="hint" role="status"></span>
+        </form>
+      </div>
+      <p class="hint"><a href="https://centipedepeertopeerllc-svg.github.io/it/">Open the IT Dashboard &rarr;</a></p>
+    </section>
     <section class="panel" id="main-panel">
       <h2>Company Notice</h2>
       <div style="display:flex;gap:14px;align-items:center;border:1px solid #b8933a;background:#fdf6dd;border-radius:10px;padding:12px;margin-bottom:1rem;">
@@ -387,6 +404,7 @@
 <script src="assets/auth.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/board.js"></script>
+<script src="assets/it-bulletin.js"></script>
 
   <section class="panel"><h2>Centipede on Facebook</h2>
 <p class="hint">The company's public Facebook Page — daily posts, program news, and events — right here in the portal. To post, comment, or manage the Page, open it in Facebook: <a href="https://www.facebook.com/profile.php?id=100064765000378" target="_blank" rel="noopener">Centipede Peer To Peer.LLC on Facebook</a>.</p>
