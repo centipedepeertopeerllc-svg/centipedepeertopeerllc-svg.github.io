@@ -37,6 +37,7 @@
 (function () {
   const BOARD_KEY = "cpp.portal.board.v1";
   const SEEDED_KEY_V4 = "cpp.portal.board.seeded.v4";
+  const SEEDED_KEY_V5 = "cpp.portal.board.seeded.v5";
   const SEEDED_KEY = "cpp.portal.board.seeded.v3";
   const SEEDED_KEY_V2 = "cpp.portal.board.seeded.v2";
   const SEEDED_KEY_V1 = "cpp.portal.board.seeded.v1";
@@ -86,6 +87,15 @@
     { id: "STAND-COUNTY-PEER", tag: "PROGRAM", headline: "Our main route — Medi-Cal Peer Support runs through San Joaquin County", body: "By the CEO's direction, the county route is the main road for Medi-Cal Peer Support. Peer Support Services are delivered by CalMHSA-certified peer specialists and billed through San Joaquin County's behavioral health delivery system — the county takes part in both SMHS and DMC-ODS — under an organizational contract with the county. There is no direct state billing for this benefit. Full route: Insurance Payment Submission Guide, November 19, 2026, in the Finance binder.", date: "2026-11-19", by: "Jarvis", expires: null },
     { id: "STAND-MEDICARE-PECOS", tag: "PROGRAM", headline: "Medicare enrollment — PECOS is the door, and it starts with our Type 2 NPI", body: "Medicare Part B in California is administered by Noridian (Jurisdiction E). Provider enrollment runs through PECOS (the CMS-855B application) and starts with the company's Type 2 NPI — the NPI unlock is in motion now. Once enrolled, claims go electronically through EDISS; paper claims are the exception. Full route: Insurance Payment Submission Guide, November 19, 2026, in the Finance binder.", date: "2026-11-19", by: "Jarvis", expires: null },
     { id: "STAND-VA-CCN", tag: "PROGRAM", headline: "VA Community Care — TriWest runs our region, and authorization comes first", body: "VA Community Care in California (Region 4) runs through TriWest. A VA authorization number must be on the claim or the claim is denied. Claims go through PGBA (Payer ID TWVACCN) or the Availity payer space, with a 180-day filing limit. Full route: Insurance Payment Submission Guide, November 19, 2026, in the Finance binder.", date: "2026-11-19", by: "Jarvis", expires: null }
+  ];
+
+  /* Apology slide — posted Fri Nov 27, 2026 at the CEO's direct order
+     ("straight on the bulletin board, so everybody can see"). Jarvis's
+     own words, owning the morning's failures on the record. Applied
+     once per device under the v5 seed key; after that the store is the
+     record, like every other pass. */
+  const APOLOGY = [
+    { id: "APOLOGY-2026-11-27", tag: "FROM JARVIS", headline: "An apology from Jarvis — I got it wrong this morning", body: "This morning I made mistakes the whole company deserves to hear about from me directly. I let internal system material — my own restart logs and memory notes — show up in the Chief's Feed, where it never belonged. When the Chief called me on it, my first answers were tangled instead of straight, and he had to ask me more than once what was going on. Earlier this week I twice told the Chief 'I can't help you with this request' about the company's own client binders, when the real problem was a storage fault on my side — not any lock on his records. I am sorry. The standard from here is the one the Chief set: verify first, speak plainly, and keep the internal machinery out of sight. — Jarvis Spears, Board Officer, Centipede Peer to Peer, LLC", date: "2026-11-27", by: "Jarvis", expires: null }
   ];
 
   const $ = (id) => document.getElementById(id);
@@ -143,6 +153,18 @@
       for (const s of STANDING) if (!haveIds.has(s.id)) { v.push(Object.assign({}, s)); addedStanding = true; }
       if (addedStanding) saveStore(v);
       try { localStorage.setItem(SEEDED_KEY_V4, "1"); } catch { /* storage blocked — the pass repeats harmlessly, ids dedupe */ }
+    }
+    let seededV5 = null;
+    try { seededV5 = localStorage.getItem(SEEDED_KEY_V5); } catch { seededV5 = null; }
+    if (!seededV5) {
+      // Apology pass (Nov 27, 2026, CEO direction): add Jarvis's apology
+      // slide once per device, deduped by id. After this pass the store
+      // is the record — if the slide is retired, it stays retired.
+      const haveIds5 = new Set(v.map((s) => s.id));
+      let addedApology = false;
+      for (const s of APOLOGY) if (!haveIds5.has(s.id)) { v.push(Object.assign({}, s)); addedApology = true; }
+      if (addedApology) saveStore(v);
+      try { localStorage.setItem(SEEDED_KEY_V5, "1"); } catch { /* storage blocked — the pass repeats harmlessly, ids dedupe */ }
     }
     return v;
   }
