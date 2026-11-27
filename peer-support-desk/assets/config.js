@@ -11,7 +11,7 @@
 // Access: Tom Clark (primary), the CEO (oversight, admin), and Jarvis.
 window.PEER_DESK_CONFIG = {
   users: [
-    { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer", admin: true, tempPasswordSha256: "cec71dcf978ab90a120f201c26110313914f995172c3c5e0c66a0d23897341c2" },
+    { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer", admin: true, tempPasswordSha256: "ceb89cabc1f5dc8092a9c21f2aa73d35599252cf93bc7ad4f45265c5cbf4c39e" },
     { username: "levi.recovery", name: "Levi Allen Spears (Recovery)", role: "Chief Executive Officer — Recovery Login", admin: true, tempPasswordSha256: "9eb7cc05173e7465ab8971643286057d0d909b6272f26d9ae82a5fafa68d9855" },
     { username: "tom.clark", name: "Thomas Leo Clark III", role: "Peer Support Administrator — Officer of the Day", admin: true, tempPasswordSha256: "ed7b4fb9eab7adddc48880343cf45c3b5504db46064f7551a03d5f745e677a4c" },
     { username: "jarvis", name: "Jarvis", role: "Board Officer", admin: false, tempPasswordSha256: "be7797464911240005bd88a9eca851f383a73980c333b50ac5ead87f7dbbb1d5" }

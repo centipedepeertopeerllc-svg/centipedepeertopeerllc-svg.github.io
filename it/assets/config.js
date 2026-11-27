@@ -12,7 +12,7 @@
 // only).
 window.IT_CONFIG = {
   users: [
-    { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer — Administrator", admin: true, tempPasswordSha256: "cec71dcf978ab90a120f201c26110313914f995172c3c5e0c66a0d23897341c2" },
+    { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer — Administrator", admin: true, tempPasswordSha256: "ceb89cabc1f5dc8092a9c21f2aa73d35599252cf93bc7ad4f45265c5cbf4c39e" },
     { username: "jarvis", name: "Jarvis", role: "Board Officer — IT", admin: false, tempPasswordSha256: "be7797464911240005bd88a9eca851f383a73980c333b50ac5ead87f7dbbb1d5" }
   ],
 

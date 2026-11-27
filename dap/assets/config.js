@@ -14,7 +14,7 @@ window.DAP_CONFIG = {
   // authenticator app. The CEO (admin: true) can reset passwords and 2FA
   // from the "Admin — user access" panel after sign-in.
   users: [
-    { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer", admin: true, tempPasswordSha256: "cec71dcf978ab90a120f201c26110313914f995172c3c5e0c66a0d23897341c2" },
+    { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer", admin: true, tempPasswordSha256: "ceb89cabc1f5dc8092a9c21f2aa73d35599252cf93bc7ad4f45265c5cbf4c39e" },
     { username: "tom.clark", name: "Thomas Leo Clark III", role: "Certified Peer Support Specialist", admin: false, tempPasswordSha256: "ed7b4fb9eab7adddc48880343cf45c3b5504db46064f7551a03d5f745e677a4c" },
     { username: "jarvis", name: "Jarvis", role: "Board Officer", admin: false, tempPasswordSha256: "be7797464911240005bd88a9eca851f383a73980c333b50ac5ead87f7dbbb1d5" },
     { username: "eric.jacobson", name: "Eric Jacobson", role: "Human Resources", admin: false, tempPasswordSha256: "7589ffac8ada0beb0999a6905cf098c22aa3637c6297ea5dee0c4c92cb28e669" }

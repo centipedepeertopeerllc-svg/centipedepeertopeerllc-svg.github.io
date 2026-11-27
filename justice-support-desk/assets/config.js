@@ -16,7 +16,7 @@
 // carry for each person, so the Portal-wide sign-in agreement holds.
 window.JUSTICE_DESK_CONFIG = {
   users: [
-    { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer", admin: true, tempPasswordSha256: "cec71dcf978ab90a120f201c26110313914f995172c3c5e0c66a0d23897341c2" },
+    { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer", admin: true, tempPasswordSha256: "ceb89cabc1f5dc8092a9c21f2aa73d35599252cf93bc7ad4f45265c5cbf4c39e" },
     { username: "levi.recovery", name: "Levi Allen Spears (Recovery)", role: "Chief Executive Officer — Recovery Login", admin: true, tempPasswordSha256: "9eb7cc05173e7465ab8971643286057d0d909b6272f26d9ae82a5fafa68d9855" },
     { username: "amber.bellante", name: "Amber Bellante", role: "Counsel — Legal Department / Justice Support Program", admin: false, tempPasswordSha256: "ab35e5ad31d4fd4fe4f3853eca29f4794b1fd31701a19a62bbde10cc556a75f4" },
     { username: "tom.clark", name: "Thomas Leo Clark III", role: "Certified Peer Support Specialist — Justice Support Center", admin: false, tempPasswordSha256: "ed7b4fb9eab7adddc48880343cf45c3b5504db46064f7551a03d5f745e677a4c" }

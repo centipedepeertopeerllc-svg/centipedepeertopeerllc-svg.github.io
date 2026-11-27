@@ -381,7 +381,7 @@
   }
   function mount(opts) {
     // Nov 20, 2026 (Jarvis, at the CEO's direction): the store key carries
-    // a revision suffix (".r9" as of the Nov 25, 2026 reset #5) so every
+    // a revision suffix (".r10" as of the Nov 26, 2026 reset #6) so every
     // device starts from a clean seed. The old device stores held stale
     // password state that a central temporary-password reset could not
     // reach (the seed only applied to devices with no store), which
@@ -391,10 +391,10 @@
     // deliberately does NOT bump this suffix — existing device stores,
     // and the own passwords people already set on them, carry over.
     CTX = {
-      storeKey: opts.storeKey + ".r9",
+      storeKey: opts.storeKey + ".r10",
       sessionKey: opts.sessionKey,
       onSignIn: opts.onSignIn,
-      store: loadStore(opts.storeKey + ".r9", opts.seedUsers),
+      store: loadStore(opts.storeKey + ".r10", opts.seedUsers),
       step: "login",
       pending: null,
       pendingSecret: null
