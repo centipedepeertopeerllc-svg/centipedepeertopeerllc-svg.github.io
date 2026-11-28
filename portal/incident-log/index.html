@@ -41,6 +41,20 @@
 <div class="paper">
 <h1>CEO INCIDENT LOG</h1>
 <div class="sub">The Chief Executive Officer's own log &mdash; the Kelly Scott incident, Friday, November 27, 2026</div>
+<h2>Incident Reports &mdash; your folder</h2>
+<p>Every incident gets its own report, right here in your dashboard. Tonight&rsquo;s report is below, in full. If another incident ever happens, start its report here &mdash; it is captured as you write it, it stays in this folder, and you pull it back up right here, any time. Nothing here needs a password.</p>
+<div style="background:#f7f1da;border:1px solid #d8c98a;border-radius:10px;padding:14px 16px;margin:10px 0 18px 0;">
+<div style="font-family:Helvetica,Arial,sans-serif;font-weight:bold;margin-bottom:8px;">Start a new incident report</div>
+<label style="font-family:Helvetica,Arial,sans-serif;font-size:.9rem;">What is this incident? (a short title)<br><input id="ni-title" type="text" style="width:100%;padding:9px;border:1px solid #b9a44f;border-radius:6px;margin:4px 0 10px 0;font-size:1rem;"></label>
+<label style="font-family:Helvetica,Arial,sans-serif;font-size:.9rem;">Date and time<br><input id="ni-when" type="text" style="width:100%;padding:9px;border:1px solid #b9a44f;border-radius:6px;margin:4px 0 10px 0;font-size:1rem;"></label>
+<label style="font-family:Helvetica,Arial,sans-serif;font-size:.9rem;">Where<br><input id="ni-where" type="text" style="width:100%;padding:9px;border:1px solid #b9a44f;border-radius:6px;margin:4px 0 10px 0;font-size:1rem;"></label>
+<label style="font-family:Helvetica,Arial,sans-serif;font-size:.9rem;">Who is involved<br><input id="ni-who" type="text" style="width:100%;padding:9px;border:1px solid #b9a44f;border-radius:6px;margin:4px 0 10px 0;font-size:1rem;"></label>
+<label style="font-family:Helvetica,Arial,sans-serif;font-size:.9rem;">What happened<br><textarea id="ni-what" style="width:100%;min-height:90px;padding:9px;border:1px solid #b9a44f;border-radius:6px;margin:4px 0 10px 0;font-size:1rem;"></textarea></label>
+<button class="save" id="ni-create" type="button">Start this incident report</button>
+<p class="note" style="margin-top:.7rem;">A new report opens below with its own ongoing log, so you can keep adding to it as things happen &mdash; the same as tonight&rsquo;s log. Each report is kept on this device in this Portal until the December 1, 2026 server build, and Jarvis files every word into the company record when you say the word.</p>
+</div>
+<div id="incidents"></div>
+
 
 <h2>The incident, as recorded</h2>
 <table class="info">
@@ -112,6 +126,70 @@
     function done(){ var b = document.getElementById('copybtn'); var old = b.textContent; b.textContent = 'Copied — paste it to Jarvis'; setTimeout(function(){ b.textContent = old; }, 2500); }
     if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(out).then(done, done); }
     else { var ta = document.createElement('textarea'); ta.value = out; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch(e){} document.body.removeChild(ta); done(); }
+  });
+  render();
+})();
+</script>
+
+<script>
+(function(){
+  var KEY = 'cpp-incident-reports-v1';
+  function load(){ try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch(e){ return []; } }
+  function store(v){ localStorage.setItem(KEY, JSON.stringify(v)); }
+  function esc(t){ var d = document.createElement('div'); d.textContent = t || ''; return d.innerHTML; }
+  function stamp(){ return new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }); }
+  var whenEl = document.getElementById('ni-when');
+  if (whenEl && !whenEl.value) whenEl.value = stamp();
+  function render(){
+    var list = load(), host = document.getElementById('incidents');
+    host.innerHTML = '';
+    list.forEach(function(inc){
+      var div = document.createElement('div');
+      div.style.cssText = 'border:1.5px solid #14532d;border-radius:10px;padding:14px 16px;margin:0 0 18px 0;background:#fffef9;';
+      var entriesHtml = (inc.entries || []).map(function(e){
+        return '<div style="border-left:3px solid #dfc166;padding:4px 0 4px 10px;margin:8px 0;"><div style="font-family:Helvetica,Arial,sans-serif;font-size:.82rem;color:#666;">' + esc(e.ts) + '</div><div style="white-space:pre-wrap;">' + esc(e.text) + '</div></div>';
+      }).join('');
+      div.innerHTML = '<h2 style="margin-top:0;">Incident Report &mdash; ' + esc(inc.title) + '</h2>' +
+        '<table class="info"><tr><th>Date and time</th><td>' + esc(inc.when) + '</td></tr>' +
+        '<tr><th>Where</th><td>' + esc(inc.where) + '</td></tr>' +
+        '<tr><th>Who is involved</th><td>' + esc(inc.who) + '</td></tr>' +
+        '<tr><th>What happened</th><td style="white-space:pre-wrap;">' + esc(inc.what) + '</td></tr></table>' +
+        '<h2>Ongoing log &mdash; this incident</h2>' + entriesHtml +
+        '<textarea data-role="entry" style="width:100%;min-height:80px;padding:9px;border:1px solid #b9a44f;border-radius:6px;font-size:1rem;" placeholder="Add to this incident, in your own words..."></textarea>' +
+        '<div class="btnrow"><button class="save" type="button" data-act="add" data-id="' + inc.id + '">Add this entry</button>' +
+        '<button class="copy" type="button" data-act="copy" data-id="' + inc.id + '">Copy this whole report</button></div>';
+      host.appendChild(div);
+    });
+  }
+  document.getElementById('ni-create').addEventListener('click', function(){
+    var title = document.getElementById('ni-title').value.trim();
+    if (!title) { alert('Give the incident a short title first, Chief.'); return; }
+    var list = load();
+    list.unshift({ id: 'inc-' + Date.now(), title: title,
+      when: document.getElementById('ni-when').value.trim(),
+      where: document.getElementById('ni-where').value.trim(),
+      who: document.getElementById('ni-who').value.trim(),
+      what: document.getElementById('ni-what').value.trim(), entries: [] });
+    store(list);
+    document.getElementById('ni-title').value = ''; document.getElementById('ni-where').value = '';
+    document.getElementById('ni-who').value = ''; document.getElementById('ni-what').value = '';
+    render();
+  });
+  document.getElementById('incidents').addEventListener('click', function(ev){
+    var btn = ev.target.closest('button[data-act]'); if (!btn) return;
+    var list = load(), inc = null;
+    list.forEach(function(x){ if (x.id === btn.getAttribute('data-id')) inc = x; });
+    if (!inc) return;
+    if (btn.getAttribute('data-act') === 'add') {
+      var ta = btn.closest('div').parentElement.querySelector('textarea[data-role="entry"]');
+      var text = ta.value.trim(); if (!text) return;
+      inc.entries = inc.entries || []; inc.entries.push({ ts: stamp(), text: text });
+      store(list); render();
+    } else if (btn.getAttribute('data-act') === 'copy') {
+      var out = 'INCIDENT REPORT \u2014 ' + inc.title + '\nDate and time: ' + inc.when + '\nWhere: ' + inc.where + '\nWho is involved: ' + inc.who + '\nWhat happened: ' + inc.what + '\n\nLOG:\n' +
+        (inc.entries || []).map(function(e){ return '[' + e.ts + '] ' + e.text; }).join('\n');
+      if (navigator.clipboard) navigator.clipboard.writeText(out);
+    }
   });
   render();
 })();
