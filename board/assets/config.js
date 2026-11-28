@@ -10,7 +10,7 @@
 // 2026). Only SHA-256 hashes of the one-time temporary passwords are here.
 window.BOARD_CONFIG = {
   users: [
-    { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer — Board Chair", admin: true, tempPasswordSha256: "ceb89cabc1f5dc8092a9c21f2aa73d35599252cf93bc7ad4f45265c5cbf4c39e" },
+    { username: "levi.spears", name: "Levi Allen Spears", role: "Chief Executive Officer — Board Chair", admin: true, tempPasswordSha256: "a0352d5f19ef4e95fca276f013a538efd0a074587637606c25b5768f733f7578" },
     { username: "levi.recovery", name: "Levi Allen Spears (Recovery)", role: "Chief Executive Officer — Recovery Login", admin: true, tempPasswordSha256: "9eb7cc05173e7465ab8971643286057d0d909b6272f26d9ae82a5fafa68d9855" },
     { username: "monica.frishkorn", name: "Monica Frishkorn-Wellner", role: "Board Director", admin: false, tempPasswordSha256: "c32137c4d6594accb0cd8ce13f50472d8621f839cfcc5defb98c794d615966f3" },
     { username: "jeremy.hughes", name: "Jeremy Hughes", role: "Board Member", admin: false, tempPasswordSha256: "ff1e49ffde7e23625b84276021eeba74fe42e5b35fc649bb290ca347d7b1e783" },
