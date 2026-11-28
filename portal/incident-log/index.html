@@ -33,14 +33,30 @@
   .entry .when { font-family: Helvetica, Arial, sans-serif; font-size:.85rem; color:#55503f; margin-bottom:.3rem; }
   .entry .what { white-space:pre-wrap; line-height:1.5; }
   .note { font-family: Helvetica, Arial, sans-serif; font-size:.88rem; color:#444; background:#fdf6dd; border:1px solid var(--gold-dark); border-radius:8px; padding:.6rem .8rem; }
+
+  .fld { width:100%; box-sizing:border-box; font: inherit; font-size:1rem; padding:.55rem .6rem; border:1.5px solid #c9bd8f; border-radius:8px; background:#fffef9; margin:0 0 .6rem 0; }
+  .inc-card { border:2px solid #14532d; border-radius:12px; padding:1rem 1.1rem; margin:1rem 0; background:#fffdf4; }
+  .inc-card h3 { margin:.1rem 0 .4rem 0; font-size:1.15rem; }
+  .inc-meta { font-size:.92rem; color:#55503f; margin-bottom:.5rem; }
 </style>
 </head>
 <body>
 <div class="topbar"><a href="../">&larr; Back to the Portal</a> &nbsp;·&nbsp; Centipede Peer to Peer, LLC · LIC: 0714781 · Stockton, California</div>
 <main class="wrap">
 <div class="paper">
-<h1>CEO INCIDENT LOG</h1>
-<div class="sub">The Chief Executive Officer's own log &mdash; the Kelly Scott incident, Friday, November 27, 2026</div>
+<h1>INCIDENT REPORTS</h1>
+<div class="sub">The Chief Executive Officer&rsquo;s incident reports &mdash; Centipede Peer to Peer, LLC. Every incident gets its own report and its own folder in the company record. Everything you write here is captured and pulls back up right here, in your dashboard &mdash; nothing to worry about.</div>
+
+<h2>Start a new incident report</h2>
+<p>If something happens, start the report right here. Give it a title, where it happened, who was involved, and what happened &mdash; then keep adding entries as it unfolds. Each report you start lives below, above tonight&rsquo;s report, and stays until Jarvis files it into the company record.</p>
+<input class="fld" id="ni-title" type="text" placeholder="Title — what happened, in a few words">
+<input class="fld" id="ni-place" type="text" placeholder="Place — where it happened">
+<input class="fld" id="ni-people" type="text" placeholder="People involved">
+<textarea class="fld" id="ni-details" rows="4" placeholder="What happened — the details, in your own words"></textarea>
+<div class="btnrow"><button class="save" id="ni-start" type="button">Start this incident report</button></div>
+<div id="newreports"></div>
+
+<h2>Incident Report &mdash; Friday, November 27, 2026 &middot; Kelly Scott</h2>
 <h2>Incident Reports &mdash; your folder</h2>
 <p>Every incident gets its own report, right here in your dashboard. Tonight&rsquo;s report is below, in full. If another incident ever happens, start its report here &mdash; it is captured as you write it, it stays in this folder, and you pull it back up right here, any time. Nothing here needs a password.</p>
 <div style="background:#f7f1da;border:1px solid #d8c98a;border-radius:10px;padding:14px 16px;margin:10px 0 18px 0;">
@@ -190,6 +206,68 @@
         (inc.entries || []).map(function(e){ return '[' + e.ts + '] ' + e.text; }).join('\n');
       if (navigator.clipboard) navigator.clipboard.writeText(out);
     }
+  });
+  render();
+})();
+</script>
+
+<script>
+(function(){
+  var KEY = 'cpp-incident-reports-v1';
+  function load(){ try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch(e){ return []; } }
+  function store(v){ try { localStorage.setItem(KEY, JSON.stringify(v)); } catch(err){} }
+  function fmt(d){ return d.toLocaleString('en-US', { timeZone:'America/Los_Angeles', weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'numeric', minute:'2-digit', second:'2-digit' }) + ' Pacific'; }
+  var host = document.getElementById('newreports');
+  function render(){
+    var reps = load();
+    host.innerHTML = '';
+    reps.slice().reverse().forEach(function(rep, ri){
+      var idx = reps.length - 1 - ri;
+      var card = document.createElement('div'); card.className = 'inc-card';
+      var h = document.createElement('h3'); h.textContent = rep.title; card.appendChild(h);
+      var meta = document.createElement('div'); meta.className = 'inc-meta';
+      meta.textContent = 'Started ' + rep.started + (rep.place ? ' · Place: ' + rep.place : '') + (rep.people ? ' · People: ' + rep.people : '');
+      card.appendChild(meta);
+      if (rep.details) { var det = document.createElement('div'); det.textContent = rep.details; card.appendChild(det); }
+      var list = document.createElement('div');
+      rep.entries.slice().reverse().forEach(function(en){
+        var d = document.createElement('div'); d.className = 'entry';
+        var w = document.createElement('div'); w.className = 'when'; w.textContent = en.when;
+        var t = document.createElement('div'); t.className = 'what'; t.textContent = en.text;
+        d.appendChild(w); d.appendChild(t); list.appendChild(d);
+      });
+      card.appendChild(list);
+      var ta = document.createElement('textarea'); ta.placeholder = 'Add an entry to this report...'; ta.id = 'ni-box-' + idx;
+      card.appendChild(ta);
+      var row = document.createElement('div'); row.className = 'btnrow';
+      var add = document.createElement('button'); add.className = 'save'; add.type = 'button'; add.textContent = 'Add this entry';
+      add.addEventListener('click', function(){
+        var text = ta.value.trim(); if (!text) { ta.focus(); return; }
+        var reps2 = load(); reps2[idx].entries.push({ when: fmt(new Date()), text: text }); store(reps2); render();
+      });
+      var cp = document.createElement('button'); cp.className = 'copy'; cp.type = 'button'; cp.textContent = 'Copy this whole report';
+      cp.addEventListener('click', function(){
+        var r = load()[idx];
+        var out = 'INCIDENT REPORT — ' + r.title + '\nStarted: ' + r.started + '\nPlace: ' + (r.place||'') + '\nPeople: ' + (r.people||'') + '\nWhat happened: ' + (r.details||'') + '\n';
+        r.entries.forEach(function(en){ out += '\n[' + en.when + '] ' + en.text; });
+        if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(out); }
+        cp.textContent = 'Copied — paste it to Jarvis'; setTimeout(function(){ cp.textContent = 'Copy this whole report'; }, 2600);
+      });
+      row.appendChild(add); row.appendChild(cp); card.appendChild(row);
+      host.appendChild(card);
+    });
+  }
+  document.getElementById('ni-start').addEventListener('click', function(){
+    var title = document.getElementById('ni-title').value.trim();
+    if (!title) { document.getElementById('ni-title').focus(); return; }
+    var reps = load();
+    reps.push({ title: title, started: fmt(new Date()),
+      place: document.getElementById('ni-place').value.trim(),
+      people: document.getElementById('ni-people').value.trim(),
+      details: document.getElementById('ni-details').value.trim(), entries: [] });
+    store(reps);
+    ['ni-title','ni-place','ni-people','ni-details'].forEach(function(id){ document.getElementById(id).value = ''; });
+    render();
   });
   render();
 })();
